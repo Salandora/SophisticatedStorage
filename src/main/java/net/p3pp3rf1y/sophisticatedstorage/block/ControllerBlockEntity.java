@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -16,7 +15,6 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public class ControllerBlockEntity extends ControllerBlockEntityBase implements ILockable, ICountDisplay, ITierDisplay, IUpgradeDisplay {
 	private long lastDepositTime = -100;
@@ -137,12 +135,6 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 	@Override
 	public List<Integer> getSlotCounts() {
 		return List.of();
-	}
-
-	@Nullable
-	@Override
-	public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-		return null;
 	}
 
 	@Override
