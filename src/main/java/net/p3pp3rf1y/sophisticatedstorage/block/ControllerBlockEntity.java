@@ -50,6 +50,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 			try (Transaction ctx = Transaction.openOuter()) {
 				long inserted = insert(ItemVariant.of(itemInHand), itemInHand.getCount(), ctx, false);
 				player.setItemInHand(hand, itemInHand.copyWithCount(itemInHand.getCount() - (int) inserted));
+				ctx.commit();
 			}
 		}
 	}
