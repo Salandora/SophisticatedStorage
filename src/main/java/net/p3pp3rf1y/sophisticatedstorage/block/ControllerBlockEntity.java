@@ -53,6 +53,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 				ItemStack copy = itemInHand.copy();
 				copy.setCount(itemInHand.getCount() - (int) inserted);
 				player.setItemInHand(hand, copy);
+				ctx.commit();
 			}
 		}
 	}
