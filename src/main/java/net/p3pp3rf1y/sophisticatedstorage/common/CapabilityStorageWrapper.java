@@ -1,5 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.common;
 
+
+import com.google.common.collect.MapMaker;
+
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.common.CapabilityWrapper;
@@ -11,12 +14,11 @@ import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
 
 import static net.p3pp3rf1y.sophisticatedcore.common.CapabilityWrapper.STORAGE_WRAPPER_CAPABILITY;
 
 public class CapabilityStorageWrapper {
-	private static final Map<ItemStack, StorageWrapper> cachedStorageWrappers = new WeakHashMap<>();
+	private static final Map<ItemStack, StorageWrapper> cachedStorageWrappers = new MapMaker().weakKeys().weakValues().makeMap();
 
 	public static Optional<StorageWrapper> get(ItemStack provider) {
 		return CapabilityWrapper.get(provider, StorageWrapper.class);
