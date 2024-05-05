@@ -44,8 +44,7 @@
         ]
     },
     "mixins": [
-        "sophisticatedstorage.mixins.json",
-        "compat/sophisticatedstorage.litematica.mixins.json"
+        "sophisticatedstorage.mixins.json"
     ],
     "accessWidener": "sophisticatedstorage.accesswidener",
     "depends": {
