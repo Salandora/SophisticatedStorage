@@ -25,7 +25,7 @@ public class ItemContentsStorage extends SavedData {
 	private ItemContentsStorage() {}
 
 	public static ItemContentsStorage get() {
-		if (SophisticatedCore.getCurrentServer() != null/* && SophisticatedCore.getCurrentServer().isSameThread()*/) {
+		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread()) {
 			ServerLevel overworld = SophisticatedCore.getCurrentServer().getLevel(Level.OVERWORLD);
 			//noinspection ConstantConditions - by this time overworld is loaded
 			DimensionDataStorage storage = overworld.getDataStorage();
