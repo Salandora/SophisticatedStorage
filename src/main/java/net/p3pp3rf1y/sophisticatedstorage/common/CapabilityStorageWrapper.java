@@ -24,7 +24,9 @@ public class CapabilityStorageWrapper {
 		return CapabilityWrapper.get(provider, StorageWrapper.class);
 	}
 
-	private CapabilityStorageWrapper() {}
+	public static void invalidateCache() {
+		cachedStorageWrappers.clear();
+	}
 
 	public static void register() {
 		ItemStorage.SIDED.registerForBlockEntities((be, dir) -> ((StorageBlockEntity) be).getCapability(ItemStorage.SIDED, dir), ModBlocks.BARREL_BLOCK_ENTITY_TYPE, ModBlocks.LIMITED_BARREL_BLOCK_ENTITY_TYPE, ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE, ModBlocks.CHEST_BLOCK_ENTITY_TYPE);
