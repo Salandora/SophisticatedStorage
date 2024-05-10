@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.common.CommonEventHandler;
+import net.p3pp3rf1y.sophisticatedstorage.compat.litematica.LitematicaCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
@@ -37,6 +38,7 @@ public class SophisticatedStorage implements ModInitializer {
 		ModParticles.registerParticles();
 
 		ModCompat.initCompats();
+		LitematicaCompat.alwaysInit();
 
 		StoragePacketHandler.init();
 		ModCompat.compatsSetup();
