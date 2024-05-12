@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
@@ -101,21 +103,47 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 				.flatMap(woodType -> WoodType.values().filter(wt -> wt.name().equals(woodType)).findFirst());
 	}
 
-	public static StorageWrapper initWrapper(ItemStack stack) {
-		UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
-		StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
+	public static ItemApiLookup.ItemApiProvider<LazyOptional<IStorageWrapper>, Void> initCapabilities() {
+		return new ItemApiLookup.ItemApiProvider<>() {
+			private IStorageWrapper wrapper = null;
+
 			@Override
-			protected boolean isAllowedInStorage(ItemStack stack) {
-				return false;
+			public LazyOptional<IStorageWrapper> find(ItemStack stack, Void context) {
+				if (stack.getCount() == 1) {
+					initWrapper(stack);
+					return LazyOptional.of(() -> wrapper).cast();
+				}
+				return LazyOptional.empty();
+			}
+
+			private void initWrapper(ItemStack stack) {
+				if (wrapper == null) {
+					UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
+					StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
+						@Override
+						public String getStorageType() {
+							return "wood_storage"; //isn't really relevant because wooden storage can't have its gui open when in item form
+						}
+
+						@Override
+						public Component getDisplayName() {
+							return Component.empty(); //isn't really relevant because wooden storage can't have its gui open when in item form
+						}
+
+						@Override
+						protected boolean isAllowedInStorage(ItemStack stack) {
+							return false;
+						}
+					};
+					if (uuid != null) {
+						CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
+						storageWrapper.load(compoundtag);
+						storageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
+					}
+					wrapper = storageWrapper;
+				}
 			}
 		};
-		if (uuid != null) {
-			CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
-			storageWrapper.load(compoundtag);
-			storageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
-		}
-
-		return storageWrapper;
 	}
 
 	public static ItemStack setWoodType(ItemStack storageStack, WoodType woodType) {
@@ -133,5 +161,13 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 			return Component.translatable(descriptionId, "", "");
 		}
 		return Component.translatable(descriptionId, Component.translatable("wood_name.sophisticatedstorage." + woodType.name().toLowerCase(Locale.ROOT)), " ");
+	}
+
+	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
+		NBTHelper.putInt(storageStack.getOrCreateTag(), "numberOfInventorySlots", numberOfInventorySlots);
+	}
+
+	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
+		NBTHelper.putInt(storageStack.getOrCreateTag(), "numberOfUpgradeSlots", numberOfUpgradeSlots);
 	}
 }

@@ -8,7 +8,7 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "B": {
-      "tag": "sophisticatedstorage:base_tier_wooden_storage"
+      "fabric:type": "sophisticatedstorage:base_tier_wooden_storage"
     },
     "C": {
       "item": "minecraft:comparator"

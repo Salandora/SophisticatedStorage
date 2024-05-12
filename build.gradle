@@ -1,1 +1,4 @@
-moduleDependency(project, [ "SophisticatedCore" ])
+moduleDependency(project, [
+        "SophisticatedBackpacks",
+        "SophisticatedCore"
+])

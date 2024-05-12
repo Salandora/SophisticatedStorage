@@ -1,7 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.common;
 
+import com.google.common.collect.Queues;
+
+import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -13,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -24,6 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsMessage;
@@ -40,10 +46,14 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
 
+import java.util.Iterator;
+import java.util.Queue;
 import javax.annotation.Nullable;
 
 public class CommonEventHandler {
 	private static final int AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT = 20;
+
+	private final Queue<TickTask> pendingTickTasks = Queues.newConcurrentLinkedQueue();
 
 	public void registerHandlers() {
 		ServerPlayConnectionEvents.JOIN.register(this::onPlayerLoggedIn);
@@ -54,6 +64,8 @@ public class CommonEventHandler {
 
 		AttackBlockCallback.EVENT.register(this::onLimitedBarrelLeftClicked);
 		UseBlockCallback.EVENT.register(this::onSneakItemBlockInteraction);
+
+		ServerTickEvents.END_SERVER_TICK.register(this::onLevelTick);
 	}
 
 	private InteractionResult onLimitedBarrelLeftClicked(Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) {
@@ -107,13 +119,29 @@ public class CommonEventHandler {
 		sendPlayerSettingsToClient(newPlayer);
 	}
 
+	private void onLevelTick(MinecraftServer server) {
+		if (pendingTickTasks.isEmpty()) {
+			return;
+		}
+
+		Iterator<TickTask> it = pendingTickTasks.iterator();
+
+		while (it.hasNext()) {
+			TickTask tickTask = it.next();
+			if (tickTask.getTick() <= server.getTickCount()) {
+				tickTask.run();
+				it.remove();
+			}
+		}
+	}
+
 	private boolean onBlockBreak(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
 		if (!(state.getBlock() instanceof WoodStorageBlockBase) || player.isShiftKeyDown()) {
 			return true;
 		}
 
 		return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).map(wbe -> {
-			if (wbe.isPacked()) {
+			if (wbe.isPacked() || Boolean.TRUE.equals(Config.COMMON.dropPacked.get())) {
 				return true;
 			}
 
@@ -131,10 +159,17 @@ public class CommonEventHandler {
 				ItemBase packingTapeItem = ModItems.PACKING_TAPE;
 				Component packingTapeItemName = packingTapeItem.getName(new ItemStack(packingTapeItem)).copy().withStyle(ChatFormatting.GREEN);
 				player.sendSystemMessage(StorageTranslationHelper.INSTANCE.translStatusMessage("too_many_item_entity_drops",
-						state.getBlock().getName().withStyle(ChatFormatting.GREEN),
+						((BlockPickInteractionAware) state.getBlock()).getPickedStack(state, level, pos, player, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.DOWN, pos, true)).getHoverName().copy().withStyle(ChatFormatting.GREEN),
 						Component.literal(String.valueOf(droppedItemEntityCount)).withStyle(ChatFormatting.RED),
 						packingTapeItemName)
 				);
+				if (level instanceof ServerLevel serverLevel) {
+					level.scheduleTick(pos, state.getBlock(), 2);
+					pendingTickTasks.add(new TickTask(serverLevel.getServer().getTickCount() + 2, () -> {
+						wbe.setUpdateBlockRender();
+						WorldHelper.notifyBlockUpdate(wbe);
+					}));
+				}
 
 				return false;
 			}

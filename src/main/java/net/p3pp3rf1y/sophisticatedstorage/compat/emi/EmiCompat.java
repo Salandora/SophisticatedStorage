@@ -24,7 +24,6 @@ import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandle
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ControllerRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
@@ -74,7 +73,6 @@ public class EmiCompat implements EmiPlugin {
         registerCraftingRecipes(registry, DyeRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
 		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
-		registerCraftingRecipes(registry, ControllerRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, FlatBarrelRecipesMaker.getRecipes());
 

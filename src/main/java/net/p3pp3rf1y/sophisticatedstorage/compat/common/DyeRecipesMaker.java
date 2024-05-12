@@ -35,40 +35,47 @@ public class DyeRecipesMaker {
 
 		Map<Item, ItemStack[]> blocks = new HashMap<>();
 		blocks.put(ModBlocks.BARREL_ITEM, getWoodStorageStacks(ModBlocks.BARREL));
+		blocks.put(ModBlocks.COPPER_BARREL_ITEM, getWoodStorageStacks(ModBlocks.COPPER_BARREL));
 		blocks.put(ModBlocks.IRON_BARREL_ITEM, getWoodStorageStacks(ModBlocks.IRON_BARREL));
 		blocks.put(ModBlocks.GOLD_BARREL_ITEM, getWoodStorageStacks(ModBlocks.GOLD_BARREL));
 		blocks.put(ModBlocks.DIAMOND_BARREL_ITEM, getWoodStorageStacks(ModBlocks.DIAMOND_BARREL));
 		blocks.put(ModBlocks.NETHERITE_BARREL_ITEM, getWoodStorageStacks(ModBlocks.NETHERITE_BARREL));
 		blocks.put(ModBlocks.CHEST_ITEM, getWoodStorageStacks(ModBlocks.CHEST));
+		blocks.put(ModBlocks.COPPER_CHEST_ITEM, getWoodStorageStacks(ModBlocks.COPPER_CHEST));
 		blocks.put(ModBlocks.IRON_CHEST_ITEM, getWoodStorageStacks(ModBlocks.IRON_CHEST));
 		blocks.put(ModBlocks.GOLD_CHEST_ITEM, getWoodStorageStacks(ModBlocks.GOLD_CHEST));
 		blocks.put(ModBlocks.DIAMOND_CHEST_ITEM, getWoodStorageStacks(ModBlocks.DIAMOND_CHEST));
 		blocks.put(ModBlocks.NETHERITE_CHEST_ITEM, getWoodStorageStacks(ModBlocks.NETHERITE_CHEST));
 		blocks.put(ModBlocks.SHULKER_BOX_ITEM, new ItemStack[] {new ItemStack(ModBlocks.SHULKER_BOX_ITEM)});
+		blocks.put(ModBlocks.COPPER_SHULKER_BOX_ITEM, new ItemStack[]{new ItemStack(ModBlocks.COPPER_SHULKER_BOX_ITEM)});
 		blocks.put(ModBlocks.IRON_SHULKER_BOX_ITEM, new ItemStack[] {new ItemStack(ModBlocks.IRON_SHULKER_BOX_ITEM)});
 		blocks.put(ModBlocks.GOLD_SHULKER_BOX_ITEM, new ItemStack[] {new ItemStack(ModBlocks.GOLD_SHULKER_BOX_ITEM)});
 		blocks.put(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, new ItemStack[] {new ItemStack(ModBlocks.DIAMOND_SHULKER_BOX_ITEM)});
 		blocks.put(ModBlocks.NETHERITE_SHULKER_BOX_ITEM, new ItemStack[] {new ItemStack(ModBlocks.NETHERITE_SHULKER_BOX_ITEM)});
 
 		blocks.put(ModBlocks.LIMITED_BARREL_1_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_BARREL_1));
+		blocks.put(ModBlocks.LIMITED_COPPER_BARREL_1_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_COPPER_BARREL_1));
 		blocks.put(ModBlocks.LIMITED_IRON_BARREL_1_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_IRON_BARREL_1));
 		blocks.put(ModBlocks.LIMITED_GOLD_BARREL_1_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_GOLD_BARREL_1));
 		blocks.put(ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_DIAMOND_BARREL_1));
 		blocks.put(ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_NETHERITE_BARREL_1));
 
 		blocks.put(ModBlocks.LIMITED_BARREL_2_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_BARREL_2));
+		blocks.put(ModBlocks.LIMITED_COPPER_BARREL_2_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_COPPER_BARREL_2));
 		blocks.put(ModBlocks.LIMITED_IRON_BARREL_2_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_IRON_BARREL_2));
 		blocks.put(ModBlocks.LIMITED_GOLD_BARREL_2_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_GOLD_BARREL_2));
 		blocks.put(ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_DIAMOND_BARREL_2));
 		blocks.put(ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_NETHERITE_BARREL_2));
 
 		blocks.put(ModBlocks.LIMITED_BARREL_3_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_BARREL_3));
+		blocks.put(ModBlocks.LIMITED_COPPER_BARREL_3_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_COPPER_BARREL_3));
 		blocks.put(ModBlocks.LIMITED_IRON_BARREL_3_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_IRON_BARREL_3));
 		blocks.put(ModBlocks.LIMITED_GOLD_BARREL_3_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_GOLD_BARREL_3));
 		blocks.put(ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_DIAMOND_BARREL_3));
 		blocks.put(ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_NETHERITE_BARREL_3));
 
 		blocks.put(ModBlocks.LIMITED_BARREL_4_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_BARREL_4));
+		blocks.put(ModBlocks.LIMITED_COPPER_BARREL_4_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_COPPER_BARREL_4));
 		blocks.put(ModBlocks.LIMITED_IRON_BARREL_4_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_IRON_BARREL_4));
 		blocks.put(ModBlocks.LIMITED_GOLD_BARREL_4_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_GOLD_BARREL_4));
 		blocks.put(ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM, getWoodStorageStacks(ModBlocks.LIMITED_DIAMOND_BARREL_4));
