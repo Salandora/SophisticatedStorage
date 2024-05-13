@@ -14,22 +14,24 @@ import net.p3pp3rf1y.sophisticatedcore.compat.litematica.LitematicaHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class ItemStorageContentsMessage implements S2CPacket {
-	private final Map<UUID, CompoundTag> storageContents;
+	private final UUID storageUuid;
+	private final CompoundTag storageContents;
 
-	public ItemStorageContentsMessage(Map<UUID, CompoundTag> storageContents) {
+	public ItemStorageContentsMessage(UUID storageUuid, CompoundTag storageContents) {
+		this.storageUuid = storageUuid;
 		this.storageContents = storageContents;
 	}
 	public ItemStorageContentsMessage(FriendlyByteBuf buffer) {
-		this(buffer.readMap(FriendlyByteBuf::readUUID, FriendlyByteBuf::readNbt));
+		this(buffer.readUUID(), buffer.readNbt());
 	}
 
 	@Override
 	public void encode(FriendlyByteBuf buffer) {
-		buffer.writeMap(this.storageContents, FriendlyByteBuf::writeUUID, FriendlyByteBuf::writeNbt);
+		buffer.writeUUID(this.storageUuid);
+		buffer.writeNbt(this.storageContents);
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -40,9 +42,9 @@ public class ItemStorageContentsMessage implements S2CPacket {
 				return;
 			}
 
-			this.storageContents.forEach(ItemContentsStorage.get()::setStorageContents);
-			CapabilityStorageWrapper.invalidateCache();
-			LitematicaHelper.incrementReceived(this.storageContents.size());
+			ItemContentsStorage.get().setStorageContents(this.storageUuid, this.storageContents);
+			CapabilityStorageWrapper.invalidateCache(this.storageUuid);
+			LitematicaHelper.incrementReceived(1);
 		});
 	}
 }
