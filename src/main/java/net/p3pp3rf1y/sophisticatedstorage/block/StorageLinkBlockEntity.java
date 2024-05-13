@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -26,7 +25,6 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
 	public StorageLinkBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlocks.STORAGE_LINK_BLOCK_ENTITY_TYPE, pos, state);
 
-		ClientChunkEvents.CHUNK_UNLOAD.register((level, levelChunk) -> this.onChunkUnloaded());
 		ServerChunkEvents.CHUNK_UNLOAD.register((level, levelChunk) -> this.onChunkUnloaded());
 	}
 
