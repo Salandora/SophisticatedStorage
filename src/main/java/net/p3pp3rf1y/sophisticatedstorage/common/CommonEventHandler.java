@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -65,7 +64,6 @@ public class CommonEventHandler {
 			return InteractionResult.PASS;
 		}
 		if (limitedBarrel.tryToTakeItem(state, level, pos, player)) {
-			Minecraft.getInstance().gameMode.destroyDelay = 5;
 			return InteractionResult.SUCCESS;
 		}
 
