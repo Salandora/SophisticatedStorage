@@ -14,6 +14,8 @@ import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class CapabilityStorageWrapper {
 	public static final ItemApiLookup<StorageWrapper, Void> STORAGE_WRAPPER_CAPABILITY = ItemApiLookup.get(SophisticatedStorage.getRL("storage_wrapper"), StorageWrapper.class, Void.class);
@@ -24,8 +26,9 @@ public class CapabilityStorageWrapper {
 		return Optional.ofNullable(STORAGE_WRAPPER_CAPABILITY.find(provider, null));
 	}
 
-	public static void invalidateCache() {
-		cachedStorageWrappers.clear();
+	public static void invalidateCache(UUID uuid) {
+		Set<Map.Entry<ItemStack, StorageWrapper>> entries = cachedStorageWrappers.entrySet();
+		entries.stream().filter(entry -> entry.getValue().getContentsUuid().isPresent() && entry.getValue().getContentsUuid().get() == uuid).forEach(entries::remove);
 	}
 
 	public static void register() {
