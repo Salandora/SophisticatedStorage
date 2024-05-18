@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -124,6 +126,13 @@ public class ModBlocks {
 	public static final BlockItem DIAMOND_BARREL_ITEM = registerItem("diamond_barrel", () -> new BarrelBlockItem(DIAMOND_BARREL));
 	public static final BlockItem NETHERITE_BARREL_ITEM = registerItem("netherite_barrel", () -> new BarrelBlockItem(NETHERITE_BARREL, new Properties().fireResistant()));
 
+	public static final Block[] BARRELS = new Block[] {
+			BARREL, COPPER_BARREL, IRON_BARREL, GOLD_BARREL, DIAMOND_BARREL, NETHERITE_BARREL
+	};
+	public static final BlockItem[] BARREL_ITEMS = new BlockItem[] {
+			BARREL_ITEM, COPPER_BARREL_ITEM, IRON_BARREL_ITEM, GOLD_BARREL_ITEM, DIAMOND_BARREL_ITEM, NETHERITE_BARREL_ITEM
+	};
+
 	private static final String LIMITED_BARREL_REG_NAME = LIMITED_BARREL_NAME;
 	public static final BarrelBlock LIMITED_BARREL_1 = register("limited_barrel_1", () -> new LimitedBarrelBlock(1, Config.SERVER.limitedBarrel1.baseSlotLimitMultiplier, Config.SERVER.limitedBarrel1.upgradeSlotCount,
 			BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD)));
@@ -201,6 +210,22 @@ public class ModBlocks {
 	public static final BlockItem LIMITED_DIAMOND_BARREL_4_ITEM = registerItem("limited_diamond_barrel_4", () -> new BarrelBlockItem(LIMITED_DIAMOND_BARREL_4));
 	public static final BlockItem LIMITED_NETHERITE_BARREL_4_ITEM = registerItem("limited_netherite_barrel_4", () -> new BarrelBlockItem(LIMITED_NETHERITE_BARREL_4, new Properties().fireResistant()));
 
+	public static final Block[] LIMITED_BARRELS = new Block[] {
+			LIMITED_BARREL_1, LIMITED_COPPER_BARREL_1, LIMITED_IRON_BARREL_1, LIMITED_GOLD_BARREL_1, LIMITED_DIAMOND_BARREL_1, LIMITED_NETHERITE_BARREL_1,
+			LIMITED_BARREL_2, LIMITED_COPPER_BARREL_2, LIMITED_IRON_BARREL_2, LIMITED_GOLD_BARREL_2, LIMITED_DIAMOND_BARREL_2, LIMITED_NETHERITE_BARREL_2,
+			LIMITED_BARREL_3, LIMITED_COPPER_BARREL_3, LIMITED_IRON_BARREL_3, LIMITED_GOLD_BARREL_3, LIMITED_DIAMOND_BARREL_3, LIMITED_NETHERITE_BARREL_3,
+			LIMITED_BARREL_4, LIMITED_COPPER_BARREL_4, LIMITED_IRON_BARREL_4, LIMITED_GOLD_BARREL_4, LIMITED_DIAMOND_BARREL_4, LIMITED_NETHERITE_BARREL_4
+	};
+	public static final BlockItem[] LIMITED_BARREL_ITEMS = new BlockItem[] {
+			LIMITED_BARREL_1_ITEM, LIMITED_COPPER_BARREL_1_ITEM, LIMITED_IRON_BARREL_1_ITEM, LIMITED_GOLD_BARREL_1_ITEM, LIMITED_DIAMOND_BARREL_1_ITEM, LIMITED_NETHERITE_BARREL_1_ITEM,
+			LIMITED_BARREL_2_ITEM, LIMITED_COPPER_BARREL_2_ITEM, LIMITED_IRON_BARREL_2_ITEM, LIMITED_GOLD_BARREL_2_ITEM, LIMITED_DIAMOND_BARREL_2_ITEM, LIMITED_NETHERITE_BARREL_2_ITEM,
+			LIMITED_BARREL_3_ITEM, LIMITED_COPPER_BARREL_3_ITEM, LIMITED_IRON_BARREL_3_ITEM, LIMITED_GOLD_BARREL_3_ITEM, LIMITED_DIAMOND_BARREL_3_ITEM, LIMITED_NETHERITE_BARREL_3_ITEM,
+			LIMITED_BARREL_4_ITEM, LIMITED_COPPER_BARREL_4_ITEM, LIMITED_IRON_BARREL_4_ITEM, LIMITED_GOLD_BARREL_4_ITEM, LIMITED_DIAMOND_BARREL_4_ITEM, LIMITED_NETHERITE_BARREL_4_ITEM
+	};
+
+	public static final Block[] ALL_BARRELS = ArrayUtils.addAll(BARRELS, LIMITED_BARRELS);
+	public static final BlockItem[] ALL_BARREL_ITEMS = ArrayUtils.addAll(BARREL_ITEMS, LIMITED_BARREL_ITEMS);
+
 	private static final String CHEST_REG_NAME = "chest";
 	public static final ChestBlock CHEST = register(CHEST_REG_NAME, () -> new ChestBlock(Config.SERVER.woodChest.inventorySlotCount, Config.SERVER.woodChest.upgradeSlotCount));
 	public static final ChestBlock COPPER_CHEST = register("copper_chest", () -> new ChestBlock(Config.SERVER.copperChest.inventorySlotCount, Config.SERVER.copperChest.upgradeSlotCount));
@@ -215,6 +240,16 @@ public class ModBlocks {
 	public static final BlockItem DIAMOND_CHEST_ITEM = registerItem("diamond_chest", () -> new ChestBlockItem(DIAMOND_CHEST));
 	public static final BlockItem NETHERITE_CHEST_ITEM = registerItem("netherite_chest", () -> new ChestBlockItem(NETHERITE_CHEST, new Properties().fireResistant()));
 
+	public static final Block[] CHESTS = new Block[] {
+			CHEST, COPPER_CHEST, IRON_CHEST, GOLD_CHEST, DIAMOND_CHEST, NETHERITE_CHEST
+	};
+	public static final BlockItem[] CHEST_ITEMS = new BlockItem[] {
+			CHEST_ITEM, COPPER_CHEST_ITEM, IRON_CHEST_ITEM, GOLD_CHEST_ITEM, DIAMOND_CHEST_ITEM, NETHERITE_CHEST_ITEM
+	};
+
+	public static final Block[] ALL_WOODSTORAGES = ArrayUtils.addAll(ALL_BARRELS, CHESTS);
+	public static final BlockItem[] ALL_WOODSTORAGE_ITEMS = ArrayUtils.addAll(ALL_BARREL_ITEMS, CHEST_ITEMS);
+
 	private static final String SHULKER_BOX_REG_NAME = "shulker_box";
 	public static final ShulkerBoxBlock SHULKER_BOX = register(SHULKER_BOX_REG_NAME, () -> new ShulkerBoxBlock(Config.SERVER.shulkerBox.inventorySlotCount, Config.SERVER.shulkerBox.upgradeSlotCount));
 	public static final ShulkerBoxBlock COPPER_SHULKER_BOX = register("copper_shulker_box", () -> new ShulkerBoxBlock(Config.SERVER.copperShulkerBox.inventorySlotCount, Config.SERVER.copperShulkerBox.upgradeSlotCount));
@@ -228,6 +263,17 @@ public class ModBlocks {
 	public static final BlockItem GOLD_SHULKER_BOX_ITEM = registerItem("gold_shulker_box", () -> new ShulkerBoxItem(GOLD_SHULKER_BOX));
 	public static final BlockItem DIAMOND_SHULKER_BOX_ITEM = registerItem("diamond_shulker_box", () -> new ShulkerBoxItem(DIAMOND_SHULKER_BOX));
 	public static final BlockItem NETHERITE_SHULKER_BOX_ITEM = registerItem("netherite_shulker_box", () -> new ShulkerBoxItem(NETHERITE_SHULKER_BOX, new Properties().stacksTo(1).fireResistant()));
+
+	public static final Block[] SHULKER_BOXES = new Block[] {
+			SHULKER_BOX, COPPER_SHULKER_BOX, IRON_SHULKER_BOX, GOLD_SHULKER_BOX, DIAMOND_SHULKER_BOX, NETHERITE_SHULKER_BOX
+	};
+	public static final BlockItem[] SHULKER_BOX_ITEMS = new BlockItem[] {
+			SHULKER_BOX_ITEM, COPPER_SHULKER_BOX_ITEM, IRON_SHULKER_BOX_ITEM, GOLD_SHULKER_BOX_ITEM, DIAMOND_SHULKER_BOX_ITEM, NETHERITE_SHULKER_BOX_ITEM
+	};
+
+	public static final Block[] ALL_STORAGECONTAINERS = ArrayUtils.addAll(ModBlocks.ALL_WOODSTORAGES, ModBlocks.SHULKER_BOXES);
+	public static final BlockItem[] ALL_STORAGECONTAINER_ITEMS = ArrayUtils.addAll(ModBlocks.ALL_WOODSTORAGE_ITEMS, ModBlocks.SHULKER_BOX_ITEMS);
+
 
 	private static final String CONTROLLER_REG_NAME = "controller";
 	public static final ControllerBlock CONTROLLER = register(CONTROLLER_REG_NAME, ControllerBlock::new);
@@ -268,27 +314,22 @@ public class ModBlocks {
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
 	public static final BlockEntityType<BarrelBlockEntity> BARREL_BLOCK_ENTITY_TYPE = registerEntityType(BARREL_REG_NAME, () ->
-			BlockEntityType.Builder.of(BarrelBlockEntity::new, BARREL, COPPER_BARREL, IRON_BARREL, GOLD_BARREL, DIAMOND_BARREL, NETHERITE_BARREL)
+			BlockEntityType.Builder.of(BarrelBlockEntity::new, BARRELS)
 					.build(null));
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
 	public static final BlockEntityType<LimitedBarrelBlockEntity> LIMITED_BARREL_BLOCK_ENTITY_TYPE = registerEntityType(LIMITED_BARREL_REG_NAME, () ->
-			BlockEntityType.Builder.of(LimitedBarrelBlockEntity::new,
-							LIMITED_BARREL_1, LIMITED_COPPER_BARREL_1, LIMITED_IRON_BARREL_1, LIMITED_GOLD_BARREL_1, LIMITED_DIAMOND_BARREL_1, LIMITED_NETHERITE_BARREL_1,
-							LIMITED_BARREL_2, LIMITED_COPPER_BARREL_2, LIMITED_IRON_BARREL_2, LIMITED_GOLD_BARREL_2, LIMITED_DIAMOND_BARREL_2, LIMITED_NETHERITE_BARREL_2,
-							LIMITED_BARREL_3, LIMITED_COPPER_BARREL_3, LIMITED_IRON_BARREL_3, LIMITED_GOLD_BARREL_3, LIMITED_DIAMOND_BARREL_3, LIMITED_NETHERITE_BARREL_3,
-							LIMITED_BARREL_4, LIMITED_COPPER_BARREL_4, LIMITED_IRON_BARREL_4, LIMITED_GOLD_BARREL_4, LIMITED_DIAMOND_BARREL_4, LIMITED_NETHERITE_BARREL_4
-					)
+			BlockEntityType.Builder.of(LimitedBarrelBlockEntity::new, LIMITED_BARRELS)
 					.build(null));
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
 	public static final BlockEntityType<ChestBlockEntity> CHEST_BLOCK_ENTITY_TYPE = registerEntityType(CHEST_REG_NAME, () ->
-			BlockEntityType.Builder.of(ChestBlockEntity::new, CHEST, COPPER_CHEST, IRON_CHEST, GOLD_CHEST, DIAMOND_CHEST, NETHERITE_CHEST)
+			BlockEntityType.Builder.of(ChestBlockEntity::new, CHESTS)
 					.build(null));
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
 	public static final BlockEntityType<ShulkerBoxBlockEntity> SHULKER_BOX_BLOCK_ENTITY_TYPE = registerEntityType(SHULKER_BOX_REG_NAME, () ->
-			BlockEntityType.Builder.of(ShulkerBoxBlockEntity::new, SHULKER_BOX, COPPER_SHULKER_BOX, IRON_SHULKER_BOX, GOLD_SHULKER_BOX, DIAMOND_SHULKER_BOX, NETHERITE_SHULKER_BOX)
+			BlockEntityType.Builder.of(ShulkerBoxBlockEntity::new, SHULKER_BOXES)
 					.build(null));
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
@@ -391,51 +432,17 @@ public class ModBlocks {
 	}
 
 	private static void registerCauldronInteractions() {
-		CauldronInteraction.WATER.put(BARREL_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(COPPER_BARREL_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(IRON_BARREL_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(GOLD_BARREL_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(DIAMOND_BARREL_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(NETHERITE_BARREL_ITEM, BarrelCauldronInteraction.INSTANCE);
+		for (BlockItem item : ALL_BARREL_ITEMS) {
+			CauldronInteraction.WATER.put(item, BarrelCauldronInteraction.INSTANCE);
+		}
 
-		CauldronInteraction.WATER.put(LIMITED_BARREL_1_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_BARREL_2_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_BARREL_3_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_BARREL_4_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_COPPER_BARREL_1_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_COPPER_BARREL_2_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_COPPER_BARREL_3_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_COPPER_BARREL_4_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_IRON_BARREL_1_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_IRON_BARREL_2_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_IRON_BARREL_3_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_IRON_BARREL_4_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_GOLD_BARREL_1_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_GOLD_BARREL_2_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_GOLD_BARREL_3_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_GOLD_BARREL_4_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_DIAMOND_BARREL_1_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_DIAMOND_BARREL_2_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_DIAMOND_BARREL_3_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_DIAMOND_BARREL_4_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_NETHERITE_BARREL_1_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_NETHERITE_BARREL_2_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_NETHERITE_BARREL_3_ITEM, BarrelCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(LIMITED_NETHERITE_BARREL_4_ITEM, BarrelCauldronInteraction.INSTANCE);
+		for (BlockItem item : CHEST_ITEMS) {
+			CauldronInteraction.WATER.put(item, WoodStorageCauldronInteraction.INSTANCE);
+		}
 
-		CauldronInteraction.WATER.put(CHEST_ITEM, WoodStorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(COPPER_CHEST_ITEM, WoodStorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(IRON_CHEST_ITEM, WoodStorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(GOLD_CHEST_ITEM, WoodStorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(DIAMOND_CHEST_ITEM, WoodStorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(NETHERITE_CHEST_ITEM, WoodStorageCauldronInteraction.INSTANCE);
-
-		CauldronInteraction.WATER.put(SHULKER_BOX_ITEM, StorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(COPPER_SHULKER_BOX_ITEM, StorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(IRON_SHULKER_BOX_ITEM, StorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(GOLD_SHULKER_BOX_ITEM, StorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(DIAMOND_SHULKER_BOX_ITEM, StorageCauldronInteraction.INSTANCE);
-		CauldronInteraction.WATER.put(NETHERITE_SHULKER_BOX_ITEM, StorageCauldronInteraction.INSTANCE);
+		for (BlockItem item : SHULKER_BOX_ITEMS) {
+			CauldronInteraction.WATER.put(item, StorageCauldronInteraction.INSTANCE);
+		}
 	}
 
 	@SuppressWarnings("java:S6548") //singleton is correct here

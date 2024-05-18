@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -43,7 +42,6 @@ import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
 
 import java.util.Iterator;
@@ -78,7 +76,6 @@ public class CommonEventHandler {
 			return InteractionResult.PASS;
 		}
 		if (limitedBarrel.tryToTakeItem(state, level, pos, player)) {
-			((MultiPlayerGameModeAccessor) Minecraft.getInstance().gameMode).setDestroyDelay(5);
 			return InteractionResult.SUCCESS;
 		}
 
@@ -158,8 +155,16 @@ public class CommonEventHandler {
 			if (droppedItemEntityCount > Config.SERVER.tooManyItemEntityDrops.get()) {
 				ItemBase packingTapeItem = ModItems.PACKING_TAPE;
 				Component packingTapeItemName = packingTapeItem.getName(new ItemStack(packingTapeItem)).copy().withStyle(ChatFormatting.GREEN);
+
+				ItemStack clonedStack;
+				if (state.getBlock() instanceof BlockPickInteractionAware) {
+					clonedStack = ((BlockPickInteractionAware) state.getBlock()).getPickedStack(state, level, pos, player, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.DOWN, pos, true));
+				} else {
+					clonedStack = state.getBlock().getCloneItemStack(level, pos, state);
+				}
+
 				player.sendSystemMessage(StorageTranslationHelper.INSTANCE.translStatusMessage("too_many_item_entity_drops",
-						((BlockPickInteractionAware) state.getBlock()).getPickedStack(state, level, pos, player, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.DOWN, pos, true)).getHoverName().copy().withStyle(ChatFormatting.GREEN),
+						clonedStack.getHoverName().copy().withStyle(ChatFormatting.GREEN),
 						Component.literal(String.valueOf(droppedItemEntityCount)).withStyle(ChatFormatting.RED),
 						packingTapeItemName)
 				);

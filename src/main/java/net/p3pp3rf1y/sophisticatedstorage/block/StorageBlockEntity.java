@@ -104,7 +104,14 @@ public abstract class StorageBlockEntity extends BlockEntity
 			public ItemStack getWrappedStorageStack() {
 				BlockPos pos = getBlockPos();
 				BlockState state = getBlockState();
-				return addWrappedStorageStackData(((BlockPickInteractionAware) state.getBlock()).getPickedStack(state, getLevel(), pos, null, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.DOWN, pos, true)), state);
+
+				ItemStack clonedStack;
+				if (state.getBlock() instanceof BlockPickInteractionAware) {
+					clonedStack = ((BlockPickInteractionAware) state.getBlock()).getPickedStack(state, getLevel(), pos, null, new BlockHitResult(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), Direction.DOWN, pos, true));
+				} else {
+					clonedStack = state.getBlock().getCloneItemStack(getLevel(), pos, state);
+				}
+				return addWrappedStorageStackData(clonedStack, state);
 			}
 
 			@Override

@@ -308,7 +308,8 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	@Nullable
-	public <T> LazyOptional<T> getCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt) {
+	@Override
+	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
 		if (level == null) {
 			return LazyOptional.empty();
 		}

@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import com.google.common.collect.MapMaker;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.loader.api.FabricLoader;
@@ -25,6 +27,7 @@ import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -103,45 +106,43 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 				.flatMap(woodType -> WoodType.values().filter(wt -> wt.name().equals(woodType)).findFirst());
 	}
 
-	public static ItemApiLookup.ItemApiProvider<LazyOptional<IStorageWrapper>, Void> initCapabilities() {
+	public static ItemApiLookup.ItemApiProvider<LazyOptional<StorageWrapper>, Void> initCapabilities() {
 		return new ItemApiLookup.ItemApiProvider<>() {
-			private IStorageWrapper wrapper = null;
+			final Map<ItemStack, StorageWrapper> wrapperMap = new MapMaker().weakKeys().weakValues().makeMap();
 
 			@Override
-			public LazyOptional<IStorageWrapper> find(ItemStack stack, Void context) {
+			public LazyOptional<StorageWrapper> find(ItemStack stack, Void context) {
 				if (stack.getCount() == 1) {
-					initWrapper(stack);
-					return LazyOptional.of(() -> wrapper).cast();
+					return LazyOptional.of(() -> wrapperMap.computeIfAbsent(stack, this::initWrapper)).cast();
 				}
+
 				return LazyOptional.empty();
 			}
 
-			private void initWrapper(ItemStack stack) {
-				if (wrapper == null) {
-					UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
-					StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
-						@Override
-						public String getStorageType() {
-							return "wood_storage"; //isn't really relevant because wooden storage can't have its gui open when in item form
-						}
-
-						@Override
-						public Component getDisplayName() {
-							return Component.empty(); //isn't really relevant because wooden storage can't have its gui open when in item form
-						}
-
-						@Override
-						protected boolean isAllowedInStorage(ItemStack stack) {
-							return false;
-						}
-					};
-					if (uuid != null) {
-						CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
-						storageWrapper.load(compoundtag);
-						storageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
+			private StorageWrapper initWrapper(ItemStack stack) {
+				UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
+				StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
+					@Override
+					public String getStorageType() {
+						return "wood_storage"; //isn't really relevant because wooden storage can't have its gui open when in item form
 					}
-					wrapper = storageWrapper;
+
+					@Override
+					public Component getDisplayName() {
+						return Component.empty(); //isn't really relevant because wooden storage can't have its gui open when in item form
+					}
+
+					@Override
+					protected boolean isAllowedInStorage(ItemStack stack) {
+						return false;
+					}
+				};
+				if (uuid != null) {
+					CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
+					storageWrapper.load(compoundtag);
+					storageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
 				}
+				return storageWrapper;
 			}
 		};
 	}

@@ -11,7 +11,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
-import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
@@ -26,7 +25,7 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt, ControllerBlockEntity c) {
 		if (cap == ItemStorage.SIDED) {
 				return c.getCapability(ItemStorage.SIDED, null) //passing null side to not get the cache failed handler
-						.map(itemHandler -> LazyOptional.of(() -> itemHandler instanceof IItemHandlerSimpleInserter simpleInserter ? new OutputOnlyItemHandlerWrapper(simpleInserter) : itemHandler))
+						.map(itemHandler -> LazyOptional.of(() -> itemHandler instanceof SlottedStackStorage simpleInserter ? new OutputOnlyItemHandlerWrapper(simpleInserter) : itemHandler))
 						.orElseGet(LazyOptional::empty).cast();
 		}
 
@@ -34,9 +33,9 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	}
 
 	private static class OutputOnlyItemHandlerWrapper implements SlottedStackStorage {
-		private final IItemHandlerSimpleInserter itemHandler;
+		private final SlottedStackStorage itemHandler;
 
-		public OutputOnlyItemHandlerWrapper(IItemHandlerSimpleInserter itemHandler) {
+		public OutputOnlyItemHandlerWrapper(SlottedStackStorage itemHandler) {
 			this.itemHandler = itemHandler;
 		}
 
@@ -47,7 +46,7 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 
 		@Override
 		public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-			return itemHandler.getSlot(slot);
+			return new SingleSlotOutputSlotWrapper(itemHandler.getSlot(slot));
 		}
 
 		@Override
@@ -87,6 +86,43 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		@Override
 		public boolean isItemValid(int slot, ItemVariant resource, int count) {
 			return false;
+		}
+	}
+
+	private static class SingleSlotOutputSlotWrapper implements SingleSlotStorage<ItemVariant> {
+		private final SingleSlotStorage<ItemVariant> backingSlot;
+		public SingleSlotOutputSlotWrapper(SingleSlotStorage<ItemVariant> backingSlot) {
+			this.backingSlot = backingSlot;
+		}
+
+		@Override
+		public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+			return 0;
+		}
+
+		@Override
+		public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+			return backingSlot.extract(resource, maxAmount, transaction);
+		}
+
+		@Override
+		public boolean isResourceBlank() {
+			return backingSlot.isResourceBlank();
+		}
+
+		@Override
+		public ItemVariant getResource() {
+			return backingSlot.getResource();
+		}
+
+		@Override
+		public long getAmount() {
+			return backingSlot.getAmount();
+		}
+
+		@Override
+		public long getCapacity() {
+			return backingSlot.getSlotCount();
 		}
 	}
 }

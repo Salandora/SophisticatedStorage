@@ -6,7 +6,6 @@ import org.joml.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
@@ -300,8 +299,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			}
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_CHEST));
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, ctx, pl) -> new StorageContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
-					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())));
+			player.openMenu(MenuProviderHelper.createMenuProvider((w, ctx, pl) -> new StorageContainerMenu(w, pl, mainChestPos), b.getDisplayName(), mainChestPos));
 			PiglinAi.angerNearbyPiglins(player, true);
 
 			return InteractionResult.CONSUME;

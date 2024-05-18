@@ -11,6 +11,7 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Dimension;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TextureBlitData;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.UV;
+import net.p3pp3rf1y.sophisticatedcore.mixin.client.accessor.AbstractContainerScreenAccessor;
 import net.p3pp3rf1y.sophisticatedcore.mixin.common.accessor.SlotAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
@@ -37,7 +38,7 @@ public class LimitedBarrelScreen extends StorageScreen {
 
 	public static void drawSlotBg(AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int x, int y, int slotsNumber) {
 		TextureBlitData backgroundTexture = getBackgroundTexture(slotsNumber);
-		GuiHelper.blit(guiGraphics, x + screen.width / 2 - backgroundTexture.getWidth() / 2 - 1, y + 17, backgroundTexture);
+		GuiHelper.blit(guiGraphics, x + ((AbstractContainerScreenAccessor) screen).getXSize() / 2 - backgroundTexture.getWidth() / 2 - 1, y + 17, backgroundTexture);
 	}
 
 	@Override

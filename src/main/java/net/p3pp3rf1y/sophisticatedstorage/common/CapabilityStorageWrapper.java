@@ -1,36 +1,37 @@
 package net.p3pp3rf1y.sophisticatedstorage.common;
 
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
-import net.p3pp3rf1y.sophisticatedcore.common.CapabilityWrapper;
+import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.StorageIOBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
-import static net.p3pp3rf1y.sophisticatedcore.common.CapabilityWrapper.STORAGE_WRAPPER_CAPABILITY;
 
 public class CapabilityStorageWrapper {
+	public static final ItemApiLookup<LazyOptional<StorageWrapper>, Void> STORAGE_WRAPPER_CAPABILITY = ItemApiLookup.get(SophisticatedStorage.getRL("storage_wrapper"), (Class<LazyOptional<StorageWrapper>>) (Class<?>) LazyOptional.class, Void.class);
+
 	public static LazyOptional<StorageWrapper> get(ItemStack provider) {
-		return CapabilityWrapper.get(provider).cast();
+		LazyOptional<StorageWrapper> wrapper = STORAGE_WRAPPER_CAPABILITY.find(provider, null);
+		if (wrapper != null) {
+			return wrapper;
+		}
+		return LazyOptional.empty();
 	}
 
 	public static void register() {
 		ItemStorage.SIDED.registerForBlockEntities((be, dir) -> ((StorageBlockEntity) be).getCapability(ItemStorage.SIDED, dir).getValueUnsafer(),
 				ModBlocks.BARREL_BLOCK_ENTITY_TYPE, ModBlocks.LIMITED_BARREL_BLOCK_ENTITY_TYPE, ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE, ModBlocks.CHEST_BLOCK_ENTITY_TYPE);
 
-		STORAGE_WRAPPER_CAPABILITY.registerForItems(WoodStorageBlockItem.initCapabilities(),
-				ModBlocks.BARREL_ITEM, ModBlocks.COPPER_BARREL_ITEM, ModBlocks.IRON_BARREL_ITEM, ModBlocks.GOLD_BARREL_ITEM, ModBlocks.DIAMOND_BARREL_ITEM, ModBlocks.NETHERITE_BARREL_ITEM,
-				ModBlocks.LIMITED_BARREL_1_ITEM, ModBlocks.LIMITED_COPPER_BARREL_1_ITEM, ModBlocks.LIMITED_IRON_BARREL_1_ITEM, ModBlocks.LIMITED_GOLD_BARREL_1_ITEM, ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM, ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM,
-				ModBlocks.LIMITED_BARREL_2_ITEM, ModBlocks.LIMITED_COPPER_BARREL_2_ITEM, ModBlocks.LIMITED_IRON_BARREL_2_ITEM, ModBlocks.LIMITED_GOLD_BARREL_2_ITEM, ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM, ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM,
-				ModBlocks.LIMITED_BARREL_3_ITEM, ModBlocks.LIMITED_COPPER_BARREL_3_ITEM, ModBlocks.LIMITED_IRON_BARREL_3_ITEM, ModBlocks.LIMITED_GOLD_BARREL_3_ITEM, ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM, ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM,
-				ModBlocks.LIMITED_BARREL_4_ITEM, ModBlocks.LIMITED_COPPER_BARREL_4_ITEM, ModBlocks.LIMITED_IRON_BARREL_4_ITEM, ModBlocks.LIMITED_GOLD_BARREL_4_ITEM, ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM, ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM,
-				ModBlocks.CHEST_ITEM, ModBlocks.COPPER_CHEST_ITEM, ModBlocks.IRON_CHEST_ITEM, ModBlocks.GOLD_CHEST_ITEM, ModBlocks.DIAMOND_CHEST_ITEM, ModBlocks.NETHERITE_CHEST_ITEM
-		);
+		ItemStorage.SIDED.registerForBlockEntities((be, dir) -> ((StorageIOBlockEntity) be).getCapability(ItemStorage.SIDED, dir).getValueUnsafer(),
+				ModBlocks.STORAGE_IO_BLOCK_ENTITY_TYPE, ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE, ModBlocks.STORAGE_OUTPUT_BLOCK_ENTITY_TYPE);
 
-		STORAGE_WRAPPER_CAPABILITY.registerForItems(ShulkerBoxItem.initCapabilities(),
-				ModBlocks.SHULKER_BOX_ITEM, ModBlocks.COPPER_SHULKER_BOX_ITEM, ModBlocks.IRON_SHULKER_BOX_ITEM, ModBlocks.GOLD_SHULKER_BOX_ITEM, ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ModBlocks.NETHERITE_SHULKER_BOX_ITEM);
+		STORAGE_WRAPPER_CAPABILITY.registerForItems(WoodStorageBlockItem.initCapabilities(), ModBlocks.ALL_WOODSTORAGE_ITEMS);
+		STORAGE_WRAPPER_CAPABILITY.registerForItems(ShulkerBoxItem.initCapabilities(), ModBlocks.SHULKER_BOX_ITEMS);
 	}
 }

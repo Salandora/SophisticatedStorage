@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.init;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -20,18 +22,8 @@ public class ModBlockColors {
 	private ModBlockColors() {}
 
 	public static void registerBlockColorHandlers() {
-		ColorProviderRegistry.BLOCK.register(ModBlockColors::getBarrelTintColor,
-				ModBlocks.BARREL, ModBlocks.COPPER_BARREL, ModBlocks.IRON_BARREL, ModBlocks.GOLD_BARREL, ModBlocks.DIAMOND_BARREL, ModBlocks.NETHERITE_BARREL,
-				ModBlocks.LIMITED_BARREL_1, ModBlocks.LIMITED_COPPER_BARREL_1, ModBlocks.LIMITED_IRON_BARREL_1, ModBlocks.LIMITED_GOLD_BARREL_1, ModBlocks.LIMITED_DIAMOND_BARREL_1, ModBlocks.LIMITED_NETHERITE_BARREL_1,
-				ModBlocks.LIMITED_BARREL_2, ModBlocks.LIMITED_COPPER_BARREL_2, ModBlocks.LIMITED_IRON_BARREL_2, ModBlocks.LIMITED_GOLD_BARREL_2, ModBlocks.LIMITED_DIAMOND_BARREL_2, ModBlocks.LIMITED_NETHERITE_BARREL_2,
-				ModBlocks.LIMITED_BARREL_3, ModBlocks.LIMITED_COPPER_BARREL_3, ModBlocks.LIMITED_IRON_BARREL_3, ModBlocks.LIMITED_GOLD_BARREL_3, ModBlocks.LIMITED_DIAMOND_BARREL_3, ModBlocks.LIMITED_NETHERITE_BARREL_3,
-				ModBlocks.LIMITED_BARREL_4, ModBlocks.LIMITED_COPPER_BARREL_4, ModBlocks.LIMITED_IRON_BARREL_4, ModBlocks.LIMITED_GOLD_BARREL_4, ModBlocks.LIMITED_DIAMOND_BARREL_4, ModBlocks.LIMITED_NETHERITE_BARREL_4
-		);
-
-		ColorProviderRegistry.BLOCK.register(ModBlockColors::getChestShulkerBoxColor,
-				ModBlocks.CHEST, ModBlocks.COPPER_CHEST, ModBlocks.IRON_CHEST, ModBlocks.GOLD_CHEST, ModBlocks.DIAMOND_CHEST, ModBlocks.NETHERITE_CHEST,
-				ModBlocks.SHULKER_BOX, ModBlocks.COPPER_SHULKER_BOX, ModBlocks.IRON_SHULKER_BOX, ModBlocks.GOLD_SHULKER_BOX, ModBlocks.DIAMOND_SHULKER_BOX, ModBlocks.NETHERITE_SHULKER_BOX
-		);
+		ColorProviderRegistry.BLOCK.register(ModBlockColors::getBarrelTintColor, ModBlocks.ALL_BARRELS);
+		ColorProviderRegistry.BLOCK.register(ModBlockColors::getChestShulkerBoxColor, ArrayUtils.addAll(ModBlocks.CHESTS, ModBlocks.SHULKER_BOXES));
 	}
 
 	private static int getBarrelTintColor(BlockState state, @Nullable BlockAndTintGetter blockDisplayReader, @Nullable BlockPos pos, int tintIndex) {

@@ -315,12 +315,14 @@ public class ClientEventHandler {
 
 	private static void registerItemRenderers() {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.CHEST_ITEM, ChestItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_CHEST_ITEM, ChestItemRenderer::render);
 
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);

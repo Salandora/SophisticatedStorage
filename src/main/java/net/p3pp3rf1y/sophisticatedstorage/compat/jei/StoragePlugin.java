@@ -16,6 +16,7 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.CraftingContainerRecipeTransferHandlerBase;
@@ -70,43 +71,13 @@ public class StoragePlugin implements IModPlugin {
 			result.add("flatTop:" + BarrelBlockItem.isFlatTop(itemStack));
 			return "{" + result + "}";
 		};
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.BARREL_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.COPPER_BARREL_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.IRON_BARREL_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.GOLD_BARREL_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.DIAMOND_BARREL_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.NETHERITE_BARREL_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.CHEST_ITEM, woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.COPPER_CHEST_ITEM, woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.IRON_CHEST_ITEM, woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.GOLD_CHEST_ITEM, woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.DIAMOND_CHEST_ITEM, woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.NETHERITE_CHEST_ITEM, woodStorageNbtInterpreter);
 
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_BARREL_1_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_BARREL_2_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_BARREL_3_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_BARREL_4_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_COPPER_BARREL_1_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_COPPER_BARREL_2_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_COPPER_BARREL_3_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_COPPER_BARREL_4_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_IRON_BARREL_1_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_IRON_BARREL_2_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_IRON_BARREL_3_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_IRON_BARREL_4_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_GOLD_BARREL_1_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_GOLD_BARREL_2_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_GOLD_BARREL_3_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_GOLD_BARREL_4_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM, barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM, barrelNbtInterpreter);
+		for (BlockItem item : ModBlocks.ALL_BARREL_ITEMS) {
+			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, barrelNbtInterpreter);
+		}
+		for (BlockItem item : ModBlocks.CHEST_ITEMS) {
+			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, woodStorageNbtInterpreter);
+		}
 
 		IIngredientSubtypeInterpreter<ItemStack> shulkerBoxNbtInterpreter = (itemStack, context) -> {
 			StringJoiner result = new StringJoiner(",");
@@ -114,12 +85,9 @@ public class StoragePlugin implements IModPlugin {
 			StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
 			return "{" + result + "}";
 		};
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.COPPER_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.IRON_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.GOLD_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.DIAMOND_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, ModBlocks.NETHERITE_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
+		for (BlockItem item : ModBlocks.SHULKER_BOX_ITEMS) {
+			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, shulkerBoxNbtInterpreter);
+		}
 	}
 
 	@Override

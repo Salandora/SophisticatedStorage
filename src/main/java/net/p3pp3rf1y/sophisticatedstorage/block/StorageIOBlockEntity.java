@@ -182,6 +182,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		}
 	}
 
+	@Nullable
 	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt, ControllerBlockEntity c) {
 		return c.getCapability(cap, opt);
 	}
