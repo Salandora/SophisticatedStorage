@@ -37,7 +37,9 @@ import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
@@ -65,7 +67,9 @@ public abstract class StorageBlockBase extends Block implements IStorageBlock, I
 		if (Minecraft.getInstance().isPaused()) {
 			return;
 		}
-		renderInfo.getUpgradeRenderData().forEach((type, data) -> UpgradeRenderRegistry.getUpgradeRenderer(type).ifPresent(renderer -> StorageBlockBase.renderUpgrade(renderer, level, rand, pos, facing, type, data)));
+
+		Map<UpgradeRenderDataType<?>, IUpgradeRenderData> upgradeRenderData = new HashMap<>(renderInfo.getUpgradeRenderData());
+		upgradeRenderData.forEach((type, data) -> UpgradeRenderRegistry.getUpgradeRenderer(type).ifPresent(renderer -> StorageBlockBase.renderUpgrade(renderer, level, rand, pos, facing, type, data)));
 	}
 
 	private static Vector3f getMiddleFacePoint(BlockPos pos, Direction facing, Vector3f vector) {
