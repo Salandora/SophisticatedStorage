@@ -10,7 +10,6 @@ import static net.p3pp3rf1y.sophisticatedcore.compat.litematica.LitematicaCompat
 
 public class LitematicaCompat implements ICompat {
 	public static void alwaysInit() {
-		// Register this on the SophisticatedCore channel
 		LitematicaPacketHandler.registerS2CMessage(ItemStorageContentsMessage.class, ItemStorageContentsMessage::new);
 
 		LITEMATICA_CAPABILITY.registerForItems((stack, context) ->
