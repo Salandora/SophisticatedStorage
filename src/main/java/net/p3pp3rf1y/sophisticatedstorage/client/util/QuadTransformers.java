@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTransformers {
-	private static final MutableQuadViewImpl editorQuad = new MutableQuadViewImpl() {
-		{
-			this.data = new int[EncodingFormat.TOTAL_STRIDE];
-			this.clear();
-		}
+	private static MutableQuadViewImpl getEditorQuad() {
+		return new MutableQuadViewImpl() {
+			{
+				this.data = new int[EncodingFormat.TOTAL_STRIDE];
+			}
 
 		@Override
 		public QuadEmitter emit() {
@@ -32,12 +32,11 @@ public class QuadTransformers {
 
 		for (int i = 0; i < quads.size(); i++) {
 			BakedQuad quad = quads.get(i);
-			MutableQuadView mqv = editorQuad.fromVanilla(quad, null, null);
+			MutableQuadView mqv = getEditorQuad().fromVanilla(quad, null, null);
 			transform.transform(mqv);
 
 			BakedQuad transformedQuad = mqv.toBakedQuad(0, quad.getSprite(), false);
 			transformedQuads.add(transformedQuad);
-			editorQuad.clear();
 		}
 
 		return transformedQuads;
