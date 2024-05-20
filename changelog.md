@@ -17,3 +17,4 @@
 - Disabled `isSameThread` requirement as it stopped the StorageWrapper from getting the right data.
 - Fixed controller not inserting items into storages. Fixes [Salandora/SophisticatedStorage#1](https://github.com/Salandora/SophisticatedStorage/issues/1).
 - Properly implemented `getSlot` in `ControllerBlockEntityBase`.
+- Fixed a rendering bug that sometimes set vertices to 0 instead of transforming them
