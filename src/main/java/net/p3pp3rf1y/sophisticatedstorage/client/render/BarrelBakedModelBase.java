@@ -403,7 +403,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return extraData != BarrelBlockEntity.ModelData.EMPTY && extraData.showsTier();
 	}
 
-	private int createHash(@Nullable BlockState state, @Nullable Direction side, BarrelBlockEntity.ModelData data, RenderType renderType) {
+	private int createHash(@Nullable BlockState state, @Nullable Direction side, BarrelBlockEntity.ModelData data, @Nullable RenderType renderType) {
 		int hash;
 		if (state != null) {
 			hash = getInWorldBlockHash(state, data, renderType);
@@ -542,7 +542,6 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	private void addRenderedItemSide(BlockState state, RandomSource rand, List<BakedQuad> ret, ItemStack displayItem, BakedModel model, int rotation,
 			@Nullable Direction dir, int displayItemIndex, int displayItemCount) {
 		List<BakedQuad> quads = model.getQuads(null, dir, rand);
-
 		quads = QuadTransformers.process(MOVE_TO_CORNER, quads);
 		quads = QuadTransformers.process(QuadTransformers.applying(toTransformation(model.getTransforms().getTransform(ItemDisplayContext.FIXED))), quads);
 		if (!model.isGui3d()) {
@@ -575,7 +574,6 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 		ret.addAll(quads);
 	}
-
 
 	private Transformation toTransformation(ItemTransform transform) {
 		if (transform.equals(ItemTransform.NO_TRANSFORM)) {
@@ -743,9 +741,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 				}
 				return model.getParticleIcon();
 			}
-
 		}
-
 		return getParticleIcon();
 	}
 

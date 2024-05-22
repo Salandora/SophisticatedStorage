@@ -34,7 +34,6 @@ import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ISlotTracker;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
-import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
@@ -53,9 +52,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class StorageBlockEntity extends BlockEntity
-		implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay, RenderAttachmentBlockEntity {
+public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay, RenderAttachmentBlockEntity {
 	public static final String STORAGE_WRAPPER_TAG = "storageWrapper";
 	private final StorageWrapper storageWrapper;
 	@Nullable
@@ -397,7 +396,7 @@ public abstract class StorageBlockEntity extends BlockEntity
 	}
 
 	@SuppressWarnings("unused")
-	@Nullable
+	@NotNull
 	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
 		if (cap == ItemStorage.SIDED) {
 			if (opt == null) {
@@ -422,12 +421,14 @@ public abstract class StorageBlockEntity extends BlockEntity
 
 	private void invalidateStorageCap() {
 		if (itemHandlerCap != null) {
-			itemHandlerCap.invalidate();
+			LazyOptional<SlottedStackStorage> tempItemHandlerCap = itemHandlerCap;
 			itemHandlerCap = null;
+			tempItemHandlerCap.invalidate();
 		}
 		if (noSideItemHandlerCap != null) {
-			noSideItemHandlerCap.invalidate();
+			LazyOptional<SlottedStackStorage> tempNoSideItemHandlerCap = noSideItemHandlerCap;
 			noSideItemHandlerCap = null;
+			tempNoSideItemHandlerCap.invalidate();
 		}
 	}
 
@@ -554,13 +555,11 @@ public abstract class StorageBlockEntity extends BlockEntity
 		if (memorizesItemsWhenLocked()) {
 			getStorageWrapper().getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).unselectAllSlots();
 			ItemDisplaySettingsCategory itemDisplaySettings = getStorageWrapper().getSettingsHandler().getTypeCategory(ItemDisplaySettingsCategory.class);
-			InventoryHandler inventoryHandler = getStorageWrapper().getInventoryHandler();
-			for (int slot = 0; slot < inventoryHandler.getSlotCount(); slot++) {
-				ItemStack stack = inventoryHandler.getStackInSlot(slot);
+			InventoryHelper.iterate(getStorageWrapper().getInventoryHandler(), (slot, stack) -> {
 				if (stack.isEmpty()) {
 					itemDisplaySettings.itemChanged(slot);
 				}
-			}
+			});
 		}
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
@@ -615,7 +614,6 @@ public abstract class StorageBlockEntity extends BlockEntity
 		if (direction == null) {
 			return;
 		}
-		//noinspection DataFlowIssue
 		storageWrapper.getUpgradeHandler().getWrappersThatImplement(INeighborChangeListenerUpgrade.class).forEach(upgrade -> upgrade.onNeighborChange(level, worldPosition, direction));
 	}
 
@@ -688,7 +686,7 @@ public abstract class StorageBlockEntity extends BlockEntity
 
 		@Override
 		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return matchesContents(resource.toStack()) && itemHandlerGetter.get().isItemValid(slot, resource, count);
+			return matchesContents(resource.toStack(count)) && itemHandlerGetter.get().isItemValid(slot, resource, count);
 		}
 
 		private boolean matchesContents(ItemStack stack) {

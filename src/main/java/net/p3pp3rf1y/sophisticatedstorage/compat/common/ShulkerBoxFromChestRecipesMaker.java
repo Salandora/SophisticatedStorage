@@ -54,7 +54,6 @@ public class ShulkerBoxFromChestRecipesMaker {
 					for (ItemStack ingredientItem : ingredientItems) {
 						if (ingredientItem.getItem() instanceof ChestBlockItem) {
 							isChestIngredient = true;
-							break;
 						}
 					}
 					if (isChestIngredient) {
@@ -68,7 +67,7 @@ public class ShulkerBoxFromChestRecipesMaker {
 				}
 				ItemStack result = ClientRecipeHelper.assemble(originalRecipe, craftinginventory);
 				//noinspection ConstantConditions
-				ResourceLocation newId = new ResourceLocation(SophisticatedStorage.ID, "shulker_from_" + BuiltInRegistries.ITEM.getKey(chestItem.getItem()).getPath()
+				ResourceLocation newId = new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_from_" + BuiltInRegistries.ITEM.getKey(chestItem.getItem()).getPath()
 						+ result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[^a-z\\d/._-]", "_"));
 
 				recipes.add(new ShapedRecipe(newId, "", CraftingBookCategory.MISC, originalRecipe.getWidth(), originalRecipe.getHeight(), ingredientsCopy, result));

@@ -30,16 +30,21 @@ public class ModCompat {
 		// compatFactories.put(new CompatInfo(CompatModIds.QUARK, null), () -> QuarkCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.CHIPPED, null), () -> ChippedCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.LITEMATICA, null), () -> LitematicaCompat::new);
-		try {
-			compatFactories.put(new CompatInfo(SODIUM_MOD_ID, VersionPredicateParser.parse(">=0.4.9 <0.5")), () -> SodiumCompat::new);
-		}
-		catch (VersionParsingException e) {
-			throw new RuntimeException(e);
-		}
+		compatFactories.put(new CompatInfo(SODIUM_MOD_ID, fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
 	}
 
 	public static void compatsSetup() {
 		loadedCompats.values().forEach(ICompat::setup);
+	}
+
+	@Nullable
+	private static VersionPredicate fromSpec(String spec) {
+		try {
+			return VersionPredicateParser.parse(spec);
+		}
+		catch (VersionParsingException e) {
+			return null;
+		}
 	}
 
 	public static void initCompats() {

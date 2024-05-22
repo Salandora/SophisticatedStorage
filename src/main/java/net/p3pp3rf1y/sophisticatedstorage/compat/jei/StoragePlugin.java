@@ -51,7 +51,7 @@ public class StoragePlugin implements IModPlugin {
 
 	@Override
 	public ResourceLocation getPluginUid() {
-		return new ResourceLocation(SophisticatedStorage.ID, "default");
+		return new ResourceLocation(SophisticatedStorage.MOD_ID, "default");
 	}
 
 	@Override

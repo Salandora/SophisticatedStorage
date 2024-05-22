@@ -17,6 +17,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	private static final String PACKED_TAG = "packed";
@@ -87,7 +88,7 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 		return !isPacked();
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
 		if (isPacked() && cap == ItemStorage.SIDED) {

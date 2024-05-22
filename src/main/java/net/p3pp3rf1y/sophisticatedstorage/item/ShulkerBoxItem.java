@@ -55,7 +55,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		if (flagIn == TooltipFlag.Default.ADVANCED) {
+		if (flagIn == TooltipFlag.ADVANCED) {
 			CapabilityStorageWrapper.get(stack).flatMap(IStorageWrapper::getContentsUuid)
 					.ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
 		}
@@ -111,7 +111,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 			}
 
 			private StorageWrapper initWrapper(ItemStack stack) {
-				UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
+				UUID uuid = getContentsUuid(stack).orElse(null);
 				StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
 					@Override
 					public String getStorageType() {
@@ -137,6 +137,10 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 				return storageWrapper;
 			}
 		};
+	}
+
+	private static Optional<UUID> getContentsUuid(ItemStack stack) {
+		return NBTHelper.getUniqueId(stack, "uuid");
 	}
 
 	@Override

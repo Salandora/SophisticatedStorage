@@ -92,11 +92,12 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 public class ModItems {
+	private ModItems() {
+	}
+
 	final static Map<ResourceLocation, Item> ITEMS = new LinkedHashMap<>(); // Must be up here!
 
-	private ModItems() {}
-
-	public static final ResourceLocation STORAGE_UPGRADE_TAG_NAME = new ResourceLocation(SophisticatedStorage.ID, "upgrade");
+	public static final ResourceLocation STORAGE_UPGRADE_TAG_NAME = new ResourceLocation(SophisticatedStorage.MOD_ID, "upgrade");
 
 	public static final TagKey<Item> STORAGE_UPGRADE_TAG = TagKey.create(Registries.ITEM, STORAGE_UPGRADE_TAG_NAME);
 
@@ -210,9 +211,7 @@ public class ModItems {
 	public static final ItemBase STORAGE_TOOL = register("storage_tool", StorageToolItem::new);
 	public static final ItemBase DEBUG_TOOL = register("debug_tool", () -> new ItemBase(new Item.Properties().stacksTo(1)));
 	public static final Item INACCESSIBLE_SLOT = register("inaccessible_slot", () -> new Item(new Item.Properties().stacksTo(1)));
-
-	public static final LootItemFunctionType COPY_STORAGE_DATA = registerLootFunction("copy_storage_data", () ->
-			new LootItemFunctionType(new CopyStorageDataFunction.Serializer()));
+	public static final LootItemFunctionType COPY_STORAGE_DATA = registerLootFunction("copy_storage_data", () -> new LootItemFunctionType(new CopyStorageDataFunction.Serializer()));
 
 	@SuppressWarnings("unused")
 	public static final CreativeModeTab CREATIVE_TAB = FabricItemGroup.builder()
@@ -225,24 +224,8 @@ public class ModItems {
 			.build();
 
 
-	public static <T extends Item> T register(String id, Supplier<T> supplier) {
-		T item = supplier.get();
-		ITEMS.put(SophisticatedStorage.getRL(id), item);
-		return Registry.register(BuiltInRegistries.ITEM, SophisticatedStorage.getRL(id), item);
-	}
-	public static <T extends LootItemFunctionType> T registerLootFunction(String id, Supplier<T> supplier) {
-		return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, SophisticatedStorage.getRL(id), supplier.get());
-	}
-
-	public static void register() {
-		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, SophisticatedStorage.getRL("item_group"), CREATIVE_TAB);
-
-		registerContainers();
-		registerRecipeCondition();
-	}
-
 	private static void registerRecipeCondition() {
-		ResourceConditions.register(DropPackedDisabledCondition.ID, DropPackedDisabledCondition::test);
+		ResourceConditions.register(DropPackedDisabledCondition.NAME, DropPackedDisabledCondition::test);
 	}
 
 	public static final UpgradeContainerType<PickupUpgradeWrapper, ContentsFilteredUpgradeContainer<PickupUpgradeWrapper>> PICKUP_BASIC_TYPE = new UpgradeContainerType<>(ContentsFilteredUpgradeContainer::new);
@@ -312,5 +295,21 @@ public class ModItems {
 		public List<UpgradeConflictDefinition> getUpgradeConflicts() {
 			return UPGRADE_CONFLICT_DEFINITIONS;
 		}
+	}
+
+	public static <T extends Item> T register(String id, Supplier<T> supplier) {
+		T item = supplier.get();
+		ITEMS.put(SophisticatedStorage.getRL(id), item);
+		return Registry.register(BuiltInRegistries.ITEM, SophisticatedStorage.getRL(id), item);
+	}
+	public static <T extends LootItemFunctionType> T registerLootFunction(String id, Supplier<T> supplier) {
+		return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, SophisticatedStorage.getRL(id), supplier.get());
+	}
+
+	public static void register() {
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, SophisticatedStorage.getRL("item_group"), CREATIVE_TAB);
+
+		registerContainers();
+		registerRecipeCondition();
 	}
 }

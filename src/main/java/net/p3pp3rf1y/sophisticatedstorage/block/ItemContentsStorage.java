@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ItemContentsStorage extends SavedData {
-	private static final String SAVED_DATA_NAME = SophisticatedStorage.ID;
+	private static final String SAVED_DATA_NAME = SophisticatedStorage.MOD_ID;
 
 	private final Map<UUID, CompoundTag> storageContents = new HashMap<>();
 	private static final ItemContentsStorage clientStorageCopy = new ItemContentsStorage();

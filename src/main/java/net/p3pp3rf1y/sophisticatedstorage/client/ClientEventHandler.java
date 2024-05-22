@@ -116,9 +116,9 @@ public class ClientEventHandler {
 		}
 	}
 
-	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.ID, "chest");
-	private static final ResourceLocation CHEST_LEFT_RL = new ResourceLocation(SophisticatedStorage.ID, "chest_left");
-	private static final ResourceLocation CHEST_RIGHT_RL = new ResourceLocation(SophisticatedStorage.ID, "chest_right");
+	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
+	private static final ResourceLocation CHEST_LEFT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_left");
+	private static final ResourceLocation CHEST_RIGHT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_right");
 	public static final ModelLayerLocation CHEST_LAYER = new ModelLayerLocation(CHEST_RL, "main");
 	public static final ModelLayerLocation CHEST_LEFT_LAYER = new ModelLayerLocation(CHEST_LEFT_RL, "main");
 	public static final ModelLayerLocation CHEST_RIGHT_LAYER = new ModelLayerLocation(CHEST_RIGHT_RL, "main");
@@ -185,7 +185,7 @@ public class ClientEventHandler {
 	private static void addBarrelPartModelsToBake(ResourceManager manager, Consumer<ResourceLocation> out) {
 		Map<ResourceLocation, Resource> models = manager.listResources("models/block/barrel_part", fileName -> fileName.getPath().endsWith(".json"));
 		models.forEach((modelName, resource) -> {
-			if (modelName.getNamespace().equals(SophisticatedStorage.ID)) {
+			if (modelName.getNamespace().equals(SophisticatedStorage.MOD_ID)) {
 				out.accept(new ResourceLocation(modelName.getNamespace(), modelName.getPath().substring("models/".length()).replace(".json", "")));
 			}
 		});
@@ -195,7 +195,6 @@ public class ClientEventHandler {
 		if (mc.screen != null) {
 			return InteractionResult.PASS;
 		}
-
 		LocalPlayer player = mc.player;
 		if (player == null || !player.isShiftKeyDown()) {
 			return InteractionResult.PASS;
@@ -226,7 +225,6 @@ public class ClientEventHandler {
 				}
 			}
 		}
-
 		return InteractionResult.PASS;
 	}
 
@@ -234,13 +232,13 @@ public class ClientEventHandler {
 		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(InputConstants.getKey(key, scancode)) || !tryCallSort(screen);
 	}
 
+	private static void registerStorageLayerLoader() {
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(StorageTextureManager.INSTANCE);
+	}
+
 	public static boolean handleGuiMouseKeyPress(Screen screen, double mouseX, double mouseY, int button) {
 		InputConstants.Key input = InputConstants.Type.MOUSE.getOrCreate(button);
 		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(input) || !tryCallSort(screen);
-	}
-
-	private static void registerStorageLayerLoader() {
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(StorageTextureManager.INSTANCE);
 	}
 
 	private static boolean tryCallSort(Screen gui) {

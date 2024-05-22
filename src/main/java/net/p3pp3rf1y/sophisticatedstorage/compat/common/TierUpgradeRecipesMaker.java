@@ -56,7 +56,6 @@ public class TierUpgradeRecipesMaker {
 						return false;
 					}
 				}, 3, 3);
-
 				NonNullList<Ingredient> ingredientsCopy = NonNullList.createWithCapacity(ingredients.size());
 				int i = 0;
 				for (Ingredient ingredient : ingredients) {
@@ -72,10 +71,9 @@ public class TierUpgradeRecipesMaker {
 					}
 					i++;
 				}
-
 				ItemStack result = ClientRecipeHelper.assemble(recipe, craftinginventory);
 				//noinspection ConstantConditions
-				ResourceLocation id = new ResourceLocation(SophisticatedStorage.ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
 				itemGroupRecipes.add(constructRecipe.construct(recipe, id, ingredientsCopy, result));
 			});
 			return itemGroupRecipes;

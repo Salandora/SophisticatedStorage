@@ -99,7 +99,7 @@ public abstract class StorageRenderer<T extends StorageBlockEntity> implements B
 	}
 
 	private static boolean isStorageItem(Item item) {
-		return RegistryHelper.getItemKey(item).getNamespace().equals(SophisticatedStorage.ID);
+		return RegistryHelper.getItemKey(item).getNamespace().equals(SophisticatedStorage.MOD_ID);
 	}
 
 	public boolean shouldShowDisabledUpgradesDisplay(T storageBlockEntity) {

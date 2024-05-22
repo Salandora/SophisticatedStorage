@@ -39,7 +39,7 @@ public class ChestItemRenderer {
 		}
 	});
 
-    public static void render(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+	public static void render(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
 		if (!(stack.getItem() instanceof BlockItem blockItem)) {
 			return;
 		}

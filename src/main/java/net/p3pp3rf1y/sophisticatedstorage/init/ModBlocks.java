@@ -147,8 +147,8 @@ public class ModBlocks {
 	public static final BarrelBlock LIMITED_NETHERITE_BARREL_1 = register("limited_netherite_barrel_1", () -> new LimitedBarrelBlock(1, Config.SERVER.netheriteLimitedBarrel1.baseSlotLimitMultiplier, Config.SERVER.netheriteLimitedBarrel1.upgradeSlotCount,
 			BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5F, 1200).sound(SoundType.WOOD)));
 	public static final BlockItem LIMITED_BARREL_1_ITEM = registerItem("limited_barrel_1", () -> new BarrelBlockItem(LIMITED_BARREL_1));
-	public static final BlockItem LIMITED_COPPER_BARREL_1_ITEM = registerItem("limited_copper_barrel_1", () -> new BarrelBlockItem(LIMITED_COPPER_BARREL_1));
 	public static final BlockItem LIMITED_IRON_BARREL_1_ITEM = registerItem("limited_iron_barrel_1", () -> new BarrelBlockItem(LIMITED_IRON_BARREL_1));
+	public static final BlockItem LIMITED_COPPER_BARREL_1_ITEM = registerItem("limited_copper_barrel_1", () -> new BarrelBlockItem(LIMITED_COPPER_BARREL_1));
 	public static final BlockItem LIMITED_GOLD_BARREL_1_ITEM = registerItem("limited_gold_barrel_1", () -> new BarrelBlockItem(LIMITED_GOLD_BARREL_1));
 	public static final BlockItem LIMITED_DIAMOND_BARREL_1_ITEM = registerItem("limited_diamond_barrel_1", () -> new BarrelBlockItem(LIMITED_DIAMOND_BARREL_1));
 	public static final BlockItem LIMITED_NETHERITE_BARREL_1_ITEM = registerItem("limited_netherite_barrel_1", () -> new BarrelBlockItem(LIMITED_NETHERITE_BARREL_1, new Properties().fireResistant()));
@@ -277,15 +277,12 @@ public class ModBlocks {
 
 	private static final String CONTROLLER_REG_NAME = "controller";
 	public static final ControllerBlock CONTROLLER = register(CONTROLLER_REG_NAME, ControllerBlock::new);
-	public static final BlockItemBase CONTROLLER_ITEM = registerItem(CONTROLLER_REG_NAME, () -> new BlockItemBase(CONTROLLER, new Properties()));
-
 	private static final String STORAGE_LINK_REG_NAME = "storage_link";
 	public static final StorageLinkBlock STORAGE_LINK = register(STORAGE_LINK_REG_NAME, StorageLinkBlock::new);
+	public static final BlockItemBase CONTROLLER_ITEM = registerItem(CONTROLLER_REG_NAME, () -> new BlockItemBase(CONTROLLER, new Properties()));
 	public static final BlockItemBase STORAGE_LINK_ITEM = registerItem(STORAGE_LINK_REG_NAME, () -> new BlockItemBase(STORAGE_LINK, new Properties()));
-
 	public static final String STORAGE_IO_REG_NAME = "storage_io";
 	public static final StorageIOBlock STORAGE_IO = register(STORAGE_IO_REG_NAME, StorageIOBlock::new);
-
 	public static final String STORAGE_INPUT_REG_NAME = "storage_input";
 	public static final StorageIOBlock STORAGE_INPUT = register(STORAGE_INPUT_REG_NAME, () -> new StorageIOBlock() {
 		@Override
@@ -363,17 +360,17 @@ public class ModBlocks {
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static final MenuType<StorageContainerMenu> STORAGE_CONTAINER_TYPE = registerMenuType("storage", () ->
-			new ExtendedScreenHandlerType<>(StorageContainerMenu::fromBuffer));
+	public static final MenuType<StorageContainerMenu> STORAGE_CONTAINER_TYPE = registerMenuType("storage",
+			() -> new ExtendedScreenHandlerType<>(StorageContainerMenu::fromBuffer));
 
-	public static final MenuType<LimitedBarrelContainerMenu> LIMITED_BARREL_CONTAINER_TYPE = registerMenuType(LIMITED_BARREL_NAME, () ->
-			new ExtendedScreenHandlerType<>(LimitedBarrelContainerMenu::fromBuffer));
+	public static final MenuType<LimitedBarrelContainerMenu> LIMITED_BARREL_CONTAINER_TYPE = registerMenuType(LIMITED_BARREL_NAME,
+			() -> new ExtendedScreenHandlerType<>(LimitedBarrelContainerMenu::fromBuffer));
 
-	public static final MenuType<StorageSettingsContainerMenu> SETTINGS_CONTAINER_TYPE = registerMenuType("settings", () ->
-			new ExtendedScreenHandlerType<>(StorageSettingsContainerMenu::fromBuffer));
+	public static final MenuType<StorageSettingsContainerMenu> SETTINGS_CONTAINER_TYPE = registerMenuType("settings",
+			() -> new ExtendedScreenHandlerType<>(StorageSettingsContainerMenu::fromBuffer));
 
-	public static final MenuType<LimitedBarrelSettingsContainerMenu> LIMITED_BARREL_SETTINGS_CONTAINER_TYPE = registerMenuType("limited_barrel_settings", () ->
-			new ExtendedScreenHandlerType<>(LimitedBarrelSettingsContainerMenu::fromBuffer));
+	public static final MenuType<LimitedBarrelSettingsContainerMenu> LIMITED_BARREL_SETTINGS_CONTAINER_TYPE = registerMenuType("limited_barrel_settings",
+			() -> new ExtendedScreenHandlerType<>(LimitedBarrelSettingsContainerMenu::fromBuffer));
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,17 +410,21 @@ public class ModBlocks {
 	public static void register() {
 		registerDispenseBehavior();
 		registerCauldronInteractions();
-		registerIngredientSerializers();
+		registerRecipeSerializers();
 
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleIdentifiablePrepareableReloadListener<>(SophisticatedStorage.getRL("recipes")) {
 			@Override
 			protected void apply(Object object, ResourceManager resourceManager, ProfilerFiller profiler) {
-				ShulkerBoxFromChestRecipe.REGISTERED_RECIPES.clear();
+				onResourceReload();
 			}
 		});
 	}
 
-	private static void registerIngredientSerializers() {
+	private static void onResourceReload() {
+		ShulkerBoxFromChestRecipe.REGISTERED_RECIPES.clear();
+	}
+
+	private static void registerRecipeSerializers() {
 		CustomIngredientSerializer.register(BaseTierWoodenStorageIngredient.Serializer.INSTANCE);
 	}
 

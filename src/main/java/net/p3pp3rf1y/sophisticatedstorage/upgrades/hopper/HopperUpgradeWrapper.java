@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
-import com.google.common.collect.MapMaker;
-
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -18,6 +16,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
@@ -31,6 +30,7 @@ import net.p3pp3rf1y.sophisticatedstorage.common.gui.BlockSide;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
 
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	private Set<Direction> pullDirections = new LinkedHashSet<>();
 	private Set<Direction> pushDirections = new LinkedHashSet<>();
 	private boolean directionsInitialized = false;
-	private final Map<Direction, BlockApiCache<Storage<ItemVariant>, Direction>> handlerCache = new MapMaker().weakKeys().weakValues().makeMap();
+	private final Map<Direction, BlockApiCache<Storage<ItemVariant>, Direction>> handlerCache = new EnumMap<>(Direction.class);
 
 	private final ContentsFilterLogic inputFilterLogic;
 	private final ContentsFilterLogic outputFilterLogic;
@@ -212,12 +212,12 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		}
 	}
 
-	private Optional<Storage<ItemVariant>> getItemHandler(Level level, BlockPos pos, Direction direction) {
+	private LazyOptional<Storage<ItemVariant>> getItemHandler(Level level, BlockPos pos, Direction direction) {
 		if (!handlerCache.containsKey(direction)) {
 			handlerCache.put(direction, BlockApiCache.create(ItemStorage.SIDED, (ServerLevel) level, pos.relative(direction)));
 		}
 
-		return Optional.ofNullable(handlerCache.get(direction).find(direction.getOpposite()));
+		return LazyOptional.ofObject(handlerCache.get(direction).find(direction.getOpposite()));
 	}
 
 	public ContentsFilterLogic getInputFilterLogic() {

@@ -139,7 +139,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('L', Items.LEATHER)
 				.define('S', storageStackUpgrade)
 				.unlockedBy("has_storage_stack_upgrade", has(storageStackUpgrade))
-				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.ID))
+				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.MOD_ID))
 				.save(consumer, SophisticatedStorage.getRL("backpack_" + RegistryHelper.getItemKey(backpackStackUpgrade).getPath() + "_from_storage_" + RegistryHelper.getItemKey(storageStackUpgrade).getPath()));
 	}
 
@@ -152,7 +152,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('L', Items.LEATHER)
 				.define('U', storageUpgrade)
 				.unlockedBy("has_storage_upgrade", has(storageUpgrade))
-				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.ID))
+				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.MOD_ID))
 				.save(consumer, SophisticatedStorage.getRL("backpack_" + RegistryHelper.getItemKey(backpackUpgrade).getPath() + "_from_storage_" + RegistryHelper.getItemKey(storageUpgrade).getPath()));
 	}
 
@@ -164,7 +164,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('P', ItemTags.PLANKS)
 				.define('U', backpackUpgrade)
 				.unlockedBy("has_backpack_upgrade", has(backpackUpgrade))
-				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.ID))
+				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.MOD_ID))
 				.save(consumer, SophisticatedStorage.getRL("storage_" + RegistryHelper.getItemKey(storageUpgrade).getPath() + "_from_backpack_" + RegistryHelper.getItemKey(backpackUpgrade).getPath()));
 	}
 
@@ -176,7 +176,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('P', ItemTags.PLANKS)
 				.define('S', backpackStackUpgrade)
 				.unlockedBy("has_backpack_stack_upgrade", has(backpackStackUpgrade))
-				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.ID))
+				.condition(DefaultResourceConditions.allModsLoaded(SophisticatedBackpacks.MOD_ID))
 				.save(consumer, SophisticatedStorage.getRL("storage_" + RegistryHelper.getItemKey(storageStackUpgrade).getPath() + "_from_backpack_" + RegistryHelper.getItemKey(backpackStackUpgrade).getPath()));
 	}
 
@@ -390,6 +390,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', Items.SHULKER_SHELL)
 				.unlockedBy("has_copper_chest", has(ModBlocks.COPPER_CHEST_ITEM))
 				.save(consumer, SophisticatedStorage.getRL("copper_shulker_from_copper_chest"));
+
 
 		ShapeBasedRecipeBuilder.shaped(ModBlocks.IRON_SHULKER_BOX_ITEM, ModBlocks.SHULKER_BOX_FROM_CHEST_RECIPE_SERIALIZER)
 				.pattern("S")
@@ -781,7 +782,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.pattern("BIB")
 				.define('S', ModItems.STACK_UPGRADE_TIER_1)
 				.define('I', ConventionalItemTags.IRON_INGOTS)
-				.define('B', Items.IRON_BLOCK)
+				.define('B', Tags.Items.STORAGE_BLOCKS_IRON)
 				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1))
 				.save(consumer);
 
@@ -791,7 +792,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.pattern("BGB")
 				.define('S', ModItems.STACK_UPGRADE_TIER_2)
 				.define('G', ConventionalItemTags.GOLD_INGOTS)
-				.define('B', Items.GOLD_BLOCK)
+				.define('B', Tags.Items.STORAGE_BLOCKS_GOLD)
 				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_2))
 				.save(consumer);
 
@@ -801,7 +802,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.pattern("BDB")
 				.define('S', ModItems.STACK_UPGRADE_TIER_3)
 				.define('D', ConventionalItemTags.DIAMONDS)
-				.define('B', Items.DIAMOND_BLOCK)
+				.define('B', Tags.Items.STORAGE_BLOCKS_DIAMOND)
 				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_3))
 				.save(consumer);
 
@@ -989,8 +990,8 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('P', ItemTags.PLANKS)
 				.define('U', backpackUpgrade)
 				.unlockedBy("has_backpack_upgrade", has(backpackUpgrade))
-				.condition(DefaultResourceConditions.allModsLoaded(CompatModIds.CHIPPED, SophisticatedBackpacks.ID))
-				.save(consumer, new ResourceLocation(SophisticatedStorage.ID, "storage_" + getChippedItemPath(upgrade) + "_from_backpack_" + getChippedItemPath(backpackUpgrade)));
+				.condition(DefaultResourceConditions.allModsLoaded(CompatModIds.CHIPPED, SophisticatedBackpacks.MOD_ID))
+				.save(consumer, new ResourceLocation(SophisticatedStorage.MOD_ID, "storage_" + getChippedItemPath(upgrade) + "_from_backpack_" + getChippedItemPath(backpackUpgrade)));
 
 		//backpack from storage upgrade
 		ShapeBasedRecipeBuilder.shaped(backpackUpgrade)
@@ -1001,8 +1002,8 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('L', Items.LEATHER)
 				.define('U', upgrade)
 				.unlockedBy("has_storage_upgrade", has(upgrade))
-				.condition(DefaultResourceConditions.allModsLoaded(CompatModIds.CHIPPED, SophisticatedBackpacks.ID))
-				.save(consumer, new ResourceLocation(SophisticatedStorage.ID, "backpack_" + getChippedItemPath(backpackUpgrade) + "_from_storage_" + getChippedItemPath(upgrade)));
+				.condition(DefaultResourceConditions.allModsLoaded(CompatModIds.CHIPPED, SophisticatedBackpacks.MOD_ID))
+				.save(consumer, new ResourceLocation(SophisticatedStorage.MOD_ID, "backpack_" + getChippedItemPath(backpackUpgrade) + "_from_storage_" + getChippedItemPath(upgrade)));
 	}
 
 	private static String getChippedItemPath(BlockTransformationUpgradeItem upgrade) {

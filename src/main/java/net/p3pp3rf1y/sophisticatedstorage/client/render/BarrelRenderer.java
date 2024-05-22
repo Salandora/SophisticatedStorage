@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
@@ -77,13 +78,13 @@ public class BarrelRenderer<T extends BarrelBlockEntity> extends StorageRenderer
 
 	protected void renderHiddenTier(T blockEntity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 		if (!blockEntity.shouldShowTier() && holdsItemThatShowsHiddenTiers()) {
-			renderTranslucentQuads(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, (model, state, rand, woodName) -> model.getTierQuads(state, rand, woodName, null));
+			renderTranslucentQuads(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, BarrelBakedModelBase::getTierQuads);
 		}
 	}
 
 	protected void renderHiddenLock(T blockEntity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 		if (!blockEntity.shouldShowLock() && blockEntity.isLocked() && holdsToolInToggleLockOrLockDisplay()) {
-			renderTranslucentQuads(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, (model, state, rand, woodName) -> model.getLockQuads(state, rand, woodName, null));
+			renderTranslucentQuads(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, BarrelBakedModelBase::getLockQuads);
 		}
 	}
 
@@ -98,12 +99,12 @@ public class BarrelRenderer<T extends BarrelBlockEntity> extends StorageRenderer
 
 		if (blockEntity.getLevel() != null && blockModel instanceof BarrelBakedModelBase barrelBakedModel) {
 			VertexConsumer vertexConsumer = TranslucentVertexConsumer.getVertexConsumer(bufferSource, 128);
-			getQuads.apply(barrelBakedModel, state, blockEntity.getLevel().random, woodName).forEach(quad -> vertexConsumer.putBulkData(poseStack.last(), quad, 1, 1, 1, packedLight, packedOverlay));
+			getQuads.apply(barrelBakedModel, state, blockEntity.getLevel().random, woodName, RenderType.cutout()).forEach(quad -> vertexConsumer.putBulkData(poseStack.last(), quad, 1, 1, 1, packedLight, packedOverlay));
 		}
 		poseStack.popPose();
 	}
 	private interface GetQuadsFunction {
-		List<BakedQuad> apply(BarrelBakedModelBase model, BlockState state, RandomSource rand, String woodName);
+		List<BakedQuad> apply(BarrelBakedModelBase model, BlockState state, RandomSource rand, String woodName, RenderType renderType);
 
 	}
 }

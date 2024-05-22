@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class ChestBlockEntity extends WoodStorageBlockEntity {
 	public static final String STORAGE_TYPE = "chest";
@@ -307,7 +308,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		doubleMainPos = null;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
 		if (level == null) {
@@ -315,7 +316,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		}
 
 		if (doubleMainPos != null) {
-			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getCapability(cap, opt)).orElseGet(null);
+			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getCapability(cap, opt)).orElseGet(LazyOptional::empty);
 		}
 
 		return super.getCapability(cap, opt);

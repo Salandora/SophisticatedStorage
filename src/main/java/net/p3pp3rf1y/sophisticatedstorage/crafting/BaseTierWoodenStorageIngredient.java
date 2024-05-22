@@ -23,11 +23,6 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 	}
 
 	@Override
-	public boolean test(@Nullable ItemStack stack) {
-		return stack != null && stack.is(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG);
-	}
-
-	@Override
 	public List<ItemStack> getMatchingStacks() {
 		List<ItemStack> itemStacks = Lists.newArrayList();
 		if (ModBlocks.CHEST_ITEM instanceof BlockItemBase itemBase) {
@@ -38,6 +33,11 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 		}
 
 		return itemStacks;
+	}
+
+	@Override
+	public boolean test(@Nullable ItemStack stack) {
+		return stack != null && stack.is(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG);
 	}
 
 	@Override

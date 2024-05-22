@@ -29,10 +29,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsMessage;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
@@ -46,6 +46,8 @@ import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
 
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 public class CommonEventHandler {
@@ -78,7 +80,6 @@ public class CommonEventHandler {
 		if (limitedBarrel.tryToTakeItem(state, level, pos, player)) {
 			return InteractionResult.SUCCESS;
 		}
-
 		return InteractionResult.PASS;
 	}
 
@@ -95,7 +96,6 @@ public class CommonEventHandler {
 		if (sneakItemInteractionBlock.trySneakItemInteraction(player, hand, state, level, pos, hitResult, player.getItemInHand(hand))) {
 			return InteractionResult.SUCCESS;
 		}
-
 		return InteractionResult.PASS;
 	}
 
@@ -137,22 +137,21 @@ public class CommonEventHandler {
 			return true;
 		}
 
-		return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).map(wbe -> {
+		AtomicBoolean cancelEvent = new AtomicBoolean(false);
+		WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).ifPresent(wbe -> {
 			if (wbe.isPacked() || Boolean.TRUE.equals(Config.COMMON.dropPacked.get())) {
-				return true;
+				return;
 			}
 
-			int droppedItemEntityCount = 0;
-			InventoryHandler inventoryHandler = wbe.getStorageWrapper().getInventoryHandler();
-			for (int slot = 0; slot < inventoryHandler.getSlotCount(); slot++) {
-				ItemStack stack = inventoryHandler.getStackInSlot(slot);
+			AtomicInteger droppedItemEntityCount = new AtomicInteger(0);
+			InventoryHelper.iterate(wbe.getStorageWrapper().getInventoryHandler(), (slot, stack) -> {
 				if (stack.isEmpty()) {
-					continue;
+					return;
 				}
-				droppedItemEntityCount += (int) Math.ceil(stack.getCount() / (double) Math.min(stack.getMaxStackSize(), AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT));
-			}
+				droppedItemEntityCount.addAndGet((int) Math.ceil(stack.getCount() / (double) Math.min(stack.getMaxStackSize(), AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT)));
+			});
 
-			if (droppedItemEntityCount > Config.SERVER.tooManyItemEntityDrops.get()) {
+			if (droppedItemEntityCount.get() > Config.SERVER.tooManyItemEntityDrops.get()) {
 				ItemBase packingTapeItem = ModItems.PACKING_TAPE;
 				Component packingTapeItemName = packingTapeItem.getName(new ItemStack(packingTapeItem)).copy().withStyle(ChatFormatting.GREEN);
 
@@ -175,11 +174,9 @@ public class CommonEventHandler {
 						WorldHelper.notifyBlockUpdate(wbe);
 					}));
 				}
-
-				return false;
+				cancelEvent.set(true);
 			}
-
-			return true;
-		}).orElse(true);
+		});
+		return !cancelEvent.get();
 	}
 }

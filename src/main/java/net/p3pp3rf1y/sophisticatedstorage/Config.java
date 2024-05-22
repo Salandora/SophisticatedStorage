@@ -52,8 +52,8 @@ public class Config {
 	public static class BaseConfig {
 		public ForgeConfigSpec specification;
 
-		public void onLoad() { }
-		public void onReload() { }
+		public void onConfigLoad() { }
+		public void onConfigReload() { }
 	}
 
 	public static class Common extends BaseConfig {
@@ -166,7 +166,16 @@ public class Config {
 		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
 
 		@Override
-		public void onReload() {
+		public void onConfigLoad() {
+			clearCache();
+		}
+
+		@Override
+		public void onConfigReload() {
+			clearCache();
+		}
+
+		private void clearCache() {
 			stackUpgrade.clearNonStackableItems();
 			maxUpgradesPerStorage.clearCache();
 			compressionUpgrade.clearCache();
@@ -430,22 +439,22 @@ public class Config {
 		SERVER = register(Server::new, ModConfig.Type.SERVER);
 
 		for (Map.Entry<ModConfig.Type, BaseConfig> pair : CONFIGS.entrySet()) {
-			ForgeConfigRegistry.INSTANCE.register(SophisticatedStorage.ID, pair.getKey(), pair.getValue().specification);
+			ForgeConfigRegistry.INSTANCE.register(SophisticatedStorage.MOD_ID, pair.getKey(), pair.getValue().specification);
 		}
 
-		ModConfigEvents.loading(SophisticatedStorage.ID).register(Config::onLoad);
-		ModConfigEvents.reloading(SophisticatedStorage.ID).register(Config::onReload);
+		ModConfigEvents.loading(SophisticatedStorage.MOD_ID).register(Config::onConfigLoad);
+		ModConfigEvents.reloading(SophisticatedStorage.MOD_ID).register(Config::onConfigReload);
 	}
 
-	public static void onLoad(ModConfig modConfig) {
+	public static void onConfigLoad(ModConfig modConfig) {
 		for (Config.BaseConfig config : CONFIGS.values())
 			if (config.specification == modConfig.getSpec())
-				config.onLoad();
+				config.onConfigLoad();
 	}
 
-	public static void onReload(ModConfig modConfig) {
+	public static void onConfigReload(ModConfig modConfig) {
 		for (Config.BaseConfig config : CONFIGS.values())
 			if (config.specification == modConfig.getSpec())
-				config.onReload();
+				config.onConfigReload();
 	}
 }

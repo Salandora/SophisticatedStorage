@@ -94,7 +94,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	private void invalidateAllCapabilityCache() {
 		capabilitySideCache.forEach((cap, map) -> {
 			HashMap<Direction, LazyOptional<?>> copy = new HashMap<>(map); //to prevent concurrent modification exception
-			copy.forEach((side, storage) -> storage.invalidate());
+			copy.forEach((side, lazyOptional) -> lazyOptional.invalidate());
 		});
 	}
 

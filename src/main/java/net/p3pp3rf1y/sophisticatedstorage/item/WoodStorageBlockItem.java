@@ -52,7 +52,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		if (isPacked(stack)) {
-			if (flagIn == TooltipFlag.Default.ADVANCED) {
+			if (flagIn == TooltipFlag.ADVANCED) {
 				CapabilityStorageWrapper.get(stack).flatMap(IStorageWrapper::getContentsUuid)
 						.ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
 			}

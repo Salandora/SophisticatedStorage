@@ -8,11 +8,11 @@ import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
 public class DropPackedDisabledCondition implements ConditionJsonProvider {
-	public static final ResourceLocation ID = SophisticatedStorage.getRL("drop_packed_disabled");
+	public static final ResourceLocation NAME = SophisticatedStorage.getRL("drop_packed_disabled");
 
 	@Override
 	public ResourceLocation getConditionId() {
-		return ID;
+		return NAME;
 	}
 
 	@Override

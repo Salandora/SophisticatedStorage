@@ -14,6 +14,7 @@ import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlock;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ShapedRecipeAccessor;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 	private final ShapedRecipe compose;
 
 	public ShulkerBoxFromChestRecipe(ShapedRecipe compose) {
-		super(compose.getId(), compose.getGroup(), compose.category(), compose.getWidth(), compose.getHeight(), compose.getIngredients(), compose.getResultItem(null));
+		super(compose.getId(), compose.getGroup(), compose.category(), compose.getWidth(), compose.getHeight(), compose.getIngredients(), ((ShapedRecipeAccessor) compose).getResult());
 		this.compose = compose;
 		REGISTERED_RECIPES.add(compose.getId());
 	}

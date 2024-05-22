@@ -18,7 +18,6 @@ public class ToolInfoOverlay {
 		if (player == null) {
 			return;
 		}
-
 		InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL).ifPresent(storageTool -> {
 			Minecraft mc = Minecraft.getInstance();
 			Window window = mc.getWindow();
