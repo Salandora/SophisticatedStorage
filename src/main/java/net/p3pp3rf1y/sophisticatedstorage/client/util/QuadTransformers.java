@@ -21,11 +21,12 @@ public class QuadTransformers {
 				this.data = new int[EncodingFormat.TOTAL_STRIDE];
 			}
 
-		@Override
-		public QuadEmitter emit() {
-			return null;
-		}
-	};
+			@Override
+			public QuadEmitter emit() {
+				return null;
+			}
+		};
+	}
 
 	public static List<BakedQuad> process(RenderContext.QuadTransform transform, List<BakedQuad> quads) {
 		List<BakedQuad> transformedQuads = new ArrayList<>();
