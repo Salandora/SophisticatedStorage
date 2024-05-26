@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTransformers {
-	private static MutableQuadViewImpl getEditorQuad() {
-		return new MutableQuadViewImpl() {
+	private static MutableQuadViewImpl getEditorQuad(BakedQuad quad) {
+		MutableQuadViewImpl mqv = new MutableQuadViewImpl() {
 			{
 				this.data = new int[EncodingFormat.TOTAL_STRIDE];
 			}
@@ -26,6 +26,13 @@ public class QuadTransformers {
 				// noop
 			}
 		};
+
+		mqv.fromVanilla(quad.getVertices(), 0, true);
+		mqv.nominalFace(quad.getDirection());
+		mqv.colorIndex(quad.getTintIndex());
+		mqv.tag(0);
+
+		return mqv;
 	}
 
 	public static List<BakedQuad> process(RenderContext.QuadTransform transform, List<BakedQuad> quads) {
@@ -33,7 +40,7 @@ public class QuadTransformers {
 
 		for (int i = 0; i < quads.size(); i++) {
 			BakedQuad quad = quads.get(i);
-			MutableQuadView mqv = getEditorQuad().fromVanilla(quad, null, null);
+			MutableQuadView mqv = getEditorQuad(quad);
 			transform.transform(mqv);
 
 			BakedQuad transformedQuad = mqv.toBakedQuad(quad.getSprite());
