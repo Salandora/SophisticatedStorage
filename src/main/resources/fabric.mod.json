@@ -34,7 +34,7 @@
             "net.p3pp3rf1y.sophisticatedstorage.compat.emi.EmiCompat"
         ],
         "jei_mod_plugin": [
-            "net.p3pp3rf1y.sophisticatedstorage.compat.jei.JEIPlugin"
+            "net.p3pp3rf1y.sophisticatedstorage.compat.jei.StoragePlugin"
         ],
         "rei_common": [
             "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REICompat"

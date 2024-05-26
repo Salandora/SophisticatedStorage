@@ -112,7 +112,7 @@ public class ClientEventHandler {
 		}
 	}
 
-	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.ID, "chest");
+	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
 	public static final ModelLayerLocation CHEST_LAYER = new ModelLayerLocation(CHEST_RL, "main");
 
 	public static void registerHandlers() {
@@ -155,7 +155,7 @@ public class ClientEventHandler {
 	private static void addBarrelPartModelsToBake(ResourceManager manager, Consumer<ResourceLocation> out) {
 		Map<ResourceLocation, Resource> models = manager.listResources("models/block/barrel_part", fileName -> fileName.getPath().endsWith(".json"));
 		models.forEach((modelName, resource) -> {
-			if (modelName.getNamespace().equals(SophisticatedStorage.ID)) {
+			if (modelName.getNamespace().equals(SophisticatedStorage.MOD_ID)) {
 				out.accept(new ResourceLocation(modelName.getNamespace(), modelName.getPath().substring("models/".length()).replace(".json", "")));
 			}
 		});
@@ -274,6 +274,7 @@ public class ClientEventHandler {
 	private static void stitchTextures(TextureAtlas atlas, ClientSpriteRegistryCallback.Registry registry) {
 		stitchBlockAtlasTextures(atlas, registry);
 		registry.register(LockRenderer.LOCK_TEXTURE.texture());
+		registry.register(LimitedBarrelRenderer.FILL_INDICATORS_TEXTURE.texture());
 		registry.register(CompressionInventoryPart.EMPTY_COMPRESSION_SLOT.getSecond());
 		registry.register(HopperUpgradeContainer.EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getSecond());
 		registry.register(HopperUpgradeContainer.EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getSecond());
@@ -281,6 +282,7 @@ public class ClientEventHandler {
 
 	private static void stitchShulkerBoxTextures(TextureAtlas atlas, ClientSpriteRegistryCallback.Registry registry) {
 		registry.register(ShulkerBoxRenderer.BASE_TIER_MATERIAL.texture());
+		registry.register(ShulkerBoxRenderer.COPPER_TIER_MATERIAL.texture());
 		registry.register(ShulkerBoxRenderer.IRON_TIER_MATERIAL.texture());
 		registry.register(ShulkerBoxRenderer.GOLD_TIER_MATERIAL.texture());
 		registry.register(ShulkerBoxRenderer.DIAMOND_TIER_MATERIAL.texture());
@@ -313,12 +315,14 @@ public class ClientEventHandler {
 
 	private static void registerItemRenderers() {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.CHEST_ITEM, ChestItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_CHEST_ITEM, ChestItemRenderer::render);
 
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);

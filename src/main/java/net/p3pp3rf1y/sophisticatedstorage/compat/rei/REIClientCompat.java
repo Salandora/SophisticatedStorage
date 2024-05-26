@@ -17,11 +17,11 @@ import net.p3pp3rf1y.sophisticatedcore.compat.rei.SettingsGhostIngredientHandler
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.StorageGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ControllerRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.ControllerRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.DyeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.FlatBarrelRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.ShulkerBoxFromChestRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.TierUpgradeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 
 import java.util.ArrayList;
@@ -70,8 +70,8 @@ public class REIClientCompat implements REIClientPlugin {
     @Override
     public void registerDisplays(DisplayRegistry registry) {
         registerRecipes(registry, DyeRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
-		registerRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes(), BuiltinPlugin.CRAFTING);
-		registerRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes(), BuiltinPlugin.CRAFTING);
+		registerRecipes(registry, TierUpgradeRecipesMaker.getCraftingRecipes(), BuiltinPlugin.CRAFTING);
+		registerRecipes(registry, TierUpgradeRecipesMaker.getSmithingRecipes(), BuiltinPlugin.SMITHING);
 		registerRecipes(registry, ControllerRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, FlatBarrelRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);

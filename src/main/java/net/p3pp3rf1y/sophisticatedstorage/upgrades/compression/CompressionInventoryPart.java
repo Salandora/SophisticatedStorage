@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
@@ -293,21 +294,27 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 	@Override
 	public long extractItem(int slot, ItemVariant resource, long amount, TransactionContext ctx) {
+		return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
+	}
+
+	private long extractItem(int slot, ItemVariant resource, long amount, TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
 		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
 			return 0;
 		}
 		int toExtract = Math.min(calculatedStacks.get(slot).getCount(), (int) amount);
 
 		if (toExtract > 0) {
-			TransactionCallback.onSuccess(ctx, () -> {
-				SlotDefinition slotDefinition = slotDefinitions.get(slot);
-				ItemStack slotStack = parent.getSlotStack(slot);
+			SlotDefinition slotDefinition = slotDefinitions.get(slot);
+			ItemStack slotStack = parent.getSlotStack(slot);
+			toExtract = Math.min(toExtract, getLimit.applyAsInt(slotStack));
 
+			int finalToExtract = toExtract;
+			TransactionCallback.onSuccess(ctx, () -> {
 				if (slotDefinition.isCompressible()) {
-					extractFromCalculated(slot, toExtract);
-					extractFromInternal(slot, toExtract);
+					extractFromCalculated(slot, finalToExtract);
+					extractFromInternal(slot, finalToExtract);
 				} else {
-					slotStack.shrink(toExtract);
+					slotStack.shrink(finalToExtract);
 					parent.setSlotStack(slot, slotStack);
 					calculatedStacks.put(slot, slotStack.copy());
 				}
@@ -605,7 +612,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			if (currentCount < stack.getCount()) {
 				insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, ctx);
 			} else if (currentCount > stack.getCount()) {
-				extractItem(slot, ItemVariant.of(stack), currentCount - stack.getCount(), ctx);
+				extractItem(slot, ItemVariant.of(stack), currentCount - stack.getCount(), ctx, s -> Integer.MAX_VALUE);
 			}
 			ctx.commit();
 		}

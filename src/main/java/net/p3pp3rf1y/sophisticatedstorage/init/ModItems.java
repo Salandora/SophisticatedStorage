@@ -1,15 +1,19 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.BlastingRecipe;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.crafting.SmokingRecipe;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerRegistry;
@@ -63,6 +67,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.data.CopyStorageDataFunction;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageTierUpgradeItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
@@ -73,20 +78,20 @@ import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeItem;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeWrapper;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.Nullable;
 
 public class ModItems {
 	final static Map<ResourceLocation, Item> ITEMS = new LinkedHashMap<>(); // Must be up here!
 
 	private ModItems() {}
 
-	public static final ResourceLocation STORAGE_UPGRADE_TAG_NAME = new ResourceLocation(SophisticatedStorage.ID, "upgrade");
+	public static final ResourceLocation STORAGE_UPGRADE_TAG_NAME = new ResourceLocation(SophisticatedStorage.MOD_ID, "upgrade");
 
 	public static final TagKey<Item> STORAGE_UPGRADE_TAG = TagKey.create(Registry.ITEM.key(), STORAGE_UPGRADE_TAG_NAME);
 
-
-	@SuppressWarnings("unused")
 	public static final CreativeModeTab CREATIVE_TAB = FabricItemGroupBuilder.build(
 			SophisticatedStorage.getRL("item_group"),
 			() -> WoodStorageBlockItem.setWoodType(new ItemStack(ModBlocks.GOLD_BARREL_ITEM), WoodType.SPRUCE));
@@ -98,92 +103,99 @@ public class ModItems {
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static final PickupUpgradeItem PICKUP_UPGRADE = register("pickup_upgrade", () ->
-			new PickupUpgradeItem(Config.SERVER.pickupUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final PickupUpgradeItem ADVANCED_PICKUP_UPGRADE = register("advanced_pickup_upgrade", () ->
-			new PickupUpgradeItem(Config.SERVER.advancedPickupUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final FilterUpgradeItem FILTER_UPGRADE = register("filter_upgrade", () ->
-			new FilterUpgradeItem(Config.SERVER.filterUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final FilterUpgradeItem ADVANCED_FILTER_UPGRADE = register("advanced_filter_upgrade", () ->
-			new FilterUpgradeItem(Config.SERVER.advancedFilterUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final MagnetUpgradeItem MAGNET_UPGRADE = register("magnet_upgrade", () ->
-			new MagnetUpgradeItem(Config.SERVER.magnetUpgrade.magnetRange::get, Config.SERVER.magnetUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final MagnetUpgradeItem ADVANCED_MAGNET_UPGRADE = register("advanced_magnet_upgrade", () ->
-			new MagnetUpgradeItem(Config.SERVER.advancedMagnetUpgrade.magnetRange::get, Config.SERVER.advancedMagnetUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final FeedingUpgradeItem FEEDING_UPGRADE = register("feeding_upgrade", () ->
-			new FeedingUpgradeItem(Config.SERVER.feedingUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final FeedingUpgradeItem ADVANCED_FEEDING_UPGRADE = register("advanced_feeding_upgrade", () ->
-			new FeedingUpgradeItem(Config.SERVER.advancedFeedingUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final CompactingUpgradeItem COMPACTING_UPGRADE = register("compacting_upgrade", () ->
-			new CompactingUpgradeItem(false, Config.SERVER.compactingUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final CompactingUpgradeItem ADVANCED_COMPACTING_UPGRADE = register("advanced_compacting_upgrade", () ->
-			new CompactingUpgradeItem(true, Config.SERVER.advancedCompactingUpgrade.filterSlots::get, CREATIVE_TAB));
-	public static final VoidUpgradeItem VOID_UPGRADE = register("void_upgrade", () ->
-			new VoidUpgradeItem(Config.SERVER.voidUpgrade, CREATIVE_TAB));
-	public static final VoidUpgradeItem ADVANCED_VOID_UPGRADE = register("advanced_void_upgrade", () ->
-			new VoidUpgradeItem(Config.SERVER.advancedVoidUpgrade, CREATIVE_TAB));
-	public static final SmeltingUpgradeItem SMELTING_UPGRADE = register("smelting_upgrade", () ->
-			new SmeltingUpgradeItem(CREATIVE_TAB, Config.SERVER.smeltingUpgrade));
-	public static final AutoSmeltingUpgradeItem AUTO_SMELTING_UPGRADE = register("auto_smelting_upgrade", () ->
-			new AutoSmeltingUpgradeItem(CREATIVE_TAB, Config.SERVER.autoSmeltingUpgrade));
-	public static final SmokingUpgradeItem SMOKING_UPGRADE = register("smoking_upgrade", () ->
-			new SmokingUpgradeItem(CREATIVE_TAB, Config.SERVER.smokingUpgrade));
-	public static final AutoSmokingUpgradeItem AUTO_SMOKING_UPGRADE = register("auto_smoking_upgrade", () ->
-			new AutoSmokingUpgradeItem(CREATIVE_TAB, Config.SERVER.autoSmokingUpgrade));
-	public static final BlastingUpgradeItem BLASTING_UPGRADE = register("blasting_upgrade", () ->
-			new BlastingUpgradeItem(CREATIVE_TAB, Config.SERVER.blastingUpgrade));
-	public static final AutoBlastingUpgradeItem AUTO_BLASTING_UPGRADE = register("auto_blasting_upgrade", () ->
-			new AutoBlastingUpgradeItem(CREATIVE_TAB, Config.SERVER.autoBlastingUpgrade));
-	public static final CraftingUpgradeItem CRAFTING_UPGRADE = register("crafting_upgrade", () -> new CraftingUpgradeItem(CREATIVE_TAB));
-	public static final StonecutterUpgradeItem STONECUTTER_UPGRADE = register("stonecutter_upgrade", () -> new StonecutterUpgradeItem(CREATIVE_TAB));
+	public static final PickupUpgradeItem PICKUP_UPGRADE = register("pickup_upgrade",
+			() -> new PickupUpgradeItem(Config.SERVER.pickupUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final PickupUpgradeItem ADVANCED_PICKUP_UPGRADE = register("advanced_pickup_upgrade",
+			() -> new PickupUpgradeItem(Config.SERVER.advancedPickupUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final FilterUpgradeItem FILTER_UPGRADE = register("filter_upgrade",
+			() -> new FilterUpgradeItem(Config.SERVER.filterUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final FilterUpgradeItem ADVANCED_FILTER_UPGRADE = register("advanced_filter_upgrade",
+			() -> new FilterUpgradeItem(Config.SERVER.advancedFilterUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final MagnetUpgradeItem MAGNET_UPGRADE = register("magnet_upgrade",
+			() -> new MagnetUpgradeItem(Config.SERVER.magnetUpgrade.magnetRange::get, Config.SERVER.magnetUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final MagnetUpgradeItem ADVANCED_MAGNET_UPGRADE = register("advanced_magnet_upgrade",
+			() -> new MagnetUpgradeItem(Config.SERVER.advancedMagnetUpgrade.magnetRange::get, Config.SERVER.advancedMagnetUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final FeedingUpgradeItem FEEDING_UPGRADE = register("feeding_upgrade",
+			() -> new FeedingUpgradeItem(Config.SERVER.feedingUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final FeedingUpgradeItem ADVANCED_FEEDING_UPGRADE = register("advanced_feeding_upgrade",
+			() -> new FeedingUpgradeItem(Config.SERVER.advancedFeedingUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final CompactingUpgradeItem COMPACTING_UPGRADE = register("compacting_upgrade",
+			() -> new CompactingUpgradeItem(false, Config.SERVER.compactingUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final CompactingUpgradeItem ADVANCED_COMPACTING_UPGRADE = register("advanced_compacting_upgrade",
+			() -> new CompactingUpgradeItem(true, Config.SERVER.advancedCompactingUpgrade.filterSlots::get, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final VoidUpgradeItem VOID_UPGRADE = register("void_upgrade",
+			() -> new VoidUpgradeItem(Config.SERVER.voidUpgrade, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final VoidUpgradeItem ADVANCED_VOID_UPGRADE = register("advanced_void_upgrade",
+			() -> new VoidUpgradeItem(Config.SERVER.advancedVoidUpgrade, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final SmeltingUpgradeItem SMELTING_UPGRADE = register("smelting_upgrade",
+			() -> new SmeltingUpgradeItem(CREATIVE_TAB, Config.SERVER.smeltingUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final AutoSmeltingUpgradeItem AUTO_SMELTING_UPGRADE = register("auto_smelting_upgrade",
+			() -> new AutoSmeltingUpgradeItem(CREATIVE_TAB, Config.SERVER.autoSmeltingUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final SmokingUpgradeItem SMOKING_UPGRADE = register("smoking_upgrade",
+			() -> new SmokingUpgradeItem(CREATIVE_TAB, Config.SERVER.smokingUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final AutoSmokingUpgradeItem AUTO_SMOKING_UPGRADE = register("auto_smoking_upgrade",
+			() -> new AutoSmokingUpgradeItem(CREATIVE_TAB, Config.SERVER.autoSmokingUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final BlastingUpgradeItem BLASTING_UPGRADE = register("blasting_upgrade",
+			() -> new BlastingUpgradeItem(CREATIVE_TAB, Config.SERVER.blastingUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final AutoBlastingUpgradeItem AUTO_BLASTING_UPGRADE = register("auto_blasting_upgrade",
+			() -> new AutoBlastingUpgradeItem(CREATIVE_TAB, Config.SERVER.autoBlastingUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final CraftingUpgradeItem CRAFTING_UPGRADE = register("crafting_upgrade",
+			() -> new CraftingUpgradeItem(CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final StonecutterUpgradeItem STONECUTTER_UPGRADE = register("stonecutter_upgrade",
+			() -> new StonecutterUpgradeItem(CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_1 = register("stack_upgrade_tier_1", () ->
-			new StackUpgradeItem(2, CREATIVE_TAB));
+			new StackUpgradeItem(2, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final StackUpgradeItem STACK_UPGRADE_TIER_1_PLUS = register("stack_upgrade_tier_1_plus", () ->
+			new StackUpgradeItem(3, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_2 = register("stack_upgrade_tier_2", () ->
-			new StackUpgradeItem(4, CREATIVE_TAB));
+			new StackUpgradeItem(4, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_3 = register("stack_upgrade_tier_3", () ->
-			new StackUpgradeItem(8, CREATIVE_TAB));
+			new StackUpgradeItem(8, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_4 = register("stack_upgrade_tier_4", () ->
-			new StackUpgradeItem(16, CREATIVE_TAB));
-	public static final JukeboxUpgradeItem JUKEBOX_UPGRADE = register("jukebox_upgrade", () -> new JukeboxUpgradeItem(CREATIVE_TAB));
-	public static final PumpUpgradeItem PUMP_UPGRADE = register("pump_upgrade", () ->
-			new PumpUpgradeItem(false, false, CREATIVE_TAB, Config.SERVER.pumpUpgrade));
-	public static final PumpUpgradeItem ADVANCED_PUMP_UPGRADE = register("advanced_pump_upgrade", () ->
-			new PumpUpgradeItem(true, true, CREATIVE_TAB, Config.SERVER.pumpUpgrade));
-	public static final XpPumpUpgradeItem XP_PUMP_UPGRADE = register("xp_pump_upgrade", () -> new XpPumpUpgradeItem(CREATIVE_TAB, Config.SERVER.xpPumpUpgrade));
+			new StackUpgradeItem(16, CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final String JUKEBOX_UPGRADE_NAME = "jukebox_upgrade";
+	public static final JukeboxUpgradeItem JUKEBOX_UPGRADE = register(JUKEBOX_UPGRADE_NAME,
+			() -> new JukeboxUpgradeItem(CREATIVE_TAB, Config.SERVER.maxUpgradesPerStorage));
+	public static final PumpUpgradeItem PUMP_UPGRADE = register("pump_upgrade", () -> new PumpUpgradeItem(false, false, CREATIVE_TAB, Config.SERVER.pumpUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final PumpUpgradeItem ADVANCED_PUMP_UPGRADE = register("advanced_pump_upgrade", () -> new PumpUpgradeItem(true, true, CREATIVE_TAB, Config.SERVER.pumpUpgrade, Config.SERVER.maxUpgradesPerStorage));
+	public static final XpPumpUpgradeItem XP_PUMP_UPGRADE = register("xp_pump_upgrade", () -> new XpPumpUpgradeItem(CREATIVE_TAB, Config.SERVER.xpPumpUpgrade, Config.SERVER.maxUpgradesPerStorage));
 	public static final CompressionUpgradeItem COMPRESSION_UPGRADE = register("compression_upgrade", () -> new CompressionUpgradeItem(CREATIVE_TAB));
-	public static final HopperUpgradeItem HOPPER_UPGRADE = register("hopper_upgrade", () ->
-			new HopperUpgradeItem(CREATIVE_TAB, Config.SERVER.hopperUpgrade.inputFilterSlots::get, Config.SERVER.hopperUpgrade.outputFilterSlots::get, Config.SERVER.hopperUpgrade.transferSpeedTicks::get, Config.SERVER.hopperUpgrade.maxTransferStackSize::get));
-	public static final HopperUpgradeItem ADVANCED_HOPPER_UPGRADE = register("advanced_hopper_upgrade", () ->
-			new HopperUpgradeItem(CREATIVE_TAB, Config.SERVER.advancedHopperUpgrade.inputFilterSlots::get, Config.SERVER.advancedHopperUpgrade.outputFilterSlots::get, Config.SERVER.advancedHopperUpgrade.transferSpeedTicks::get, Config.SERVER.advancedHopperUpgrade.maxTransferStackSize::get));
-	public static final StorageTierUpgradeItem BASIC_TIER_UPGRADE = register("basic_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC, true));
-	public static final StorageTierUpgradeItem BASIC_TO_IRON_TIER_UPGRADE = register("basic_to_iron_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_IRON));
-	public static final StorageTierUpgradeItem BASIC_TO_GOLD_TIER_UPGRADE = register("basic_to_gold_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_GOLD));
-	public static final StorageTierUpgradeItem BASIC_TO_DIAMOND_TIER_UPGRADE = register("basic_to_diamond_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_DIAMOND));
-	public static final StorageTierUpgradeItem BASIC_TO_NETHERITE_TIER_UPGRADE = register("basic_to_netherite_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_NETHERITE));
-	public static final StorageTierUpgradeItem IRON_TO_GOLD_TIER_UPGRADE = register("iron_to_gold_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.IRON_TO_GOLD));
-	public static final StorageTierUpgradeItem IRON_TO_DIAMOND_TIER_UPGRADE = register("iron_to_diamond_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.IRON_TO_DIAMOND));
-	public static final StorageTierUpgradeItem IRON_TO_NETHERITE_TIER_UPGRADE = register("iron_to_netherite_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.IRON_TO_NETHERITE));
-	public static final StorageTierUpgradeItem GOLD_TO_DIAMOND_TIER_UPGRADE = register("gold_to_diamond_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.GOLD_TO_DIAMOND));
-	public static final StorageTierUpgradeItem GOLD_TO_NETHERITE_TIER_UPGRADE = register("gold_to_netherite_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.GOLD_TO_NETHERITE));
-	public static final StorageTierUpgradeItem DIAMOND_TO_NETHERITE_TIER_UPGRADE = register("diamond_to_netherite_tier_upgrade", () ->
-			new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.DIAMOND_TO_NETHERITE));
+	public static final HopperUpgradeItem HOPPER_UPGRADE = register("hopper_upgrade", () -> new HopperUpgradeItem(CREATIVE_TAB,
+			Config.SERVER.hopperUpgrade.inputFilterSlots::get, Config.SERVER.hopperUpgrade.outputFilterSlots::get, Config.SERVER.hopperUpgrade.transferSpeedTicks::get, Config.SERVER.hopperUpgrade.maxTransferStackSize::get));
+	public static final HopperUpgradeItem ADVANCED_HOPPER_UPGRADE = register("advanced_hopper_upgrade", () -> new HopperUpgradeItem(CREATIVE_TAB,
+			Config.SERVER.advancedHopperUpgrade.inputFilterSlots::get, Config.SERVER.advancedHopperUpgrade.outputFilterSlots::get, Config.SERVER.advancedHopperUpgrade.transferSpeedTicks::get, Config.SERVER.advancedHopperUpgrade.maxTransferStackSize::get));
+	public static final StorageTierUpgradeItem BASIC_TIER_UPGRADE = register("basic_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC, true));
+	public static final StorageTierUpgradeItem BASIC_TO_COPPER_TIER_UPGRADE = register("basic_to_copper_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_COPPER));
+	public static final StorageTierUpgradeItem BASIC_TO_IRON_TIER_UPGRADE = register("basic_to_iron_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_IRON));
+	public static final StorageTierUpgradeItem BASIC_TO_GOLD_TIER_UPGRADE = register("basic_to_gold_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_GOLD));
+	public static final StorageTierUpgradeItem BASIC_TO_DIAMOND_TIER_UPGRADE = register("basic_to_diamond_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_DIAMOND));
+	public static final StorageTierUpgradeItem BASIC_TO_NETHERITE_TIER_UPGRADE = register("basic_to_netherite_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_NETHERITE));
+	public static final StorageTierUpgradeItem COPPER_TO_IRON_TIER_UPGRADE = register("copper_to_iron_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.COPPER_TO_IRON));
+	public static final StorageTierUpgradeItem COPPER_TO_GOLD_TIER_UPGRADE = register("copper_to_gold_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.COPPER_TO_GOLD));
+	public static final StorageTierUpgradeItem COPPER_TO_DIAMOND_TIER_UPGRADE = register("copper_to_diamond_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.COPPER_TO_DIAMOND));
+	public static final StorageTierUpgradeItem COPPER_TO_NETHERITE_TIER_UPGRADE = register("copper_to_netherite_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.COPPER_TO_NETHERITE));
+	public static final StorageTierUpgradeItem IRON_TO_GOLD_TIER_UPGRADE = register("iron_to_gold_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.IRON_TO_GOLD));
+	public static final StorageTierUpgradeItem IRON_TO_DIAMOND_TIER_UPGRADE = register("iron_to_diamond_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.IRON_TO_DIAMOND));
+	public static final StorageTierUpgradeItem IRON_TO_NETHERITE_TIER_UPGRADE = register("iron_to_netherite_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.IRON_TO_NETHERITE));
+	public static final StorageTierUpgradeItem GOLD_TO_DIAMOND_TIER_UPGRADE = register("gold_to_diamond_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.GOLD_TO_DIAMOND));
+	public static final StorageTierUpgradeItem GOLD_TO_NETHERITE_TIER_UPGRADE = register("gold_to_netherite_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.GOLD_TO_NETHERITE));
+	public static final StorageTierUpgradeItem DIAMOND_TO_NETHERITE_TIER_UPGRADE = register("diamond_to_netherite_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.DIAMOND_TO_NETHERITE));
 
 	public static final ItemBase UPGRADE_BASE = register("upgrade_base", () -> new ItemBase(new Item.Properties().stacksTo(16), CREATIVE_TAB));
 
-	public static final ItemBase PACKING_TAPE = register("packing_tape", () -> new ItemBase(new Item.Properties().stacksTo(1).durability(4), CREATIVE_TAB));
+	public static final ItemBase PACKING_TAPE = register("packing_tape", () -> new ItemBase(new Item.Properties().stacksTo(1).durability(8), CREATIVE_TAB) {
+		@Override
+		public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag isAdvanced) {
+			super.appendHoverText(stack, level, tooltip, isAdvanced);
+			tooltip.add(Component.translatable(StorageTranslationHelper.INSTANCE.translItemTooltip("packing_tape"),
+							Component.literal(String.valueOf(stack.getMaxDamage() - stack.getDamageValue())).withStyle(ChatFormatting.GREEN)
+					).withStyle(ChatFormatting.DARK_GRAY)
+			);
+		}
+	});
 	public static final ItemBase STORAGE_TOOL = register("storage_tool", StorageToolItem::new);
 	public static final ItemBase DEBUG_TOOL = register("debug_tool", () -> new ItemBase(new Item.Properties().stacksTo(1), CREATIVE_TAB));
-	public static final Item INACCESSIBLE_SLOT = register("inaccessible_slot", () -> new Item(new Item.Properties().stacksTo(1)));
+	public static final Item INACCESSIBLE_SLOT = register("inaccessible_slot", () -> new Item(new Item.Properties().stacksTo(1).tab(null)));
 
 	public static final LootItemFunctionType COPY_STORAGE_DATA = registerLootFunction("copy_storage_data", () ->
 			new LootItemFunctionType(new CopyStorageDataFunction.Serializer()));

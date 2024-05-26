@@ -1,8 +1,9 @@
-package net.p3pp3rf1y.sophisticatedstorage.compat.common;
+package net.p3pp3rf1y.sophisticatedstorage.compat.jei;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -10,38 +11,24 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.p3pp3rf1y.sophisticatedcore.compat.common.ClientRecipeHelper;
+import net.minecraft.world.item.crafting.UpgradeRecipe;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedstorage.crafting.SmithingStorageUpgradeRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageTierUpgradeRecipe;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageTierUpgradeShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.jetbrains.annotations.NotNull;
 
 public class TierUpgradeRecipesMaker {
 	private TierUpgradeRecipesMaker() {}
 
-	public static List<CraftingRecipe> getShapedCraftingRecipes() {
-		RecipeConstructor<StorageTierUpgradeRecipe> constructRecipe = (originalRecipe, id, ingredients, result) -> new ShapedRecipe(id, "", originalRecipe.getWidth(), originalRecipe.getHeight(), ingredients, result);
-		return getCraftingRecipes(constructRecipe, StorageTierUpgradeRecipe.REGISTERED_RECIPES, StorageTierUpgradeRecipe.class);
-	}
-
-	public static List<CraftingRecipe> getShapelessCraftingRecipes() {
-		RecipeConstructor<StorageTierUpgradeShapelessRecipe> constructRecipe = (originalRecipe, id, ingredients, result) -> new ShapelessRecipe(id, "", result, ingredients);
-		return getCraftingRecipes(constructRecipe, StorageTierUpgradeShapelessRecipe.REGISTERED_RECIPES, StorageTierUpgradeShapelessRecipe.class);
-	}
-
-	@NotNull
-	private static <T extends CraftingRecipe> List<CraftingRecipe> getCraftingRecipes(RecipeConstructor<T> constructRecipe, Set<ResourceLocation> registeredRecipes, Class<T> originalRecipeClass) {
-		return ClientRecipeHelper.getAndTransformAvailableItemGroupRecipes(registeredRecipes, originalRecipeClass, recipe -> {
+	public static List<CraftingRecipe> getCraftingRecipes() {
+		return ClientRecipeHelper.getAndTransformAvailableItemGroupRecipes(StorageTierUpgradeRecipe.REGISTERED_RECIPES, StorageTierUpgradeRecipe.class, recipe -> {
 			List<CraftingRecipe> itemGroupRecipes = new ArrayList<>();
 			getStorageItems(recipe).forEach(storageItem -> {
 				NonNullList<Ingredient> ingredients = recipe.getIngredients();
@@ -55,7 +42,6 @@ public class TierUpgradeRecipesMaker {
 						return false;
 					}
 				}, 3, 3);
-
 				NonNullList<Ingredient> ingredientsCopy = NonNullList.createWithCapacity(ingredients.size());
 				int i = 0;
 				for (Ingredient ingredient : ingredients) {
@@ -65,15 +51,17 @@ public class TierUpgradeRecipesMaker {
 						craftinginventory.setItem(i, storageItem.copy());
 					} else {
 						ingredientsCopy.add(i, ingredient);
-						craftinginventory.setItem(i, ingredientItems[0]);
+						if (!ingredient.isEmpty()) {
+							craftinginventory.setItem(i, ingredientItems[0]);
+						}
 					}
 					i++;
 				}
-
 				ItemStack result = ClientRecipeHelper.assemble(recipe, craftinginventory);
 				//noinspection ConstantConditions
-				ResourceLocation id = new ResourceLocation(SophisticatedStorage.ID, "tier_upgrade_" + Registry.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
-				itemGroupRecipes.add(constructRecipe.construct(recipe, id, ingredientsCopy, result));
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + Registry.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}:\s]", "_"));
+
+				itemGroupRecipes.add(new ShapedRecipe(id, "", recipe.getWidth(), recipe.getHeight(), ingredientsCopy, result));
 			});
 			return itemGroupRecipes;
 		});
@@ -86,8 +74,8 @@ public class TierUpgradeRecipesMaker {
 
 			for (ItemStack ingredientItem : ingredientItems) {
 				Item item = ingredientItem.getItem();
-				if (item instanceof StorageBlockItem storageBlockItem) {
-					storageBlockItem.fillItemCategory(ModItems.CREATIVE_TAB, storageItems);
+				if (item instanceof StorageBlockItem) {
+					item.fillItemCategory(ModItems.CREATIVE_TAB, storageItems);
 				}
 			}
 		}
@@ -95,7 +83,35 @@ public class TierUpgradeRecipesMaker {
 		return storageItems;
 	}
 
-	private interface RecipeConstructor<T extends Recipe<?>> {
-		CraftingRecipe construct(T originalRecipe, ResourceLocation id, NonNullList<Ingredient> ingredients, ItemStack result);
+	public static List<UpgradeRecipe> getSmithingRecipes() {
+		return ClientRecipeHelper.getAndTransformAvailableItemGroupRecipes(SmithingStorageUpgradeRecipe.REGISTERED_RECIPES, SmithingStorageUpgradeRecipe.class, recipe -> {
+			List<UpgradeRecipe> itemGroupRecipes = new ArrayList<>();
+			getStorageItems(recipe).forEach(storageItem -> {
+				SimpleContainer container = new SimpleContainer(2);
+				container.setItem(0, storageItem);
+				ItemStack[] additionItems = recipe.addition.getItems();
+				container.setItem(1, additionItems[0]);
+
+				ItemStack result = recipe.assemble(container);
+				//noinspection ConstantConditions
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + Registry.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}:\s]", "_"));
+
+				itemGroupRecipes.add(new UpgradeRecipe(id, Ingredient.of(storageItem), recipe.addition, result));
+			});
+			return itemGroupRecipes;
+		});
+	}
+
+	private static List<ItemStack> getStorageItems(UpgradeRecipe recipe) {
+		NonNullList<ItemStack> storageItems = NonNullList.create();
+
+		for (ItemStack ingredientItem : recipe.base.getItems()) {
+			Item item = ingredientItem.getItem();
+			if (item instanceof StorageBlockItem) {
+				item.fillItemCategory(ModItems.CREATIVE_TAB, storageItems);
+			}
+		}
+
+		return storageItems;
 	}
 }

@@ -1,4 +1,4 @@
-package net.p3pp3rf1y.sophisticatedstorage.compat.common;
+package net.p3pp3rf1y.sophisticatedstorage.compat.jei;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.p3pp3rf1y.sophisticatedcore.compat.common.ClientRecipeHelper;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromChestRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
@@ -67,7 +67,7 @@ public class ShulkerBoxFromChestRecipesMaker {
 				}
 				ItemStack result = ClientRecipeHelper.assemble(originalRecipe, craftinginventory);
 				//noinspection ConstantConditions
-				ResourceLocation newId = new ResourceLocation(SophisticatedStorage.ID, "shulker_from_" + Registry.ITEM.getKey(chestItem.getItem()).getPath()
+				ResourceLocation newId = new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_from_" + Registry.ITEM.getKey(chestItem.getItem()).getPath()
 						+ result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[^a-z\\d/._-]", "_"));
 
 				recipes.add(new ShapedRecipe(newId, "", originalRecipe.getWidth(), originalRecipe.getHeight(), ingredientsCopy, result));

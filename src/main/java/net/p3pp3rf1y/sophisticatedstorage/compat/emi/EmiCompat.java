@@ -9,6 +9,7 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.recipe.EmiSmithingRecipe;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -17,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.UpgradeRecipe;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
@@ -24,11 +26,11 @@ import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandle
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ControllerRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.ControllerRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.DyeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.FlatBarrelRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.ShulkerBoxFromChestRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.TierUpgradeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
@@ -72,8 +74,8 @@ public class EmiCompat implements EmiPlugin {
         registry.addDragDropHandler(SettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
 
         registerCraftingRecipes(registry, DyeRecipesMaker.getRecipes());
-		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
-		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
+		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getCraftingRecipes());
+		registerSmithingRecipes(registry, TierUpgradeRecipesMaker.getSmithingRecipes());
 		registerCraftingRecipes(registry, ControllerRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, FlatBarrelRecipesMaker.getRecipes());
@@ -163,4 +165,7 @@ public class EmiCompat implements EmiPlugin {
             )
         );
     }
+	private static void registerSmithingRecipes(EmiRegistry registry, Collection<UpgradeRecipe> recipes) {
+		recipes.forEach(r -> registry.addRecipe(new EmiSmithingRecipe(r)));
+	}
 }
