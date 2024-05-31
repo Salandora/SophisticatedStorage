@@ -184,7 +184,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 				if (isLocked()) {
 					memorySettings.selectSlot(slot);
 				}
-				player.setItemInHand(hand, stackInHand.copyWithCount(stackInSlot.getCount() - (int) inserted));
+				player.setItemInHand(hand, stackInHand.copyWithCount(stackInHand.getCount() - (int) inserted));
 				ctx.commit();
 				return true;
 			}
@@ -200,7 +200,10 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 			ItemVariant resource = ItemVariant.of(playerStack);
 			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameTags(stackInSlot, playerStack)))) {
 				try (Transaction ctx = Transaction.openOuter()) {
-					long inserted = invHandler.insertItemOnlyToSlot(slot, resource, playerStack.getCount(), ctx);
+					long inserted;
+					try (Transaction simulate = Transaction.openNested(ctx)) {
+						inserted = invHandler.insertItemOnlyToSlot(slot, resource, playerStack.getCount(), simulate);
+					}
 					if (inserted > 0) {
 						long extracted = playerInventory.getSlot(playerSlot).extract(resource, inserted, ctx);
 						if (extracted > 0) {
