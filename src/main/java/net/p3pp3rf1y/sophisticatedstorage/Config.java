@@ -30,33 +30,41 @@ import net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgrad
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeConfig;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 
 public class Config {
-	private static final Map<ModConfig.Type, BaseConfig> CONFIGS = new EnumMap<>(ModConfig.Type.class);
 	private Config() {}
 
 	private static final String MAX_UPGRADES_MATCHER = "([a-z0-9_]+\\|[a-z0-9_/.-]+\\|\\d+)";
 
-	public static Common COMMON;
-	public static Client CLIENT;
-	public static Server SERVER;
+	public static final Common COMMON;
+	public static final ForgeConfigSpec COMMON_SPEC;
+	public static final Client CLIENT;
+	public static final ForgeConfigSpec CLIENT_SPEC;
+	public static final Server SERVER;
+	public static final ForgeConfigSpec SERVER_SPEC;
 
-	public static class BaseConfig {
-		public ForgeConfigSpec specification;
-
-		public void onConfigLoad() { }
-		public void onConfigReload() { }
+	static {
+		final Pair<Server, ForgeConfigSpec> serverSpec = new ForgeConfigSpec.Builder().configure(Server::new);
+		SERVER_SPEC = serverSpec.getRight();
+		SERVER = serverSpec.getLeft();
+		ForgeConfigRegistry.INSTANCE.register(SophisticatedStorage.MOD_ID, ModConfig.Type.SERVER, SERVER_SPEC);
+		final Pair<Client, ForgeConfigSpec> clientSpec = new ForgeConfigSpec.Builder().configure(Client::new);
+		CLIENT_SPEC = clientSpec.getRight();
+		CLIENT = clientSpec.getLeft();
+		ForgeConfigRegistry.INSTANCE.register(SophisticatedStorage.MOD_ID,ModConfig.Type.CLIENT, CLIENT_SPEC);
+		final Pair<Common, ForgeConfigSpec> commonSpec = new ForgeConfigSpec.Builder().configure(Common::new);
+		COMMON_SPEC = commonSpec.getRight();
+		COMMON = commonSpec.getLeft();
+		ForgeConfigRegistry.INSTANCE.register(SophisticatedStorage.MOD_ID, ModConfig.Type.COMMON, COMMON_SPEC);
 	}
 
-	public static class Common extends BaseConfig {
+	public static class Common {
 		public final ForgeConfigSpec.BooleanValue dropPacked;
 
 		public Common(ForgeConfigSpec.Builder builder) {
@@ -68,7 +76,7 @@ public class Config {
 		}
 	}
 
-	public static class Client extends BaseConfig {
+	public static class Client {
 		public final ForgeConfigSpec.BooleanValue showHigherTierTintedVariants;
 		public final ForgeConfigSpec.BooleanValue showSingleWoodVariantOnly;
 
@@ -84,7 +92,7 @@ public class Config {
 		}
 	}
 
-	public static class Server extends BaseConfig {
+	public static class Server {
 		public final StorageConfig woodBarrel;
 		public final StorageConfig copperBarrel;
 		public final StorageConfig ironBarrel;
@@ -165,13 +173,16 @@ public class Config {
 		public final ForgeConfigSpec.IntValue tooManyItemEntityDrops;
 		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
 
-		@Override
-		public void onConfigLoad() {
+		public void initListeners() {
+			ModConfigEvents.reloading(SophisticatedStorage.MOD_ID).register(this::onConfigReload);
+			ModConfigEvents.loading(SophisticatedStorage.MOD_ID).register(this::onConfigLoad);
+		}
+
+		public void onConfigLoad(ModConfig config) {
 			clearCache();
 		}
 
-		@Override
-		public void onConfigReload() {
+		public void onConfigReload(ModConfig config) {
 			clearCache();
 		}
 
@@ -326,7 +337,7 @@ public class Config {
 			}
 
 			public boolean isItemDisallowed(Item item) {
-				if (!SERVER.specification.isLoaded()) {
+				if (!SERVER_SPEC.isLoaded()) {
 					return true;
 				}
 
@@ -422,39 +433,5 @@ public class Config {
 				return maxUpgradesPerStorage.get(storageType).getOrDefault(upgradeGroup.name(), Integer.MAX_VALUE);
 			}
 		}
-	}
-
-	private static <T extends BaseConfig> T register(Function<ForgeConfigSpec.Builder, T> factory, ModConfig.Type side) {
-		Pair<T, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(factory);
-
-		T config = specPair.getLeft();
-		config.specification = specPair.getRight();
-		CONFIGS.put(side, config);
-		return config;
-	}
-
-	public static void register() {
-		COMMON = register(Common::new, ModConfig.Type.COMMON);
-		CLIENT = register(Client::new, ModConfig.Type.CLIENT);
-		SERVER = register(Server::new, ModConfig.Type.SERVER);
-
-		for (Map.Entry<ModConfig.Type, BaseConfig> pair : CONFIGS.entrySet()) {
-			ForgeConfigRegistry.INSTANCE.register(SophisticatedStorage.MOD_ID, pair.getKey(), pair.getValue().specification);
-		}
-
-		ModConfigEvents.loading(SophisticatedStorage.MOD_ID).register(Config::onConfigLoad);
-		ModConfigEvents.reloading(SophisticatedStorage.MOD_ID).register(Config::onConfigReload);
-	}
-
-	public static void onConfigLoad(ModConfig modConfig) {
-		for (Config.BaseConfig config : CONFIGS.values())
-			if (config.specification == modConfig.getSpec())
-				config.onConfigLoad();
-	}
-
-	public static void onConfigReload(ModConfig modConfig) {
-		for (Config.BaseConfig config : CONFIGS.values())
-			if (config.specification == modConfig.getSpec())
-				config.onConfigReload();
 	}
 }

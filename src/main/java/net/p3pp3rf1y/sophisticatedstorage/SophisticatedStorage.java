@@ -25,7 +25,7 @@ public class SophisticatedStorage implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Config.register();
+		Config.SERVER.initListeners();
 
 		commonEventHandler.registerHandlers();
 
