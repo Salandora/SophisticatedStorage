@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
@@ -16,6 +18,7 @@ import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParti
 
 import java.util.Random;
 
+@Environment(EnvType.CLIENT)
 class BarrelBlockClientExtensions {
 	private static final Random random = new Random();
 

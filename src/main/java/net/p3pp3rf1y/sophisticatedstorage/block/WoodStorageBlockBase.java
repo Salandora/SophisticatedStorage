@@ -136,9 +136,9 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
 		ItemStack stack = new ItemStack(this);
-		addNameWoodAndTintData(stack, level, pos);
+		addNameWoodAndTintData(stack, world, pos);
 		return stack;
 	}
 

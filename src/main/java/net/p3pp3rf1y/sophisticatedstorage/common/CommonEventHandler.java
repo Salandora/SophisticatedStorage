@@ -152,6 +152,7 @@ public class CommonEventHandler {
 			});
 
 			if (droppedItemEntityCount.get() > Config.SERVER.tooManyItemEntityDrops.get()) {
+				cancelEvent.set(true);
 				ItemBase packingTapeItem = ModItems.PACKING_TAPE;
 				Component packingTapeItemName = packingTapeItem.getName(new ItemStack(packingTapeItem)).copy().withStyle(ChatFormatting.GREEN);
 
@@ -174,7 +175,6 @@ public class CommonEventHandler {
 						WorldHelper.notifyBlockUpdate(wbe);
 					}));
 				}
-				cancelEvent.set(true);
 			}
 		});
 		return !cancelEvent.get();
