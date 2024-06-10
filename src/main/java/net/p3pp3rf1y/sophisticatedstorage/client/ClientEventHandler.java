@@ -1,8 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import committee.nova.mkb.api.IKeyBinding;
-import committee.nova.mkb.api.IKeyConflictContext;
 
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterGeometryLoadersCallback;
 import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
@@ -87,8 +85,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
-import static committee.nova.mkb.keybinding.KeyConflictContext.GUI;
-
 public class ClientEventHandler {
 	private ClientEventHandler() {}
 
@@ -97,22 +93,7 @@ public class ClientEventHandler {
 	public static final KeyMapping SORT_KEYBIND = new KeyMapping(StorageTranslationHelper.INSTANCE.translKeybind("sort"),
 			InputConstants.Type.MOUSE, MIDDLE_BUTTON, KEYBIND_SOPHISTICATEDSTORAGE_CATEGORY); // StorageGuiKeyConflictContext.INSTANCE
 
-	@SuppressWarnings("java:S6548") //singleton is intended here
-	private static class StorageGuiKeyConflictContext implements IKeyConflictContext {
-		public static final StorageGuiKeyConflictContext INSTANCE = new StorageGuiKeyConflictContext();
-
-		@Override
-		public boolean isActive() {
-			return GUI.isActive() && Minecraft.getInstance().screen instanceof StorageScreen;
-		}
-
-		@Override
-		public boolean conflicts(IKeyConflictContext other) {
-			return this == other;
-		}
-	}
-
-	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
+	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.ID, "chest");
 	public static final ModelLayerLocation CHEST_LAYER = new ModelLayerLocation(CHEST_RL, "main");
 
 	public static void registerHandlers() {
@@ -201,12 +182,11 @@ public class ClientEventHandler {
 	}
 
 	public static boolean handleGuiKeyPress(Screen screen, int key, int scancode, int modifiers) {
-		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(InputConstants.getKey(key, scancode)) || !tryCallSort(screen);
+		return !SORT_KEYBIND.isDown() || !tryCallSort(screen);
 	}
 
 	public static boolean handleGuiMouseKeyPress(Screen screen, double mouseX, double mouseY, int button) {
-		InputConstants.Key input = InputConstants.Type.MOUSE.getOrCreate(button);
-		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(input) || !tryCallSort(screen);
+		return !SORT_KEYBIND.matchesMouse(button) || !tryCallSort(screen);
 	}
 
 	private static void registerStorageLayerLoader() {
@@ -251,8 +231,6 @@ public class ClientEventHandler {
 	}
 
 	private static void registerKeyMappings() {
-		((IKeyBinding)SORT_KEYBIND).setKeyConflictContext(StorageGuiKeyConflictContext.INSTANCE);
-
 		KeyBindingHelper.registerKeyBinding(SORT_KEYBIND);
 	}
 
