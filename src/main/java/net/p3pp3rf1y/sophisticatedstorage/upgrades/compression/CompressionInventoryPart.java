@@ -601,7 +601,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack, BiConsumer<Integer, ItemStack> setStackInSlotSuper) {
 		int currentCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
-		try (Transaction ctx = Transaction.openOuter()) {
+		// TODO: Is there a better way?
+		try (Transaction ctx = Transaction.openNested(Transaction.getCurrentUnsafe())) {
 			if (currentCount < stack.getCount()) {
 				insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, ctx);
 			} else if (currentCount > stack.getCount()) {
