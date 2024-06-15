@@ -240,7 +240,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		if (isStorageUpgrade(itemInHand)) {
 			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
 			ItemVariant resource = ItemVariant.of(itemInHand);
-			if (InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource,1, null).getCount() != itemInHand.getCount()) {
+			if (InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource,1, null).getCount() != 0) {
 				try (Transaction ctx = Transaction.openOuter()) {
 					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);
 					ctx.commit();
