@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
@@ -292,22 +293,29 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	}
 
 	@Override
-	public long extractItem(int slot, ItemVariant resource, long amount, TransactionContext ctx) {
+	public long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx) {
+		return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
+	}
+
+	private long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
 		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
 			return 0;
 		}
 		int toExtract = Math.min(calculatedStacks.get(slot).getCount(), (int) amount);
 
 		if (toExtract > 0) {
-			TransactionCallback.onSuccess(ctx, () -> {
-				SlotDefinition slotDefinition = slotDefinitions.get(slot);
-				ItemStack slotStack = parent.getSlotStack(slot);
+			SlotDefinition slotDefinition = slotDefinitions.get(slot);
+			ItemStack slotStack = parent.getSlotStack(slot);
+			toExtract = Math.min(toExtract, getLimit.applyAsInt(slotStack));
+			//ItemStack result = slotDefinition.isCompressible() ? new ItemStack(slotDefinition.item(), toExtract) : ItemHandlerHelper.copyStackWithSize(slotStack, toExtract);
 
+			int finalToExtract = toExtract;
+			onSuccessOrRun(ctx, () -> {
 				if (slotDefinition.isCompressible()) {
-					extractFromCalculated(slot, toExtract);
-					extractFromInternal(slot, toExtract);
+					extractFromCalculated(slot, finalToExtract);
+					extractFromInternal(slot, finalToExtract);
 				} else {
-					slotStack.shrink(toExtract);
+					slotStack.shrink(finalToExtract);
 					parent.setSlotStack(slot, slotStack);
 					calculatedStacks.put(slot, slotStack.copy());
 				}
@@ -474,35 +482,32 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 
 		Map<Integer, SlotDefinition> finalDefinitions = definitions;
-		try (Transaction nested = Transaction.openNested(ctx)) {
-			TransactionCallback.onSuccess(nested, () -> {
-				if (!slotDefinitions.containsKey(slot)) {
-					setSlotDefinitions(finalDefinitions, false);
-					compactInternalSlots();
-					updateCalculatedStacks();
-				}
+		onSuccessOrRun(ctx, () -> {
+			if (!slotDefinitions.containsKey(slot)) {
+				setSlotDefinitions(finalDefinitions, false);
+				compactInternalSlots();
+				updateCalculatedStacks();
+			}
 
-				if (slotDefinitions.get(slot).isCompressible()) {
-					insertIntoInternalAndCalculated(slot, inserted);
-				} else if (inserted > 0) {
-					calculatedStacks.compute(slot, (s, st) -> {
-						if (st == null || st.isEmpty()) {
-							return resource.toStack((int) inserted);
-						}
-						st.grow((int) inserted);
-						return st;
-					});
-					ItemStack slotStack = parent.getSlotStack(slot);
-					if (slotStack.isEmpty()) {
-						parent.setSlotStack(slot, resource.toStack((int) inserted));
-					} else {
-						slotStack.grow((int) inserted);
-						parent.setSlotStack(slot, slotStack);
+			if (slotDefinitions.get(slot).isCompressible()) {
+				insertIntoInternalAndCalculated(slot, inserted);
+			} else if (inserted > 0) {
+				calculatedStacks.compute(slot, (s, st) -> {
+					if (st == null || st.isEmpty()) {
+						return resource.toStack((int) inserted);
 					}
+					st.grow((int) inserted);
+					return st;
+				});
+				ItemStack slotStack = parent.getSlotStack(slot);
+				if (slotStack.isEmpty()) {
+					parent.setSlotStack(slot, resource.toStack((int) inserted));
+				} else {
+					slotStack.grow((int) inserted);
+					parent.setSlotStack(slot, slotStack);
 				}
-			});
-			nested.commit();
-		}
+			}
+		});
 
 		return inserted;
 	}
@@ -598,17 +603,25 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		currentCalculated.setCount(Integer.MAX_VALUE - spaceBeforeMaxInt);
 	}
 
+	public static void onSuccessOrRun(@Nullable TransactionContext ctx, Runnable r) {
+		if (ctx != null) {
+			TransactionCallback.onSuccess(ctx, r);
+		} else if (Transaction.getLifecycle() == Transaction.Lifecycle.OPEN) {
+			TransactionCallback.onSuccess(Transaction.getCurrentUnsafe(), r);
+		} else {
+			r.run();
+		}
+	}
+
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack, BiConsumer<Integer, ItemStack> setStackInSlotSuper) {
+		// We want this to always run, but  we might come from a closing transaction, so we can not open a new one hence why we,
+		// by passing null we later check if there is a transaction and either attach to it or run directly
 		int currentCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
-		// TODO: Is there a better way?
-		try (Transaction ctx = Transaction.openNested(Transaction.getCurrentUnsafe())) {
-			if (currentCount < stack.getCount()) {
-				insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, ctx);
-			} else if (currentCount > stack.getCount()) {
-				extractItem(slot, ItemVariant.of(stack), currentCount - stack.getCount(), ctx);
-			}
-			ctx.commit();
+		if (currentCount < stack.getCount()) {
+			insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, null);
+		} else if (currentCount > stack.getCount()) {
+			extractItem(slot, ItemVariant.of(stack), currentCount - stack.getCount(), null, s -> Integer.MAX_VALUE);
 		}
 	}
 
