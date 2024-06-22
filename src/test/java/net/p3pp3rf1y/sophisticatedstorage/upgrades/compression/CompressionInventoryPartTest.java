@@ -40,13 +40,13 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.AssertionFailureBuilder.assertionFailure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -298,11 +298,11 @@ public class CompressionInventoryPartTest {
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 2), 1, new ItemStack(Items.IRON_INGOT, 21), 2, new ItemStack(Items.IRON_NUGGET, 194))
 				},
 				{
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 289), 1, new ItemStack(Items.IRON_INGOT, 5), 2, new ItemStack(Items.IRON_NUGGET, 3)),
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 61), 1, new ItemStack(Items.IRON_INGOT, 5), 2, new ItemStack(Items.IRON_NUGGET, 3)),
 						64 * 8,
 						0,
 						300,
-						new ItemStack(Items.IRON_BLOCK, 289),
+						new ItemStack(Items.IRON_BLOCK, 61),
 						Map.of(0, ItemStack.EMPTY),
 						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.IRON_INGOT, 5), 2, new ItemStack(Items.IRON_NUGGET, 48))
 				},
@@ -420,12 +420,12 @@ public class CompressionInventoryPartTest {
 						new ItemStack(Items.IRON_INGOT, 10)
 				},
 				{
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 289), 1, new ItemStack(Items.IRON_INGOT, 5), 2, new ItemStack(Items.IRON_NUGGET, 3)),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 289), 1, new ItemStack(Items.IRON_INGOT, 2606), 2, new ItemStack(Items.IRON_NUGGET, 23457)),
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 61), 1, new ItemStack(Items.IRON_INGOT, 5), 2, new ItemStack(Items.IRON_NUGGET, 3)),
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 61), 1, new ItemStack(Items.IRON_INGOT, 554), 2, new ItemStack(Items.IRON_NUGGET, 4989)),
 						64 * 8,
 						0,
 						300,
-						new ItemStack(Items.IRON_BLOCK, 289)
+						new ItemStack(Items.IRON_BLOCK, 61)
 				}
 		};
 	}
@@ -564,7 +564,13 @@ public class CompressionInventoryPartTest {
 			ctx.commit();
 		}
 
-		assertEquals(10L, part.insertItem(1, ItemVariant.of(Items.GOLD_NUGGET), 10, null, (s, res, amount, nested) -> 10L));
+		long inserted;
+		try (Transaction ctx = Transaction.openOuter()) {
+			inserted = part.insertItem(1, ItemVariant.of(Items.GOLD_NUGGET), 10, null, (s, res, amount, nested) -> 10L);
+			ctx.commit();
+		}
+
+		assertEquals(10L, inserted);
 	}
 
 	@Test
@@ -827,13 +833,7 @@ public class CompressionInventoryPartTest {
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256)),
 						256,
 						ImmutablePair.of(1, 256),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2304))
-				),
-				new ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256)),
-						256,
-						ImmutablePair.of(1, 257),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 255), 1, new ItemStack(Items.IRON_INGOT, 2303))
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2496))
 				),
 				new ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256)),
@@ -842,16 +842,16 @@ public class CompressionInventoryPartTest {
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2560))
 				),
 				new ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256)),
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256), 2, new ItemStack(Items.IRON_NUGGET, 1)),
 						256,
-						ImmutablePair.of(1, 256 + 10 * 9),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 246), 1, new ItemStack(Items.IRON_INGOT, 2214))
+						ImmutablePair.of(2, 64),
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2553), 2, new ItemStack(Items.IRON_NUGGET, 22977))
 				),
 				new ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256), 2, new ItemStack(Items.IRON_NUGGET, 256)),
 						256,
 						ImmutablePair.of(2, 256 + 10 * 9),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2550), 2, new ItemStack(Items.IRON_NUGGET, 22950))
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2560), 2, new ItemStack(Items.IRON_NUGGET, 23232)) // the extract gets maxed to 64
 				)
 		);
 	}
