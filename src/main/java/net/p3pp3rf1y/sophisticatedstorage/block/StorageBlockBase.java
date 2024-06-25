@@ -230,7 +230,7 @@ public abstract class StorageBlockBase extends Block implements IStorageBlock, I
 			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
 			ItemVariant resource = ItemVariant.of(itemInHand);
 			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).isSuccessful()
-					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != itemInHand.getCount()) {
+					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != 0) {
 				try (Transaction ctx = Transaction.openOuter()) {
 					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);
 					ctx.commit();

@@ -40,13 +40,13 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.AssertionFailureBuilder.assertionFailure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -564,7 +564,13 @@ public class CompressionInventoryPartTest {
 			ctx.commit();
 		}
 
-		assertEquals(10L, part.insertItem(1, ItemVariant.of(Items.GOLD_NUGGET), 10, null, (s, res, amount, nested) -> 10L));
+		long inserted;
+		try (Transaction ctx = Transaction.openOuter()) {
+			inserted = part.insertItem(1, ItemVariant.of(Items.GOLD_NUGGET), 10, null, (s, res, amount, nested) -> 10L);
+			ctx.commit();
+		}
+
+		assertEquals(10L, inserted);
 	}
 
 	@Test
