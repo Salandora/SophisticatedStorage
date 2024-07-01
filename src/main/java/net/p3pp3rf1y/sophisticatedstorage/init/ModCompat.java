@@ -3,7 +3,6 @@ package net.p3pp3rf1y.sophisticatedstorage.init;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.version.VersionPredicate;
-import net.fabricmc.loader.impl.util.version.VersionPredicateParser;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds;
 import net.p3pp3rf1y.sophisticatedcore.compat.ICompat;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
@@ -43,7 +42,7 @@ public class ModCompat {
 	@Nullable
 	private static VersionPredicate fromSpec(String spec) {
 		try {
-			return VersionPredicateParser.parse(spec);
+			return VersionPredicate.parse(spec);
 		}
 		catch (VersionParsingException e) {
 			return null;
