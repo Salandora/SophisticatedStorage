@@ -337,7 +337,6 @@ public class ModBlocks {
 
 	public static final SimpleRecipeSerializer<?> STORAGE_DYE_RECIPE_SERIALIZER = registerRecipeSerializer("storage_dye", () -> new SimpleRecipeSerializer<>(StorageDyeRecipe::new));
 	public static final RecipeSerializer<?> STORAGE_TIER_UPGRADE_RECIPE_SERIALIZER = registerRecipeSerializer("storage_tier_upgrade", StorageTierUpgradeRecipe.Serializer::new);
-	public static final RecipeSerializer<?> STORAGE_TIER_UPGRADE_SHAPELESS_RECIPE_SERIALIZER = registerRecipeSerializer("storage_tier_upgrade_shapeless", SmithingStorageUpgradeRecipe.Serializer::new);
 	public static final RecipeSerializer<?> SMITHING_STORAGE_UPGRADE_RECIPE_SERIALIZER = registerRecipeSerializer("smithing_storage_upgrade", SmithingStorageUpgradeRecipe.Serializer::new);
 	public static final RecipeSerializer<?> SHULKER_BOX_FROM_CHEST_RECIPE_SERIALIZER = registerRecipeSerializer("shulker_box_from_chest", ShulkerBoxFromChestRecipe.Serializer::new);
 	public static final SimpleRecipeSerializer<?> FLAT_TOP_BARREL_TOGGLE_RECIPE_SERIALIZER = registerRecipeSerializer("flat_top_barrel_toggle", () -> new SimpleRecipeSerializer<>(FlatTopBarrelToggleRecipe::new));

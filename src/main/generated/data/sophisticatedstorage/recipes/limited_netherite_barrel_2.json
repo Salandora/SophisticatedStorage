@@ -1,19 +1,11 @@
 {
-  "type": "sophisticatedstorage:storage_tier_upgrade_shapeless",
-  "conditions": [
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:limited_netherite_barrel_2"
-    }
-  ],
-  "ingredients": [
-    {
-      "item": "sophisticatedstorage:limited_diamond_barrel_2"
-    },
-    {
-      "tag": "c:netherite_ingots"
-    }
-  ],
+  "type": "sophisticatedstorage:smithing_storage_upgrade",
+  "addition": {
+    "item": "minecraft:netherite_ingot"
+  },
+  "base": {
+    "item": "sophisticatedstorage:limited_diamond_barrel_2"
+  },
   "result": {
     "item": "sophisticatedstorage:limited_netherite_barrel_2"
   }

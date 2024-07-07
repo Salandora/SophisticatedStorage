@@ -1,19 +1,11 @@
 {
-  "type": "sophisticatedstorage:storage_tier_upgrade_shapeless",
-  "conditions": [
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:netherite_chest"
-    }
-  ],
-  "ingredients": [
-    {
-      "item": "sophisticatedstorage:diamond_chest"
-    },
-    {
-      "tag": "c:netherite_ingots"
-    }
-  ],
+  "type": "sophisticatedstorage:smithing_storage_upgrade",
+  "addition": {
+    "item": "minecraft:netherite_ingot"
+  },
+  "base": {
+    "item": "sophisticatedstorage:diamond_chest"
+  },
   "result": {
     "item": "sophisticatedstorage:netherite_chest"
   }
