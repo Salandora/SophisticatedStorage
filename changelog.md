@@ -1,7 +1,7 @@
 # Changelog
 
 ### General
-- Update to version 0.10.25
+- Update to version 0.9.7
 - Code cleanup
 
 ### Fixes
