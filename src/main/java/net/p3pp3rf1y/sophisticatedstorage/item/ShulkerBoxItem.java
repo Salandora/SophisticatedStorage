@@ -148,15 +148,14 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		return Optional.of(new StorageContentsTooltip(stack));
 	}
 
-	@Override
-	public ItemStack stash(ItemStack storageStack, ItemStack stack) {
+	public ItemStack stash(ItemStack storageStack, ItemStack stack, @Nullable Transaction ctx) {
 		return CapabilityStorageWrapper.get(storageStack).map(wrapper -> {
 			if (wrapper.getContentsUuid().isEmpty()) {
 				wrapper.setContentsUuid(UUID.randomUUID());
 			}
-			try (Transaction ctx = Transaction.openOuter()) {
-				long inserted = wrapper.getInventoryForUpgradeProcessing().insert(ItemVariant.of(stack), stack.getCount(), ctx);
-				ctx.commit();
+			try (Transaction inner = Transaction.openNested(ctx)) {
+				long inserted = wrapper.getInventoryForUpgradeProcessing().insert(ItemVariant.of(stack), stack.getCount(), inner);
+				inner.commit();
 				return stack.copyWithCount(stack.getCount() - (int) inserted);
 			}
 		}).orElse(stack);
@@ -201,10 +200,15 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		}
 
 		ItemStack stackToStash = slot.getItem();
-		ItemStack stashResult = stash(storageStack, stackToStash);
-		if (stashResult.getCount() != stackToStash.getCount()) {
-			slot.set(stashResult);
-			slot.onTake(player, stashResult);
+		ItemStack stashResult;
+		try (Transaction simulate = Transaction.openOuter()) {
+			stashResult = stash(storageStack, stackToStash, simulate);
+		}
+
+		if (stashResult.getCount() < stackToStash.getCount()) {
+			int countToTake = stackToStash.getCount() - stashResult.getCount();
+			ItemStack takeResult = slot.safeTake(countToTake, countToTake, player);
+			stash(storageStack, takeResult, null);
 			return true;
 		}
 
@@ -217,7 +221,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 			return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 		}
 
-		ItemStack result = stash(storageStack, otherStack);
+		ItemStack result = stash(storageStack, otherStack, null);
 		if (result.getCount() != otherStack.getCount()) {
 			carriedAccess.set(result);
 			slot.set(storageStack);
