@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:pickup_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     "RRR"
   ],
   "result": {
-    "item": "sophisticatedstorage:pickup_upgrade"
+    "id": "sophisticatedstorage:pickup_upgrade"
   }
 }

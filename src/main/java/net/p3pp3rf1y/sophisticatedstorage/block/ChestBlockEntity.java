@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.DisplaySide;
 import net.p3pp3rf1y.sophisticatedcore.settings.ISettingsCategory;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public class ChestBlockEntity extends WoodStorageBlockEntity {
 	public static final String STORAGE_TYPE = "chest";
@@ -308,18 +306,18 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		doubleMainPos = null;
 	}
 
-	@NotNull
+	@Nullable
 	@Override
-	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
+	public SlottedStackStorage getExternalItemHandler(@Nullable Direction side) {
 		if (level == null) {
-			return LazyOptional.empty();
+			return null;
 		}
 
 		if (doubleMainPos != null) {
-			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getCapability(cap, opt)).orElseGet(LazyOptional::empty);
+			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getExternalItemHandler(side)).orElse(null);
 		}
 
-		return super.getCapability(cap, opt);
+		return super.getExternalItemHandler(side);
 	}
 
 	public boolean isMainChest() {

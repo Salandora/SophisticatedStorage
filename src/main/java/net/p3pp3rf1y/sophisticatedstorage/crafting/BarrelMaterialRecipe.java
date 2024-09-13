@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BarrelMaterialRecipe extends CustomRecipe {
-	public BarrelMaterialRecipe(ResourceLocation registryName, CraftingBookCategory category) {
-		super(registryName, category);
+	public BarrelMaterialRecipe(CraftingBookCategory category) {
+		super(category);
 	}
 
 	@Override

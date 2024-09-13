@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:controller"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "fabric:type": "sophisticatedstorage:base_tier_wooden_storage"
@@ -26,6 +27,6 @@
     "SCS"
   ],
   "result": {
-    "item": "sophisticatedstorage:controller"
+    "id": "sophisticatedstorage:controller"
   }
 }

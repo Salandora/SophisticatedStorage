@@ -52,9 +52,9 @@ public class StorageTextureManager extends SimpleJsonResourceReloadListener impl
 	}
 
 	@Override
-	protected Map<ResourceLocation, JsonElement> prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+	protected Map<ResourceLocation, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
 		clear();
-		Map<ResourceLocation, JsonElement> fileContents = super.prepare(pResourceManager, pProfiler);
+		Map<ResourceLocation, JsonElement> fileContents = super.prepare(resourceManager, profiler);
 		Map<ResourceLocation, StorageTextureDefinition> storageTextureDefinitions = new HashMap<>();
 		fileContents.forEach((resourceLocation, json) -> loadDefinition(storageTextureDefinitions, resourceLocation, json, fileContents));
 
@@ -83,7 +83,7 @@ public class StorageTextureManager extends SimpleJsonResourceReloadListener impl
 	}
 
 	@Override
-	protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+	protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
 		//noop as everything is done in prepare due to the need to have it done before TextureStitchEvent fires
 	}
 

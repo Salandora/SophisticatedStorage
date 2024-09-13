@@ -1,22 +1,20 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
@@ -88,14 +86,13 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 		return !isPacked();
 	}
 
-	@Nonnull
+	@Nullable
 	@Override
-	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
-		if (isPacked() && cap == ItemStorage.SIDED) {
-			return LazyOptional.empty();
+	public SlottedStackStorage getExternalItemHandler(@Nullable Direction side) {
+		if (isPacked()) {
+			return null;
 		}
-
-		return super.getCapability(cap, opt);
+		return super.getExternalItemHandler(side);
 	}
 
 	@Override

@@ -15,7 +15,7 @@ public class ItemTagProvider extends FabricTagProvider.ItemTagProvider {
 	}
 
 	@Override
-	protected void addTags(HolderLookup.Provider arg) {
+	protected void addTags(HolderLookup.Provider provider) {
 		getOrCreateTagBuilder(BASE_TIER_WOODEN_STORAGE_TAG).add(ModBlocks.BARREL_ITEM, ModBlocks.CHEST_ITEM);
 	}
 }

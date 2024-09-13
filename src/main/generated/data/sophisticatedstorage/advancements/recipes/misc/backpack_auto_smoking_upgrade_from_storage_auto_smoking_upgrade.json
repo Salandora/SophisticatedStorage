@@ -1,4 +1,16 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedbackpacks:auto_smoking_upgrade"
+    },
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "sophisticatedbackpacks"
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_storage_upgrade": {
@@ -22,14 +34,13 @@
   },
   "requirements": [
     [
-      "has_storage_upgrade",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_storage_upgrade"
     ]
   ],
   "rewards": {
     "recipes": [
       "sophisticatedstorage:backpack_auto_smoking_upgrade_from_storage_auto_smoking_upgrade"
     ]
-  },
-  "sends_telemetry_event": true
+  }
 }

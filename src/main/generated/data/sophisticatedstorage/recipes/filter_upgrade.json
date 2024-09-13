@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:filter_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -23,6 +24,6 @@
     "RSR"
   ],
   "result": {
-    "item": "sophisticatedstorage:filter_upgrade"
+    "id": "sophisticatedstorage:filter_upgrade"
   }
 }

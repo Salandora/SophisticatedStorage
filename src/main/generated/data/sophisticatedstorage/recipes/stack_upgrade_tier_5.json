@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_5"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "tag": "c:netherite_blocks"
@@ -23,6 +24,6 @@
     "BNB"
   ],
   "result": {
-    "item": "sophisticatedstorage:stack_upgrade_tier_5"
+    "id": "sophisticatedstorage:stack_upgrade_tier_5"
   }
 }

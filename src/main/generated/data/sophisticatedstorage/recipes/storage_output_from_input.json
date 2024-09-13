@@ -1,17 +1,18 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "conditions": [
+  "fabric:load_conditions": [
     {
       "condition": "sophisticatedcore:item_enabled",
       "itemRegistryName": "sophisticatedstorage:storage_output"
     }
   ],
+  "type": "sophisticatedcore:shapless_recipe",
+  "category": "misc",
   "ingredients": [
     {
       "item": "sophisticatedstorage:storage_input"
     }
   ],
   "result": {
-    "item": "sophisticatedstorage:storage_output"
+    "id": "sophisticatedstorage:storage_output"
   }
 }

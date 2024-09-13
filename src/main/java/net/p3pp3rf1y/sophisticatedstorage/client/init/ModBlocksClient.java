@@ -11,7 +11,7 @@ import static net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks.LIMITED_BARREL_S
 import static net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks.SETTINGS_CONTAINER_TYPE;
 import static net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks.STORAGE_CONTAINER_TYPE;
 
-public class ModBlocks {
+public class ModBlocksClient {
 	public static void registerScreens() {
 		MenuScreens.register(STORAGE_CONTAINER_TYPE, StorageScreen::constructScreen);
 		MenuScreens.register(SETTINGS_CONTAINER_TYPE, StorageSettingsScreen::constructScreen);

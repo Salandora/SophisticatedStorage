@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:storage_io"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "fabric:type": "sophisticatedstorage:base_tier_wooden_storage"
@@ -29,6 +30,6 @@
     "SPS"
   ],
   "result": {
-    "item": "sophisticatedstorage:storage_io"
+    "id": "sophisticatedstorage:storage_io"
   }
 }

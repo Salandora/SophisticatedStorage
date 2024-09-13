@@ -1,11 +1,12 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "conditions": [
+  "fabric:load_conditions": [
     {
       "condition": "sophisticatedcore:item_enabled",
       "itemRegistryName": "sophisticatedstorage:chest"
     }
   ],
+  "type": "sophisticatedcore:shapless_recipe",
+  "category": "misc",
   "ingredients": [
     {
       "item": "minecraft:chest"
@@ -15,7 +16,7 @@
     }
   ],
   "result": {
-    "item": "sophisticatedstorage:chest",
+    "id": "sophisticatedstorage:chest",
     "nbt": "{woodType:\"oak\"}"
   }
 }

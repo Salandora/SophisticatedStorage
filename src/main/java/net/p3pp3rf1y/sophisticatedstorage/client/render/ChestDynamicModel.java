@@ -29,7 +29,6 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +43,6 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 
 	static {
 		WoodStorageBlockBase.CUSTOM_TEXTURE_WOOD_TYPES.keySet().forEach(woodType -> WOOD_BREAK_TEXTURES.put(woodType.name(), SophisticatedStorage.getRL(BLOCK_BREAK_FOLDER + woodType.name() + "_chest")));
-	}
-
-	public static Collection<ResourceLocation> getWoodBreakTextures() {
-		return WOOD_BREAK_TEXTURES.values();
 	}
 
 	@Override

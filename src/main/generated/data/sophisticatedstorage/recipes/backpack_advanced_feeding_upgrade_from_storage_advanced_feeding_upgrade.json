@@ -1,17 +1,18 @@
 {
   "fabric:load_conditions": [
     {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedbackpacks:advanced_feeding_upgrade"
+    },
+    {
       "condition": "fabric:all_mods_loaded",
       "values": [
         "sophisticatedbackpacks"
       ]
-    },
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedbackpacks:advanced_feeding_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "L": {
       "item": "minecraft:leather"
@@ -29,6 +30,6 @@
     "T T"
   ],
   "result": {
-    "item": "sophisticatedbackpacks:advanced_feeding_upgrade"
+    "id": "sophisticatedbackpacks:advanced_feeding_upgrade"
   }
 }

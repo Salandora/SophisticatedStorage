@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:storage_link"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "E": {
       "item": "minecraft:ender_pearl"
@@ -25,6 +26,6 @@
     "RS"
   ],
   "result": {
-    "item": "sophisticatedstorage:storage_link"
+    "id": "sophisticatedstorage:storage_link"
   }
 }

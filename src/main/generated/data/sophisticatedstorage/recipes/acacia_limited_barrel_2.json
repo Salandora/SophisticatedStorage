@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:limited_barrel_2"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "P": {
       "item": "minecraft:acacia_planks"
@@ -23,7 +24,7 @@
     "PPP"
   ],
   "result": {
-    "item": "sophisticatedstorage:limited_barrel_2",
+    "id": "sophisticatedstorage:limited_barrel_2",
     "nbt": "{woodType:\"acacia\"}"
   }
 }

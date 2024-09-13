@@ -40,7 +40,7 @@ public class StorageToolItem extends ItemBase {
 	private static final String MODE_TAG = "mode";
 
 	public StorageToolItem() {
-		super(new Item.Properties().stacksTo(1));
+		super(new Properties().stacksTo(1));
 	}
 
 	@Override

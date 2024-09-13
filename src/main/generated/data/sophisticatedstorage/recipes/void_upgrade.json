@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:void_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     "ROR"
   ],
   "result": {
-    "item": "sophisticatedstorage:void_upgrade"
+    "id": "sophisticatedstorage:void_upgrade"
   }
 }

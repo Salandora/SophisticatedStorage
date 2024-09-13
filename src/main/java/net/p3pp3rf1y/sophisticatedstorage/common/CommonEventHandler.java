@@ -29,8 +29,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
-import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsMessage;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
+import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsPacket;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
@@ -109,7 +109,7 @@ public class CommonEventHandler {
 
 	private void sendPlayerSettingsToClient(Player player) {
 		String playerTagName = StorageSettingsHandler.SOPHISTICATED_STORAGE_SETTINGS_PLAYER_TAG;
-		PacketHandler.sendToClient((ServerPlayer) player, new SyncPlayerSettingsMessage(playerTagName, SettingsManager.getPlayerSettingsTag(player, playerTagName)));
+		PacketHelper.sendToPlayer(new SyncPlayerSettingsPacket(playerTagName, SettingsManager.getPlayerSettingsTag(player, playerTagName)), player);
 	}
 
 	private void onPlayerRespawn(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {

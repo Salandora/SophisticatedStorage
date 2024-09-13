@@ -62,6 +62,9 @@
         "modmenu": "*"
     },
     "custom": {
+        "loom:injected_interfaces": {
+            "net/minecraft/class_2586": ["net/p3pp3rf1y/sophisticatedstorage/extensions/CapabilityHelper"]
+        },
         "modmenu": {
             "parent": {
                 "id": "sophisticatedmods",

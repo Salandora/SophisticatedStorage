@@ -68,7 +68,7 @@ public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicMode
 
 	@SuppressWarnings("java:S6548") //singleton is intended here
 	public static final class Loader extends BarrelDynamicModelBase.Loader<BarrelDynamicModel> {
-		public static final BarrelDynamicModel.Loader INSTANCE = new BarrelDynamicModel.Loader();
+		public static final Loader INSTANCE = new Loader();
 
 		@Override
 		protected BarrelDynamicModel instantiateModel(@Nullable ResourceLocation parentLocation, Map<String, Map<BarrelModelPart, BarrelModelPartDefinition>> woodOverrides, @Nullable ResourceLocation flatTopModelName, Map<DynamicBarrelBakingData.DynamicPart, ResourceLocation> dynamicPartModels, Map<String, Map<BarrelModelPart, BarrelModelPartDefinition>> woodPartitionedModelPartDefinitions) {

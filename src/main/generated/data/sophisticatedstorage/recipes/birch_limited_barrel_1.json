@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:limited_barrel_1"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "P": {
       "item": "minecraft:birch_planks"
@@ -23,7 +24,7 @@
     "PPP"
   ],
   "result": {
-    "item": "sophisticatedstorage:limited_barrel_1",
+    "id": "sophisticatedstorage:limited_barrel_1",
     "nbt": "{woodType:\"birch\"}"
   }
 }

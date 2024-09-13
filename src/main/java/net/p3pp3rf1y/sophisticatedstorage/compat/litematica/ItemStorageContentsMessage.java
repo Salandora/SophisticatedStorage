@@ -1,21 +1,21 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.litematica;
 
-import me.pepperbell.simplenetworking.S2CPacket;
-import me.pepperbell.simplenetworking.SimpleChannel;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedcore.compat.litematica.LitematicaHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 
 import java.util.UUID;
 
-public class ItemStorageContentsMessage implements S2CPacket {
+public class ItemStorageContentsMessage implements FabricPacket {
+	public static final PacketType<ItemStorageContentsMessage> TYPE = PacketType.create(new ResourceLocation(SophisticatedBackpacks.MOD_ID, "litematica_item_storage_contents"), ItemStorageContentsMessage::new);
+
 	private final UUID storageUuid;
 	private final CompoundTag storageContents;
 
@@ -28,22 +28,22 @@ public class ItemStorageContentsMessage implements S2CPacket {
 	}
 
 	@Override
-	public void encode(FriendlyByteBuf buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		buffer.writeUUID(this.storageUuid);
 		buffer.writeNbt(this.storageContents);
 	}
 
-	@Environment(EnvType.CLIENT)
-	@Override
-	public void handle(Minecraft client, ClientPacketListener listener, PacketSender responseSender, SimpleChannel channel) {
-		client.execute(() -> {
-			if (client.player == null || this.storageContents == null) {
-				return;
-			}
+	public void handle(LocalPlayer player, PacketSender responseSender) {
+		if (this.storageContents == null) {
+			return;
+		}
 
-			ItemContentsStorage.get().setStorageContents(this.storageUuid, this.storageContents);
-			// TODO: CapabilityStorageWrapper.invalidateCache(this.storageUuid);
-			LitematicaHelper.incrementReceived(1);
-		});
+		ItemContentsStorage.get().setStorageContents(this.storageUuid, this.storageContents);
+		LitematicaHelper.incrementReceived(1);
+	}
+
+	@Override
+	public PacketType<?> getType() {
+		return TYPE;
 	}
 }

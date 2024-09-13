@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -73,7 +73,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 	}
 
 	private static Properties getProperties(float explosionResistance) {
-		BlockBehaviour.StatePredicate statePredicate = (state, blockGetter, pos) -> {
+		StatePredicate statePredicate = (state, blockGetter, pos) -> {
 			BlockEntity blockentity = blockGetter.getBlockEntity(pos);
 			if (!(blockentity instanceof ShulkerBoxBlockEntity shulkerboxblockentity)) {
 				return true;
@@ -81,7 +81,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 				return shulkerboxblockentity.isClosed();
 			}
 		};
-		return BlockBehaviour.Properties.of().strength(2.0F, explosionResistance).dynamicShape().noOcclusion().isSuffocating(statePredicate).isViewBlocking(statePredicate).pushReaction(PushReaction.DESTROY).mapColor(DyeColor.PURPLE);
+		return Properties.of().strength(2.0F, explosionResistance).dynamicShape().noOcclusion().isSuffocating(statePredicate).isViewBlocking(statePredicate).pushReaction(PushReaction.DESTROY).mapColor(DyeColor.PURPLE);
 	}
 
 	@Override
@@ -114,8 +114,13 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 			}
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_SHULKER_BOX));
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
-					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())));
+			player.openMenu(
+					MenuProviderHelper.createMenuProvider(
+							(w, p, pl) -> new StorageContainerMenu(w, pl, pos),
+							buffer -> buffer.writeBlockPos(pos),
+							WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())
+					)
+			);
 			PiglinAi.angerNearbyPiglins(player, true);
 			return InteractionResult.CONSUME;
 		}).orElse(InteractionResult.PASS);
@@ -195,7 +200,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 	}
 
 	@Override
-	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
 		BlockEntity blockentity = level.getBlockEntity(pos);
 		if (blockentity instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity && !level.isClientSide && player.isCreative()) {
 			ItemStack shulkerBoxDrop = new ItemStack(this);
@@ -206,7 +211,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 			level.addFreshEntity(itementity);
 		}
 
-		super.playerWillDestroy(level, pos, state, player);
+		return super.playerWillDestroy(level, pos, state, player);
 	}
 
 	@Override
@@ -254,7 +259,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		ItemStack stack = super.getCloneItemStack(level, pos, state);
 		WorldHelper.getBlockEntity(level, pos, ShulkerBoxBlockEntity.class).ifPresent(be -> {
 			StorageWrapper storageWrapper = be.getStorageWrapper();

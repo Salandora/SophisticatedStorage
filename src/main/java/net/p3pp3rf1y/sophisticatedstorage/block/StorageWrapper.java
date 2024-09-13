@@ -71,7 +71,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private int mainColor = -1;
 	private int accentColor = -1;
 
-	private Runnable upgradeCachesInvalidatedHandler = () -> {};
+	private Runnable upgradeCachesInvalidatedHandler = () -> {
+	};
 
 	private final Map<Class<? extends IUpgradeWrapper>, Consumer<? extends IUpgradeWrapper>> upgradeDefaultsHandlers = new HashMap<>();
 
@@ -123,10 +124,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 				inventoryIOHandler = null;
 				upgradeCachesInvalidatedHandler.run();
 			}) {
-
 				@Override
 				public boolean isItemValid(int slot, ItemVariant resource, int count) {
-					//noinspection ConstantConditions - by this time the upgrade has registryName so it can't be null
 					return super.isItemValid(slot, resource, count) && (resource.isBlank() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(resource.getItem()).getNamespace()) || resource.toStack(count).is(ModItems.STORAGE_UPGRADE_TAG));
 				}
 

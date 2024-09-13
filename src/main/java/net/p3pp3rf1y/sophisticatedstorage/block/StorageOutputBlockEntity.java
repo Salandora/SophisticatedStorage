@@ -1,38 +1,48 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public class StorageOutputBlockEntity extends StorageIOBlockEntity {
+	@Nullable
+	private Storage<ItemVariant> itemHandler;
+
 	public StorageOutputBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlocks.STORAGE_OUTPUT_BLOCK_ENTITY_TYPE, pos, state);
 	}
 
+	@Nullable
 	@Override
-	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt, ControllerBlockEntity c) {
-		if (cap == ItemStorage.SIDED) {
-				return c.getCapability(ItemStorage.SIDED, null) //passing null side to not get the cache failed handler
-						.map(itemHandler -> LazyOptional.of(() -> itemHandler instanceof SlottedStackStorage simpleInserter ? new OutputOnlyItemHandlerWrapper(simpleInserter) : itemHandler))
-						.orElseGet(LazyOptional::empty).cast();
+	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
+		if (getControllerPos().isEmpty()) {
+			return null;
+		}
+		if (itemHandler == null) {
+			itemHandler = super.getExternalItemHandler(side);
+			if (itemHandler instanceof SlottedStackStorage simpleInserter) {
+				//itemHandler = new OutputOnlyItemHandlerWrapper(simpleInserter);
+				itemHandler = FilteringStorage.extractOnlyOf(simpleInserter);
+			}
 		}
 
-		return super.getControllerCapability(cap, opt, c);
+		return itemHandler;
 	}
 
-	private static class OutputOnlyItemHandlerWrapper implements SlottedStackStorage {
+	@Override
+	protected void invalidateItemHandlerCache() {
+		super.invalidateItemHandlerCache();
+		itemHandler = null;
+	}
+
+	/*private static class OutputOnlyItemHandlerWrapper implements SlottedStackStorage {
 		private final SlottedStackStorage itemHandler;
 
 		public OutputOnlyItemHandlerWrapper(SlottedStackStorage itemHandler) {
@@ -124,5 +134,5 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		public long getCapacity() {
 			return backingSlot.getSlotCount();
 		}
-	}
+	}*/
 }

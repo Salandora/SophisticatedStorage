@@ -44,7 +44,9 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 @JeiPlugin
 public class StoragePlugin implements IModPlugin {
-	private static Consumer<IRecipeCatalystRegistration> additionalCatalystRegistrar = registration -> {};
+	private static Consumer<IRecipeCatalystRegistration> additionalCatalystRegistrar = registration -> {
+	};
+
 	public static void setAdditionalCatalystRegistrar(Consumer<IRecipeCatalystRegistration> additionalCatalystRegistrar) {
 		StoragePlugin.additionalCatalystRegistrar = additionalCatalystRegistrar;
 	}

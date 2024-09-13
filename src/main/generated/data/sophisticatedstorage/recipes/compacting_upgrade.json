@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:compacting_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     "RPR"
   ],
   "result": {
-    "item": "sophisticatedstorage:compacting_upgrade"
+    "id": "sophisticatedstorage:compacting_upgrade"
   }
 }

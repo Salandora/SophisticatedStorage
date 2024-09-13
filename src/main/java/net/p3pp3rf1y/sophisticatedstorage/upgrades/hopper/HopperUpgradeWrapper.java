@@ -16,7 +16,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
@@ -37,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrapper, HopperUpgradeItem>
@@ -70,88 +70,19 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		}
 
 		for (Direction pushDirection : pushDirections) {
-			if (getItemHandler(level, pos, pushDirection).map(this::pushItems)
-					/*.orElse(getWorldlyContainer(level, pos, pushDirection).map(container -> pushItemsToContainer(container, pushDirection.getOpposite()))*/
-					.orElse(false))/*)*/ {
+			if (runOnItemHandler(level, pos, pushDirection, this::pushItems)) {
 				break;
 			}
 		}
 
 		for (Direction pullDirection : pullDirections) {
-			if (getItemHandler(level, pos, pullDirection).map(this::pullItems)
-					/*.orElse(getWorldlyContainer(level, pos, pullDirection).map(container -> pullItemsFromContainer(container, pullDirection.getOpposite()))*/
-					.orElse(false))/*)*/ {
+			if (runOnItemHandler(level, pos, pullDirection, this::pullItems)) {
 				break;
 			}
 		}
 
 		coolDownTime = level.getGameTime() + upgradeItem.getTransferSpeedTicks();
 	}
-
-	// TODO: Necessary?
-	/*private boolean pushItemsToContainer(WorldlyContainer worldlyContainer, Direction face) {
-		ITrackedContentsItemHandler fromHandler = storageWrapper.getInventoryForUpgradeProcessing();
-
-		for (int slot = 0; slot < fromHandler.getSlotCount(); slot++) {
-			ItemStack slotStack = fromHandler.getStackInSlot(slot);
-			if (!slotStack.isEmpty() && outputFilterLogic.matchesFilter(slotStack)) {
-				try (Transaction extractionSimulation = Transaction.openOuter())
-				fromHandler.extractSlot()
-				ItemStack extractedStack = StorageUtil.simulateExtract(fromHandler, ) fromHandler.extractItem(slot, Math.min(worldlyContainer.getMaxStackSize(), upgradeItem.getMaxTransferStackSize()), true);
-				if (!extractedStack.isEmpty() && pushStackToContainer(worldlyContainer, face, extractedStack, fromHandler, slot)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-	// TODO: Necessary?
-	private boolean pushStackToContainer(WorldlyContainer worldlyContainer, Direction face, ItemStack extractedStack, ITrackedContentsItemHandler fromHandler, int slotToExtractFrom) {
-		for (int containerSlot = 0; containerSlot < worldlyContainer.getContainerSize(); containerSlot++) {
-			if (worldlyContainer.canPlaceItemThroughFace(containerSlot, extractedStack, face)) {
-				ItemStack existingStack = worldlyContainer.getItem(containerSlot);
-				if (existingStack.isEmpty()) {
-					worldlyContainer.setItem(containerSlot, extractedStack);
-					fromHandler.extractItem(slotToExtractFrom, extractedStack.getCount(), false);
-					return true;
-				} else if (ItemHandlerHelper.canItemStacksStack(existingStack, extractedStack)) {
-					int maxStackSize = Math.min(worldlyContainer.getMaxStackSize(), existingStack.getMaxStackSize());
-					int remainder = maxStackSize - existingStack.getCount();
-					if (remainder > 0) {
-						int countToExtract = Math.min(extractedStack.getCount(), remainder);
-						existingStack.grow(countToExtract);
-						worldlyContainer.setItem(containerSlot, existingStack);
-						fromHandler.extractItem(slotToExtractFrom, countToExtract, false);
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean pullItemsFromContainer(WorldlyContainer worldlyContainer, Direction face) {
-		ITrackedContentsItemHandler toHandler = storageWrapper.getInventoryForUpgradeProcessing();
-		for (int containerSlot = 0; containerSlot < worldlyContainer.getContainerSize(); containerSlot++) {
-			ItemStack existingStack = worldlyContainer.getItem(containerSlot);
-			if (!existingStack.isEmpty() && worldlyContainer.canTakeItemThroughFace(containerSlot, existingStack, face) && inputFilterLogic.matchesFilter(existingStack)) {
-				ItemVariant resource = ItemVariant.of(existingStack);
-				long maxAmount = existingStack.getCount();
-				try (Transaction nested = Transaction.openNested(null)) {
-					maxAmount -= toHandler.insert(resource, maxAmount, nested);
-					nested.commit();
-				}
-
-				if (maxAmount > 0) {
-					worldlyContainer.setItem(containerSlot, resource.toStack((int) maxAmount));
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}*/
 
 	private void initDirections(Level level, BlockPos pos) {
 		if (upgrade.hasTag() && (upgrade.getItem() != ModItems.HOPPER_UPGRADE || directionsInitialized)) {
@@ -167,16 +98,6 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			directionsInitialized = true;
 		}
 	}
-
-	/*private Optional<WorldlyContainer> getWorldlyContainer(Level level, BlockPos pos, Direction direction) {
-		BlockState storageState = level.getBlockState(pos);
-		BlockPos offsetPos = storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : pos.relative(direction);
-		BlockState state = level.getBlockState(offsetPos);
-		if (state.getBlock() instanceof WorldlyContainerHolder worldlyContainerHolder) {
-			return Optional.of(worldlyContainerHolder.getContainer(state, level, offsetPos));
-		}
-		return Optional.empty();
-	}*/
 
 	private boolean pullItems(Storage<ItemVariant> fromHandler) {
 		return moveItems(fromHandler, storageWrapper.getInventoryForUpgradeProcessing(), inputFilterLogic);
@@ -208,16 +129,33 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	@Override
 	public void onNeighborChange(Level level, BlockPos pos, Direction direction) {
 		if (pushDirections.contains(direction) || pullDirections.contains(direction)) {
-			handlerCache.put(direction, BlockApiCache.create(ItemStorage.SIDED, (ServerLevel) level, pos.relative(direction)));
+			updateCacheOnSide(level, pos, direction);
 		}
 	}
 
-	private LazyOptional<Storage<ItemVariant>> getItemHandler(Level level, BlockPos pos, Direction direction) {
-		if (!handlerCache.containsKey(direction)) {
-			handlerCache.put(direction, BlockApiCache.create(ItemStorage.SIDED, (ServerLevel) level, pos.relative(direction)));
+	public void updateCacheOnSide(Level level, BlockPos pos, Direction direction) {
+		if (!level.isLoaded(pos) || !level.isLoaded(pos.relative(direction)) || !(level instanceof ServerLevel serverLevel)) {
+			handlerCache.remove(direction);
+			return;
 		}
 
-		return LazyOptional.ofObject(handlerCache.get(direction).find(direction.getOpposite()));
+		handlerCache.computeIfAbsent(direction, k -> {
+			BlockState storageState = level.getBlockState(pos);
+			BlockPos offsetPos = storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : pos.relative(direction);
+			return BlockApiCache.create(ItemStorage.SIDED, serverLevel, offsetPos);
+		});
+	}
+
+	private boolean runOnItemHandler(Level level, BlockPos pos, Direction direction, Predicate<Storage<ItemVariant>> run) {
+		if (!handlerCache.containsKey(direction)) {
+			updateCacheOnSide(level, pos, direction);
+		}
+		if (handlerCache.get(direction) == null) {
+			return false;
+		}
+
+		@Nullable Storage<ItemVariant> handler = handlerCache.get(direction).find(direction.getOpposite());
+		return handler != null && run.test(handler);
 	}
 
 	public ContentsFilterLogic getInputFilterLogic() {

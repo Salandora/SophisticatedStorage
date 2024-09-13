@@ -1,74 +1,24 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.VersionParsingException;
-import net.fabricmc.loader.api.metadata.version.VersionPredicate;
+import net.p3pp3rf1y.sophisticatedcore.compat.CompatInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds;
-import net.p3pp3rf1y.sophisticatedcore.compat.ICompat;
-import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedcore.compat.CompatRegistry;
 import net.p3pp3rf1y.sophisticatedstorage.compat.chipped.ChippedCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.litematica.LitematicaCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.mkb.ModernKeyBindingCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.sodium.SodiumCompat;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-
 public class ModCompat {
-	private ModCompat() {}
+	private ModCompat() {
+	}
 
 	public static final String SODIUM = "sodium";
 	public static final String MKB = "mkb";
 
-	private static final Map<CompatInfo, Supplier<Callable<ICompat>>> compatFactories = new HashMap<>();
-
-	private static final Map<CompatInfo, ICompat> loadedCompats = new HashMap<>();
-
-	static {
-		// compatFactories.put(new CompatInfo(CompatModIds.QUARK, null), () -> QuarkCompat::new);
-		compatFactories.put(new CompatInfo(CompatModIds.CHIPPED, null), () -> ChippedCompat::new);
-		compatFactories.put(new CompatInfo(CompatModIds.LITEMATICA, null), () -> LitematicaCompat::new);
-		compatFactories.put(new CompatInfo(SODIUM, fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
-		compatFactories.put(new CompatInfo(MKB, null), () -> ModernKeyBindingCompat::new);
-	}
-
-	public static void compatsSetup() {
-		loadedCompats.values().forEach(ICompat::setup);
-	}
-
-	@Nullable
-	private static VersionPredicate fromSpec(String spec) {
-		try {
-			return VersionPredicate.parse(spec);
-		}
-		catch (VersionParsingException e) {
-			return null;
-		}
-	}
-
-	public static void initCompats() {
-		for (Map.Entry<CompatInfo, Supplier<Callable<ICompat>>> entry : compatFactories.entrySet()) {
-			if (entry.getKey().isLoaded()) {
-				try {
-					loadedCompats.put(entry.getKey(), entry.getValue().get().call());
-				}
-				catch (Exception e) {
-					SophisticatedStorage.LOGGER.error("Error instantiating compatibility ", e);
-				}
-			}
-		}
-
-		loadedCompats.values().forEach(ICompat::init);
-	}
-
-	record CompatInfo(String modId, @Nullable VersionPredicate supportedVersionRange){
-		public boolean isLoaded() {
-			return FabricLoader.getInstance().getModContainer(modId())
-					.map(container -> supportedVersionRange() == null || supportedVersionRange().test(container.getMetadata().getVersion()))
-					.orElse(false);
-		}
+	public static void register() {
+		//CompatRegistry.registerCompat(new CompatInfo(CompatModIds.QUARK, null), () -> new QuarkCompat());
+		CompatRegistry.registerCompat(new CompatInfo(CompatModIds.CHIPPED, null), () -> ChippedCompat::new);
+		CompatRegistry.registerCompat(new CompatInfo(CompatModIds.LITEMATICA, null), () -> LitematicaCompat::new);
+		CompatRegistry.registerCompat(new CompatInfo(SODIUM, CompatRegistry.fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
+		CompatRegistry.registerCompat(new CompatInfo(MKB, null), () -> ModernKeyBindingCompat::new);
 	}
 }

@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:basic_tier_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "R": {
       "item": "minecraft:redstone_torch"
@@ -20,6 +21,6 @@
     " S "
   ],
   "result": {
-    "item": "sophisticatedstorage:basic_tier_upgrade"
+    "id": "sophisticatedstorage:basic_tier_upgrade"
   }
 }

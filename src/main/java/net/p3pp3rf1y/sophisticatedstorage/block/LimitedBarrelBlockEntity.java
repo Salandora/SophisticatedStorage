@@ -195,6 +195,20 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean depositFromAllOfPlayersInventory(Player player, int slot, InventoryHandler invHandler, ItemStack stackInSlot, MemorySettingsCategory memorySettings) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		Predicate<ItemStack> memoryItemMatches = itemStack -> memorySettings.isSlotSelected(slot) && memorySettings.matchesFilter(slot, itemStack);
+		// TODO:
+		/*CapabilityHelper.runOnItemHandler(player, playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
+			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemHandlerHelper.canItemStacksStack(stackInSlot, playerStack)))) {
+
+				ItemStack result = invHandler.insertItemOnlyToSlot(slot, playerStack, true);
+				if (result.getCount() < playerStack.getCount()) {
+					ItemStack extracted = playerInventory.extractItem(playerSlot, playerStack.getCount() - result.getCount(), true);
+					if (!extracted.isEmpty()) {
+						invHandler.insertItemOnlyToSlot(slot, playerInventory.extractItem(playerSlot, extracted.getCount(), false), false);
+						success.set(true);
+					}
+				}
+			}
+		}));*/
 		PlayerInventoryStorage playerInventory = PlayerInventoryStorage.of(player);
 		InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
 			ItemVariant resource = ItemVariant.of(playerStack);

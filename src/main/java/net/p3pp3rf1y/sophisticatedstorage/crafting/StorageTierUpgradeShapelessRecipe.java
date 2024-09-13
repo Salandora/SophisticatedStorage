@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -10,30 +9,26 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
+import net.p3pp3rf1y.sophisticatedcore.mixin.common.accessor.ShapelessRecipeAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.block.IStorageBlock;
-import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ShapelessRecipeAccessor;
 
-import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
 
 public class StorageTierUpgradeShapelessRecipe extends ShapelessRecipe implements IWrapperRecipe<ShapelessRecipe> {
-	public static final Set<ResourceLocation> REGISTERED_RECIPES = new LinkedHashSet<>();
 	private final ShapelessRecipe compose;
 
 	public StorageTierUpgradeShapelessRecipe(ShapelessRecipe compose) {
-		super(compose.getId(), compose.getGroup(), compose.category(), ((ShapelessRecipeAccessor) compose).getResult(), compose.getIngredients());
+		super(compose.getGroup(), compose.category(), ((ShapelessRecipeAccessor) compose).getResult(), compose.getIngredients());
 		this.compose = compose;
-		REGISTERED_RECIPES.add(compose.getId());
 	}
 
 	@Override
-	public boolean matches(CraftingContainer pInv, Level pLevel) {
-		return super.matches(pInv, pLevel) && getOriginalStorage(pInv).map(storage -> !(storage.getItem() instanceof WoodStorageBlockItem) || !WoodStorageBlockItem.isPacked(storage)).orElse(false);
+	public boolean matches(CraftingContainer inv, Level level) {
+		return super.matches(inv, level) && getOriginalStorage(inv).map(storage -> !(storage.getItem() instanceof WoodStorageBlockItem) || !WoodStorageBlockItem.isPacked(storage)).orElse(false);
 	}
 
 	@Override
@@ -46,10 +41,9 @@ public class StorageTierUpgradeShapelessRecipe extends ShapelessRecipe implement
 		ItemStack upgradedStorage = super.assemble(inv, registryAccess);
 		getOriginalStorage(inv).ifPresent(originalStorage -> upgradedStorage.setTag(originalStorage.getTag()));
 		if (upgradedStorage.getItem() instanceof ShulkerBoxItem shulkerBoxItem) {
-			CapabilityStorageWrapper.get(upgradedStorage).ifPresent(wrapper -> {
-				shulkerBoxItem.setNumberOfInventorySlots(upgradedStorage, wrapper.getDefaultNumberOfInventorySlots());
-				shulkerBoxItem.setNumberOfUpgradeSlots(upgradedStorage, wrapper.getDefaultNumberOfUpgradeSlots());
-			});
+			StackStorageWrapper wrapper = StackStorageWrapper.fromData(upgradedStorage);
+			shulkerBoxItem.setNumberOfInventorySlots(upgradedStorage, wrapper.getDefaultNumberOfInventorySlots());
+			shulkerBoxItem.setNumberOfUpgradeSlots(upgradedStorage, wrapper.getDefaultNumberOfUpgradeSlots());
 		}
 		return upgradedStorage;
 	}

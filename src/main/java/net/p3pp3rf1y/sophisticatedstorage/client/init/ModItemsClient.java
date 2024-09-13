@@ -66,7 +66,7 @@ import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.TANK_TYPE;
 import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.VOID_TYPE;
 import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.XP_PUMP_TYPE;
 
-public class ModItems {
+public class ModItemsClient {
 
 	public static void registerScreens() {
 		UpgradeGuiManager.registerTab(FEEDING_TYPE, (FeedingUpgradeContainer uc, Position p, StorageScreenBase<?> s) ->

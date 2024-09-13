@@ -7,7 +7,8 @@ import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticleData;
 
 public class ModParticles {
-	private ModParticles() {}
+	private ModParticles() {
+	}
 
 	public static final CustomTintTerrainParticleData TERRAIN_PARTICLE = register("terrain_particle", new CustomTintTerrainParticleData());
 

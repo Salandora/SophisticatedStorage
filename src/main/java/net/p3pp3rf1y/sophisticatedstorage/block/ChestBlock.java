@@ -51,10 +51,10 @@ import net.p3pp3rf1y.sophisticatedcore.api.IDisplaySideStorage;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
@@ -202,20 +202,11 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		}
 
 		Direction direction = context.getHorizontalDirection().getOpposite();
-		return CapabilityStorageWrapper.get(chestBeingPlaced)
-				.map(wrapper ->
-						getStateForPlacement(context, direction, fluidstate,
-								StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
-								StorageBlockItem.getAccentColorFromStack(chestBeingPlaced).orElse(-1),
-								WoodStorageBlockItem.getWoodType(chestBeingPlaced).orElse(WoodType.ACACIA),
-								InventoryHelper.isEmpty(wrapper.getUpgradeHandler()))
-				)
-				.orElse(
-						getStateForPlacement(context, direction, fluidstate,
-								StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
-								StorageBlockItem.getAccentColorFromStack(chestBeingPlaced).orElse(-1),
-								WoodStorageBlockItem.getWoodType(chestBeingPlaced).orElse(WoodType.ACACIA), true)
-				);
+		return getStateForPlacement(context, direction, fluidstate,
+				StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
+				StorageBlockItem.getAccentColorFromStack(chestBeingPlaced).orElse(-1),
+				WoodStorageBlockItem.getWoodType(chestBeingPlaced).orElse(WoodType.ACACIA),
+				InventoryHelper.isEmpty(StackStorageWrapper.fromData(chestBeingPlaced).getUpgradeHandler()));
 	}
 
 	private BlockState getStateForPlacement(BlockPlaceContext context, Direction direction, FluidState fluidstate, int mainColor, int accentColor, WoodType woodType, boolean itemHasNoUpgrades) {
@@ -299,7 +290,13 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			}
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_CHEST));
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, mainChestPos), b.getDisplayName(), mainChestPos));
+			player.openMenu(
+					MenuProviderHelper.createMenuProvider(
+							(w, p, pl) -> new StorageContainerMenu(w, pl, mainChestPos),
+							b.getDisplayName(),
+							mainChestPos
+					)
+			);
 			PiglinAi.angerNearbyPiglins(player, true);
 
 			return InteractionResult.CONSUME;
@@ -351,7 +348,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 	}
 
 	@Override
-	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
 		if (state.getValue(TYPE) != ChestType.SINGLE) {
 			level.getBlockEntity(pos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(be -> {
 				be.setDestroyedByPlayer();
@@ -364,7 +361,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			});
 		}
 
-		super.playerWillDestroy(level, pos, state, player);
+		return super.playerWillDestroy(level, pos, state, player);
 	}
 
 	@Override
@@ -473,10 +470,10 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 	}
 
 	@Override
-	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-		super.entityInside(state, world, pos, entity);
-		if (!world.isClientSide && entity instanceof ItemEntity itemEntity) {
-			WorldHelper.getBlockEntity(world, pos, ChestBlockEntity.class).ifPresent(te -> tryToPickup(world, itemEntity, te.getMainStorageWrapper()));
+	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+		super.entityInside(state, level, pos, entity);
+		if (!level.isClientSide && entity instanceof ItemEntity itemEntity) {
+			WorldHelper.getBlockEntity(level, pos, ChestBlockEntity.class).ifPresent(be -> tryToPickup(level, itemEntity, be.getMainStorageWrapper()));
 		}
 	}
 

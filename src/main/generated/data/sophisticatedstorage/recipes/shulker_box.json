@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:shulker_box"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "C": {
       "tag": "c:chests"
@@ -23,6 +24,6 @@
     " S"
   ],
   "result": {
-    "item": "sophisticatedstorage:shulker_box"
+    "id": "sophisticatedstorage:shulker_box"
   }
 }

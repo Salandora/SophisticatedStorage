@@ -1,7 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
@@ -14,9 +15,9 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
-
 public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 	public static final BaseTierWoodenStorageIngredient INSTANCE = new BaseTierWoodenStorageIngredient();
+	public static final Codec<BaseTierWoodenStorageIngredient> CODEC = MapCodec.unit(INSTANCE).stable().codec();
 
 	private BaseTierWoodenStorageIngredient() {
 		super();
@@ -59,18 +60,13 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 		}
 
 		@Override
-		public BaseTierWoodenStorageIngredient read(JsonObject json) {
-			return new BaseTierWoodenStorageIngredient();
+		public Codec<BaseTierWoodenStorageIngredient> getCodec(boolean allowEmpty) {
+			return CODEC;
 		}
 
 		@Override
 		public BaseTierWoodenStorageIngredient read(FriendlyByteBuf buf) {
 			return new BaseTierWoodenStorageIngredient();
-		}
-
-		@Override
-		public void write(JsonObject json, BaseTierWoodenStorageIngredient ingredient) {
-			//noop
 		}
 
 		@Override

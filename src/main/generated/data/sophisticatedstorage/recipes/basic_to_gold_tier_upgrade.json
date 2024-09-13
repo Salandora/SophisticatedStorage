@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:basic_to_gold_tier_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "G": {
       "tag": "c:gold_ingots"
@@ -20,6 +21,6 @@
     "GGG"
   ],
   "result": {
-    "item": "sophisticatedstorage:basic_to_gold_tier_upgrade"
+    "id": "sophisticatedstorage:basic_to_gold_tier_upgrade"
   }
 }

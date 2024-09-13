@@ -3,8 +3,8 @@ package net.p3pp3rf1y.sophisticatedstorage.init;
 import org.apache.commons.lang3.ArrayUtils;
 
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -12,10 +12,7 @@ import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +34,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
-import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
@@ -87,7 +83,8 @@ public class ModBlocks {
 
 	private static final String LIMITED_BARREL_NAME = "limited_barrel";
 
-	private ModBlocks() {}
+	private ModBlocks() {
+	}
 
 	public static final TagKey<Item> BASE_TIER_WOODEN_STORAGE_TAG = TagKey.create(Registries.ITEM, SophisticatedStorage.getRL("base_tier_wooden_storage"));
 
@@ -411,17 +408,18 @@ public class ModBlocks {
 		registerDispenseBehavior();
 		registerCauldronInteractions();
 		registerRecipeSerializers();
-
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleIdentifiablePrepareableReloadListener<>(SophisticatedStorage.getRL("recipes")) {
-			@Override
-			protected void apply(Object object, ResourceManager resourceManager, ProfilerFiller profiler) {
-				onResourceReload();
-			}
-		});
+		registerCapabilities();
 	}
 
-	private static void onResourceReload() {
-		ShulkerBoxFromChestRecipe.REGISTERED_RECIPES.clear();
+	private static void registerCapabilities() {
+		ItemStorage.SIDED.registerForBlockEntity(ControllerBlockEntity::getExternalItemHandler, CONTROLLER_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(ChestBlockEntity::getExternalItemHandler, CHEST_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(ShulkerBoxBlockEntity::getExternalItemHandler, SHULKER_BOX_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(LimitedBarrelBlockEntity::getExternalItemHandler, LIMITED_BARREL_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(BarrelBlockEntity::getExternalItemHandler, BARREL_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(StorageIOBlockEntity::getExternalItemHandler, STORAGE_IO_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(StorageInputBlockEntity::getExternalItemHandler, STORAGE_INPUT_BLOCK_ENTITY_TYPE);
+		ItemStorage.SIDED.registerForBlockEntity(StorageOutputBlockEntity::getExternalItemHandler, STORAGE_OUTPUT_BLOCK_ENTITY_TYPE);
 	}
 
 	private static void registerRecipeSerializers() {
@@ -434,15 +432,15 @@ public class ModBlocks {
 
 	private static void registerCauldronInteractions() {
 		for (BlockItem item : ALL_BARREL_ITEMS) {
-			CauldronInteraction.WATER.put(item, BarrelCauldronInteraction.INSTANCE);
+			CauldronInteraction.WATER.map().put(item, BarrelCauldronInteraction.INSTANCE);
 		}
 
 		for (BlockItem item : CHEST_ITEMS) {
-			CauldronInteraction.WATER.put(item, WoodStorageCauldronInteraction.INSTANCE);
+			CauldronInteraction.WATER.map().put(item, WoodStorageCauldronInteraction.INSTANCE);
 		}
 
 		for (BlockItem item : SHULKER_BOX_ITEMS) {
-			CauldronInteraction.WATER.put(item, StorageCauldronInteraction.INSTANCE);
+			CauldronInteraction.WATER.map().put(item, StorageCauldronInteraction.INSTANCE);
 		}
 	}
 
@@ -460,6 +458,7 @@ public class ModBlocks {
 	@SuppressWarnings("java:S6548") //singleton is correct here
 	public static class WoodStorageCauldronInteraction extends StorageCauldronInteraction {
 		private static final WoodStorageCauldronInteraction INSTANCE = new WoodStorageCauldronInteraction();
+
 		@Override
 		protected void removePaint(ItemStack stack) {
 			super.removePaint(stack);

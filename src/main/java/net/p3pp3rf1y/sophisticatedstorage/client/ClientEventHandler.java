@@ -49,8 +49,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvent;
+import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
@@ -83,8 +84,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.LevelRendererAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
-import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolMessage;
-import net.p3pp3rf1y.sophisticatedstorage.network.StoragePacketHandler;
+import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPacket;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -124,8 +124,7 @@ public class ClientEventHandler {
 		ModItemColors.registerItemColorHandlers();
 		ModBlockColors.registerBlockColorHandlers();
 
-		ClientLifecycleEvent.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
-
+		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
 
 		if (!FabricLoader.getInstance().isModLoaded(ModCompat.MKB)) {
 			ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
@@ -177,7 +176,7 @@ public class ClientEventHandler {
 		});
 	}
 
-	private static InteractionResult onMouseScrolled(Minecraft mc, double delta) {
+	private static InteractionResult onMouseScrolled(Minecraft mc, double deltaX, double deltaY) {
 		if (mc.screen != null) {
 			return InteractionResult.PASS;
 		}
@@ -189,7 +188,7 @@ public class ClientEventHandler {
 		if (stack.getItem() != ModItems.STORAGE_TOOL) {
 			return InteractionResult.PASS;
 		}
-		StoragePacketHandler.sendToServer(new ScrolledToolMessage(delta > 0));
+		PacketHelper.sendToServer(new ScrolledToolPacket(deltaY > 0));
 		return InteractionResult.SUCCESS;
 	}
 
@@ -242,11 +241,11 @@ public class ClientEventHandler {
 	}
 
 	private static void onModelRegistry(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
-		loaders.put(SophisticatedStorage.getRL("barrel"), BarrelDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("limited_barrel"), LimitedBarrelDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("chest"), ChestDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("shulker_box"), ShulkerBoxDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("simple_composite"), SimpleCompositeModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "barrel"), BarrelDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "limited_barrel"), LimitedBarrelDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "chest"), ChestDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_box"), ShulkerBoxDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "simple_composite"), SimpleCompositeModel.Loader.INSTANCE);
 	}
 
 	private static void onRegisterReloadListeners() {

@@ -6,6 +6,7 @@
     }
   ],
   "type": "sophisticatedstorage:storage_tier_upgrade",
+  "category": "misc",
   "key": {
     "I": {
       "tag": "c:iron_ingots"

@@ -209,7 +209,8 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 			return overrides;
 		}
 
-		@SuppressWarnings({"java:S1874"}) // need to override getTransforms not just call the non deprecated version here
+		@SuppressWarnings({"java:S1874"})
+		// need to override getTransforms not just call the non deprecated version here
 		@Override
 		public ItemTransforms getTransforms() {
 			return transforms;

@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:smoking_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "L": {
       "tag": "minecraft:logs"
@@ -20,6 +21,6 @@
     " L "
   ],
   "result": {
-    "item": "sophisticatedstorage:smoking_upgrade"
+    "id": "sophisticatedstorage:smoking_upgrade"
   }
 }

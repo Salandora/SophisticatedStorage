@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_1_plus"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "tag": "c:copper_blocks"
@@ -23,6 +24,6 @@
     "BCB"
   ],
   "result": {
-    "item": "sophisticatedstorage:stack_upgrade_tier_1_plus"
+    "id": "sophisticatedstorage:stack_upgrade_tier_1_plus"
   }
 }

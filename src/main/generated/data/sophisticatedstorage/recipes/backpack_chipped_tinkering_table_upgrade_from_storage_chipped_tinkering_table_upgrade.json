@@ -1,18 +1,24 @@
 {
   "fabric:load_conditions": [
     {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedbackpacks:chipped/tinkering_table_upgrade"
+    },
+    {
       "condition": "fabric:all_mods_loaded",
       "values": [
-        "chipped",
         "sophisticatedbackpacks"
       ]
     },
     {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedbackpacks:chipped/tinkering_table_upgrade"
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "chipped"
+      ]
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "L": {
       "item": "minecraft:leather"
@@ -30,6 +36,6 @@
     "T T"
   ],
   "result": {
-    "item": "sophisticatedbackpacks:chipped/tinkering_table_upgrade"
+    "id": "sophisticatedbackpacks:chipped/tinkering_table_upgrade"
   }
 }

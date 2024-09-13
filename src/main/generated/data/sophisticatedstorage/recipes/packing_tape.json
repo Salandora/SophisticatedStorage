@@ -1,14 +1,11 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "conditions": [
+  "fabric:load_conditions": [
     {
       "condition": "sophisticatedstorage:drop_packed_disabled"
-    },
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:packing_tape"
     }
   ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
   "ingredients": [
     {
       "item": "minecraft:slime_ball"

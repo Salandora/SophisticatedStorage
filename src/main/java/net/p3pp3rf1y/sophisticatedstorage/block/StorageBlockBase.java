@@ -101,17 +101,17 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-		super.entityInside(state, world, pos, entity);
-		if (!world.isClientSide && entity instanceof ItemEntity itemEntity) {
-			WorldHelper.getBlockEntity(world, pos, StorageBlockEntity.class).ifPresent(te -> tryToPickup(world, itemEntity, te.getStorageWrapper()));
+	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+		super.entityInside(state, level, pos, entity);
+		if (!level.isClientSide && entity instanceof ItemEntity itemEntity) {
+			WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(be -> tryToPickup(level, itemEntity, be.getStorageWrapper()));
 		}
 	}
 
-	protected void tryToPickup(Level world, ItemEntity itemEntity, IStorageWrapper w) {
+	protected void tryToPickup(Level level, ItemEntity itemEntity, IStorageWrapper w) {
 		ItemStack remainingStack = itemEntity.getItem().copy();
 		try (Transaction ctx = Transaction.openOuter()) {
-			remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(world, w.getUpgradeHandler(), remainingStack, ctx);
+			remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(level, w.getUpgradeHandler(), remainingStack, ctx);
 			ctx.commit();
 		}
 		if (remainingStack.getCount() < itemEntity.getItem().getCount()) {
@@ -171,9 +171,10 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 	}
 
 	@Override
-	public void playerWillDestroy(Level pLevel, BlockPos pPos, BlockState pState, Player pPlayer) {
-		super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
-		WorldHelper.getBlockEntity(pLevel, pPos, StorageBlockEntity.class).ifPresent(IControllableStorage::removeFromController);
+	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+		super.playerWillDestroy(level, pos, state, player);
+		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(IControllableStorage::removeFromController);
+		return state;
 	}
 
 	@Override

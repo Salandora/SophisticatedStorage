@@ -11,8 +11,8 @@ import java.util.List;
 
 class BlockSideTest {
 	@ParameterizedTest
-	@MethodSource
-	public void fromDirectionConvertsCorrectly(FromDirectionParams fromDirectionParams) {
+	@MethodSource("fromDirectionConvertsCorrectly")
+	void fromDirectionConvertsCorrectly(FromDirectionParams fromDirectionParams) {
 		Assertions.assertEquals(fromDirectionParams.expectedSide, BlockSide.fromDirection(fromDirectionParams.direction, fromDirectionParams.baseHorizontalDirection, fromDirectionParams.baseVerticalFacing));
 	}
 
@@ -66,12 +66,12 @@ class BlockSideTest {
 
 
 	@ParameterizedTest
-	@MethodSource
-	public void toDirectionConvertsCorrectly(ToDirectionParams toDirectionParams) {
+	@MethodSource("toDirectionConvertsCorrectly")
+	void toDirectionConvertsCorrectly(ToDirectionParams toDirectionParams) {
 		Assertions.assertEquals(toDirectionParams.expectedDirection, toDirectionParams.side.toDirection(toDirectionParams.baseHorizontalDirection, toDirectionParams.baseVerticalFacing));
 	}
 
-	public record ToDirectionParams(BlockSide side, Direction baseHorizontalDirection, VerticalFacing baseVerticalFacing, Direction expectedDirection) {}
+	private record ToDirectionParams(BlockSide side, Direction baseHorizontalDirection, VerticalFacing baseVerticalFacing, Direction expectedDirection) {}
 
 	private static List<ToDirectionParams> toDirectionConvertsCorrectly() {
 		return List.of(

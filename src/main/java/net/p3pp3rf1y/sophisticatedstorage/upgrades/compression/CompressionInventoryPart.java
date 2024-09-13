@@ -472,15 +472,13 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			return 0;
 		}
 
-		int limit = 0;
-
 		Map<Integer, SlotDefinition> definitions = slotDefinitions;
 
 		if (definitions.isEmpty()) {
 			definitions = getSlotDefinitions(resource.getItem(), slot, Map.of());
 		}
 
-		limit = getStackLimit(definitions.get(slot));
+		int limit = getStackLimit(definitions.get(slot));
 
 		int currentCalculatedCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
 		long inserted = Math.min(Math.max(parent.getBaseStackLimit(resource) - parent.getSlotStack(slot).getCount(), limit - currentCalculatedCount), maxAmount);

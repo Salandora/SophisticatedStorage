@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:blasting_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     "RFR"
   ],
   "result": {
-    "item": "sophisticatedstorage:blasting_upgrade"
+    "id": "sophisticatedstorage:blasting_upgrade"
   }
 }

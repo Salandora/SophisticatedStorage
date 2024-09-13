@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:compression_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     "RIR"
   ],
   "result": {
-    "item": "sophisticatedstorage:compression_upgrade"
+    "id": "sophisticatedstorage:compression_upgrade"
   }
 }

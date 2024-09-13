@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_1"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -20,6 +21,6 @@
     "LLL"
   ],
   "result": {
-    "item": "sophisticatedstorage:stack_upgrade_tier_1"
+    "id": "sophisticatedstorage:stack_upgrade_tier_1"
   }
 }

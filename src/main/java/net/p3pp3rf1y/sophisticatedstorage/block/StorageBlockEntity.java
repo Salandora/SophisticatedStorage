@@ -2,11 +2,8 @@ package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
@@ -28,7 +25,6 @@ import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllableStorage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
@@ -52,7 +48,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay, RenderAttachmentBlockEntity {
 	public static final String STORAGE_WRAPPER_TAG = "storageWrapper";
@@ -73,9 +68,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	private boolean chunkBeingUnloaded = false;
 
 	@Nullable
-	private LazyOptional<SlottedStackStorage> itemHandlerCap;
-	@Nullable
-	private LazyOptional<SlottedStackStorage> noSideItemHandlerCap;
+	private SlottedStackStorage cachedFailedInsertItemHandler;
 	private boolean locked = false;
 	private boolean showLock = true;
 	private boolean showTier = true;
@@ -176,11 +169,6 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		storageWrapper.setUpgradeCachesInvalidatedHandler(this::onUpgradeCachesInvalidated);
 
 		ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> onChunkUnloaded());
-		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((be, world) -> {
-			if (be == this) {
-				invalidateCaps();
-			}
-		});
 	}
 
 	@SuppressWarnings("java:S1172") //parameter used in override
@@ -191,7 +179,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	protected abstract String getStorageType();
 
 	protected void onUpgradeCachesInvalidated() {
-		invalidateStorageCap();
+		invalidateCapabilities();
 	}
 
 	public boolean isOpen() {
@@ -395,39 +383,15 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		setChanged();
 	}
 
-	@SuppressWarnings("unused")
-	@NotNull
-	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
-		if (cap == ItemStorage.SIDED) {
-			if (opt == null) {
-				if (noSideItemHandlerCap == null) {
-					noSideItemHandlerCap = LazyOptional.of(() -> getStorageWrapper().getInventoryForInputOutput());
-				}
-				return noSideItemHandlerCap.cast();
-			}
-			if (itemHandlerCap == null) {
-				itemHandlerCap = LazyOptional.of(() -> new CachedFailedInsertInventoryHandler(() -> getStorageWrapper().getInventoryForInputOutput(), () -> level != null ? level.getGameTime() : 0));
-			}
-			return itemHandlerCap.cast();
+	@Nullable
+	public SlottedStackStorage getExternalItemHandler(@Nullable Direction side) {
+		if (side == null) {
+			return getStorageWrapper().getInventoryForInputOutput();
 		}
-		return LazyOptional.empty();
-	}
-
-	public void invalidateCaps() {
-		invalidateStorageCap();
-	}
-
-	private void invalidateStorageCap() {
-		if (itemHandlerCap != null) {
-			LazyOptional<SlottedStackStorage> tempItemHandlerCap = itemHandlerCap;
-			itemHandlerCap = null;
-			tempItemHandlerCap.invalidate();
+		if (cachedFailedInsertItemHandler == null) {
+			cachedFailedInsertItemHandler = new CachedFailedInsertInventoryHandler(() -> getStorageWrapper().getInventoryForInputOutput(), () -> level != null ? level.getGameTime() : 0);
 		}
-		if (noSideItemHandlerCap != null) {
-			LazyOptional<SlottedStackStorage> tempNoSideItemHandlerCap = noSideItemHandlerCap;
-			noSideItemHandlerCap = null;
-			tempNoSideItemHandlerCap.invalidate();
-		}
+		return cachedFailedInsertItemHandler;
 	}
 
 	public boolean shouldDropContents() {
@@ -542,7 +506,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
 			contentsFilteredItemHandler = null;
-			invalidateStorageCap();
+			invalidateCapabilities();
 		}
 		setChanged();
 		WorldHelper.notifyBlockUpdate(this);
@@ -562,7 +526,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
 			contentsFilteredItemHandler = null;
-			invalidateStorageCap();
+			invalidateCapabilities();
 		}
 		setChanged();
 		setUpdateBlockRender();

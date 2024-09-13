@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:stonecutter_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     " R "
   ],
   "result": {
-    "item": "sophisticatedstorage:stonecutter_upgrade"
+    "id": "sophisticatedstorage:stonecutter_upgrade"
   }
 }

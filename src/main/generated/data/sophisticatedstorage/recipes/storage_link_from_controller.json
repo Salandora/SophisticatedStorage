@@ -1,11 +1,12 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "conditions": [
+  "fabric:load_conditions": [
     {
       "condition": "sophisticatedcore:item_enabled",
       "itemRegistryName": "sophisticatedstorage:storage_link"
     }
   ],
+  "type": "sophisticatedcore:shapless_recipe",
+  "category": "misc",
   "ingredients": [
     {
       "item": "sophisticatedstorage:controller"
@@ -16,6 +17,6 @@
   ],
   "result": {
     "count": 3,
-    "item": "sophisticatedstorage:storage_link"
+    "id": "sophisticatedstorage:storage_link"
   }
 }

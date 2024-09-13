@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:crafting_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
       "item": "sophisticatedstorage:upgrade_base"
@@ -26,6 +27,6 @@
     " C "
   ],
   "result": {
-    "item": "sophisticatedstorage:crafting_upgrade"
+    "id": "sophisticatedstorage:crafting_upgrade"
   }
 }

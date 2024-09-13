@@ -12,12 +12,14 @@ import dev.emi.emi.api.widget.Bounds;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
@@ -126,12 +128,13 @@ public class EmiCompat implements EmiPlugin {
 		}
     }
 
-    private static void registerCraftingRecipes(EmiRegistry registry, Collection<CraftingRecipe> recipes) {
+    private static void registerCraftingRecipes(EmiRegistry registry, Collection<RecipeHolder<CraftingRecipe>> recipes) {
+		Minecraft mc = Minecraft.getInstance();
         recipes.forEach(r -> registry.addRecipe(
             new EmiCraftingRecipe(
-                r.getIngredients().stream().map(EmiIngredient::of).toList(),
-                EmiStack.of(r.getResultItem(null)),
-                r.getId())
+                r.value().getIngredients().stream().map(EmiIngredient::of).toList(),
+                EmiStack.of(r.value().getResultItem(mc.level.registryAccess())),
+                r.id())
             )
         );
     }

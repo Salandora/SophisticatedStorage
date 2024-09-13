@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:upgrade_base"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "I": {
       "tag": "c:iron_ingots"
@@ -20,6 +21,6 @@
     "PIP"
   ],
   "result": {
-    "item": "sophisticatedstorage:upgrade_base"
+    "id": "sophisticatedstorage:upgrade_base"
   }
 }

@@ -1,11 +1,12 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "conditions": [
+  "fabric:load_conditions": [
     {
       "condition": "sophisticatedcore:item_enabled",
       "itemRegistryName": "sophisticatedstorage:shulker_box"
     }
   ],
+  "type": "sophisticatedcore:shapless_recipe",
+  "category": "misc",
   "ingredients": [
     {
       "item": "minecraft:cyan_shulker_box"
@@ -15,7 +16,7 @@
     }
   ],
   "result": {
-    "item": "sophisticatedstorage:shulker_box",
+    "id": "sophisticatedstorage:shulker_box",
     "nbt": "{accentColor:1481884,mainColor:1481884}"
   }
 }

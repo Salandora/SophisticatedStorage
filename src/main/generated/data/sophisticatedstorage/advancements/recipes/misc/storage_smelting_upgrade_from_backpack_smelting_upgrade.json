@@ -1,4 +1,16 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:smelting_upgrade"
+    },
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "sophisticatedbackpacks"
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_backpack_upgrade": {
@@ -22,14 +34,13 @@
   },
   "requirements": [
     [
-      "has_backpack_upgrade",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_backpack_upgrade"
     ]
   ],
   "rewards": {
     "recipes": [
       "sophisticatedstorage:storage_smelting_upgrade_from_backpack_smelting_upgrade"
     ]
-  },
-  "sends_telemetry_event": true
+  }
 }

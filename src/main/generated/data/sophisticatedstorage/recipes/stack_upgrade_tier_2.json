@@ -5,10 +5,11 @@
       "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_2"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:iron_block"
+      "tag": "c:iron_blocks"
     },
     "I": {
       "tag": "c:iron_ingots"
@@ -23,6 +24,6 @@
     "BIB"
   ],
   "result": {
-    "item": "sophisticatedstorage:stack_upgrade_tier_2"
+    "id": "sophisticatedstorage:stack_upgrade_tier_2"
   }
 }

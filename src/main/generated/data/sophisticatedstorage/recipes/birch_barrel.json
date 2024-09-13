@@ -5,7 +5,8 @@
       "itemRegistryName": "sophisticatedstorage:barrel"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "P": {
       "item": "minecraft:birch_planks"
@@ -23,7 +24,7 @@
     "PSP"
   ],
   "result": {
-    "item": "sophisticatedstorage:barrel",
+    "id": "sophisticatedstorage:barrel",
     "nbt": "{woodType:\"birch\"}"
   }
 }

@@ -22,6 +22,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -130,9 +131,13 @@ public class BarrelBlock extends WoodStorageBlockBase {
 			}
 
 			player.awardStat(Stats.OPEN_BARREL);
-
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> instantiateContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
-					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())));
+			player.openMenu(
+					MenuProviderHelper.createMenuProvider(
+							(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
+							buffer -> buffer.writeBlockPos(pos),
+							WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())
+					)
+			);
 			PiglinAi.angerNearbyPiglins(player, true);
 			return InteractionResult.CONSUME;
 		}).orElse(InteractionResult.PASS);
@@ -177,10 +182,10 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
-		ItemStack cloneItemStack = super.getCloneItemStack(world, pos, state);
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+		ItemStack cloneItemStack = super.getCloneItemStack(level, pos, state);
 		BarrelBlockItem.setFlatTop(cloneItemStack, state.getValue(FLAT_TOP));
-		WorldHelper.getBlockEntity(world, pos, BarrelBlockEntity.class).ifPresent(barrelBlockEntity -> {
+		WorldHelper.getBlockEntity(level, pos, BarrelBlockEntity.class).ifPresent(barrelBlockEntity -> {
 			Map<BarrelMaterial, ResourceLocation> materials = barrelBlockEntity.getMaterials();
 			if (!materials.isEmpty()) {
 				BarrelBlockItem.setMaterials(cloneItemStack, materials);
@@ -216,7 +221,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
+	public VoxelShape getBlockSupportShape(BlockState state, BlockGetter reader, BlockPos pos) {
 		return Shapes.block();
 	}
 
@@ -241,12 +246,12 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public VoxelShape getOcclusionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+	public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
 		return Shapes.block();
 	}
 
 	@Override
-	public boolean useShapeForLightOcclusion(BlockState pState) {
+	public boolean useShapeForLightOcclusion(BlockState state) {
 		return true;
 	}
 }

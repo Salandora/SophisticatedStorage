@@ -5,10 +5,11 @@
       "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_3"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "B": {
-      "item": "minecraft:gold_block"
+      "tag": "c:gold_blocks"
     },
     "G": {
       "tag": "c:gold_ingots"
@@ -23,6 +24,6 @@
     "BGB"
   ],
   "result": {
-    "item": "sophisticatedstorage:stack_upgrade_tier_3"
+    "id": "sophisticatedstorage:stack_upgrade_tier_3"
   }
 }

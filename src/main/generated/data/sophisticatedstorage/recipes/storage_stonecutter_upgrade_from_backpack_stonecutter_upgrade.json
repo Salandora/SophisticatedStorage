@@ -1,17 +1,18 @@
 {
   "fabric:load_conditions": [
     {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:stonecutter_upgrade"
+    },
+    {
       "condition": "fabric:all_mods_loaded",
       "values": [
         "sophisticatedbackpacks"
       ]
-    },
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:stonecutter_upgrade"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
   "key": {
     "P": {
       "tag": "minecraft:planks"
@@ -26,6 +27,6 @@
     "P P"
   ],
   "result": {
-    "item": "sophisticatedstorage:stonecutter_upgrade"
+    "id": "sophisticatedstorage:stonecutter_upgrade"
   }
 }

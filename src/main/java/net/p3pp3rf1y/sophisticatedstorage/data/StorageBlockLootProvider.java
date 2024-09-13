@@ -90,13 +90,14 @@ public class StorageBlockLootProvider extends LootTableProvider {
 			return LootTable.lootTable().withPool(pool);
 		}
 
-		public LootTable.Builder dropBlock(ItemLike pItem) {
-			LootPool.Builder pool = applyExplosionCondition(pItem, LootPool.lootPool()
-					.name("main")
-					.setRolls(ConstantValue.exactly(1.0F))
-					.add(LootItem.lootTableItem(pItem))
+		public LootTable.Builder dropBlock(ItemLike item) {
+			return LootTable.lootTable().withPool(
+					applyExplosionCondition(item, LootPool.lootPool()
+						.name("main")
+						.setRolls(ConstantValue.exactly(1.0F))
+						.add(LootItem.lootTableItem(item))
+					)
 			);
-			return LootTable.lootTable().withPool(pool);
 		}
 	}
 }
