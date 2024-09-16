@@ -66,8 +66,10 @@ public class ShulkerBoxFromChestRecipesMaker {
 					i++;
 				}
 				ItemStack result = ClientRecipeHelper.assemble(originalRecipe, craftinginventory);
+
+				// Changes made due to emi complaining about multi id recipes
 				//noinspection ConstantConditions
-				ResourceLocation newId = new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_from_" + BuiltInRegistries.ITEM.getKey(chestItem.getItem()).getPath()
+				ResourceLocation newId = new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_from_" + BuiltInRegistries.ITEM.getKey(chestItem.getItem()).getPath() + chestItem.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[^a-z\\d/._-]", "_")
 						+ result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[^a-z\\d/._-]", "_"));
 
 				recipes.add(new ShapedRecipe(newId, "", CraftingBookCategory.MISC, originalRecipe.getWidth(), originalRecipe.getHeight(), ingredientsCopy, result));
