@@ -247,11 +247,12 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 			ctx.commit();
 		}
 
-		if (player.getInventory().add(resource.toStack((int) extracted))) {
+		ItemStack extractedStack = resource.toStack((int) extracted);
+ 		if (player.getInventory().add(extractedStack)) {
 			//noinspection ConstantConditions
 			getLevel().playSound(null, getBlockPos(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, (RandHelper.getRandomMinusOneToOne(getLevel().random) * .7f + 1) * 2);
-		} else {
-			player.drop(resource.toStack((int) extracted), false);
+		} else if (!extractedStack.isEmpty()) {
+			player.drop(extractedStack, false);
 		}
 		return true;
 	}

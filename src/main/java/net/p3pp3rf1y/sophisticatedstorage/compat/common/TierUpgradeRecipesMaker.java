@@ -78,7 +78,9 @@ public class TierUpgradeRecipesMaker {
 					i++;
 				}
 				ItemStack result = ClientRecipeHelper.assemble(recipe, craftinginventory);
-				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}:\s]", "_"));
+
+				// Changes made due to emi complaining about multi id recipes
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + "_to_" + BuiltInRegistries.ITEM.getKey(result.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
 				itemGroupRecipes.add(new RecipeHolder<>(id, constructRecipe.construct(recipe, ingredientsCopy, result)));
 			});
 			return itemGroupRecipes;

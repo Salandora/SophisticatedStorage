@@ -2,6 +2,7 @@ package net.p3pp3rf1y.sophisticatedstorage.compat.common;
 
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -103,12 +104,17 @@ public class DyeRecipesMaker {
 			ingredients.add(Ingredient.of(stacks));
 			ingredients.add(Ingredient.of(ConventionalItemTags.LIME_DYES));
 
+			int maincolor = ColorHelper.getColor(DyeColor.YELLOW.getTextureDiffuseColors());
+			int accentcolor = ColorHelper.getColor(DyeColor.LIME.getTextureDiffuseColors());
+
 			ItemStack result = new ItemStack(block);
 			if (result.getItem() instanceof ITintableBlockItem tintableBlockItem) {
-				tintableBlockItem.setMainColor(result, ColorHelper.getColor(DyeColor.YELLOW.getTextureDiffuseColors()));
-				tintableBlockItem.setAccentColor(result, ColorHelper.getColor(DyeColor.LIME.getTextureDiffuseColors()));
+				tintableBlockItem.setMainColor(result, maincolor);
+				tintableBlockItem.setAccentColor(result, accentcolor);
 			}
-			ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "multiple_colors");
+
+			// Changes made due to emi complaining about multi id recipes
+			ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, BuiltInRegistries.ITEM.getKey(block.asItem()).getPath() + "_multiple_colors_accentcolor_" + accentcolor + "_maincolor_" + maincolor);
 			ShapedRecipePattern pattern = new ShapedRecipePattern(3, 1, ingredients, Optional.empty());
 			recipes.add(new RecipeHolder<>(id, new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result)));
 		});
@@ -121,11 +127,14 @@ public class DyeRecipesMaker {
 				ingredients.add(Ingredient.of(stacks));
 				ingredients.add(Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation("c", color.getName() + "_dyes"))));
 				ItemStack result = new ItemStack(block);
+
 				if (result.getItem() instanceof ITintableBlockItem tintableBlockItem) {
 					tintableBlockItem.setMainColor(result, ColorHelper.getColor(color.getTextureDiffuseColors()));
 					tintableBlockItem.setAccentColor(result, ColorHelper.getColor(color.getTextureDiffuseColors()));
 				}
-				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "single_color_" + color.getSerializedName());
+
+				// Changes made due to emi complaining about multi id recipes
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, BuiltInRegistries.ITEM.getKey(block.asItem()).getPath() + "_single_color_" + color.getSerializedName());
 				ShapedRecipePattern pattern = new ShapedRecipePattern(1, 2, ingredients, Optional.empty());
 				recipes.add(new RecipeHolder<>(id, new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result)));
 			});
