@@ -2,3 +2,13 @@ moduleDependency(project, [
         "SophisticatedBackpacks",
         "SophisticatedCore"
 ])
+
+repositories {
+    maven {
+        url = 'https://maven.cafeteria.dev/releases/'
+    }
+}
+
+dependencies {
+    modImplementation include("me.luligabi:NoIndium:1.1.0+1.20")
+}
