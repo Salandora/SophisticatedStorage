@@ -8,7 +8,7 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "B": {
-      "item": "minecraft:diamond_block"
+      "tag": "c:diamond_blocks"
     },
     "D": {
       "tag": "c:diamonds"
