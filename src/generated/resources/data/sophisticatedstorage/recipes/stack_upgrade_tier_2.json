@@ -8,7 +8,7 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "B": {
-      "item": "minecraft:iron_block"
+      "tag": "c:iron_blocks"
     },
     "I": {
       "tag": "c:iron_ingots"
