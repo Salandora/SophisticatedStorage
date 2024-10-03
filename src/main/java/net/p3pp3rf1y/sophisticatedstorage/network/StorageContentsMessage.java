@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.p3pp3rf1y.sophisticatedcore.client.render.ClientStorageContentsTooltipBase;
+import net.p3pp3rf1y.sophisticatedcore.client.render.ClientStorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedcore.network.SimplePacketBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 
@@ -42,7 +42,7 @@ public class StorageContentsMessage extends SimplePacketBase {
 			}
 
 			ItemContentsStorage.get().setStorageContents(shulkerBoxUuid, contents);
-			ClientStorageContentsTooltipBase.refreshContents();
+			ClientStorageContentsTooltip.refreshContents();
 		});
 		return true;
 	}

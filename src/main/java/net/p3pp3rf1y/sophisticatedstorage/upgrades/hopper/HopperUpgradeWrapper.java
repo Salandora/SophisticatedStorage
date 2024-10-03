@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
-import com.google.common.collect.MapMaker;
-
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -17,6 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
@@ -28,7 +27,10 @@ import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.BlockSide;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
 
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -38,11 +40,12 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrapper, HopperUpgradeItem>
-		implements ITickableUpgrade {
+		implements ITickableUpgrade, INeighborChangeListenerUpgrade {
 
 	private Set<Direction> pullDirections = new LinkedHashSet<>();
 	private Set<Direction> pushDirections = new LinkedHashSet<>();
-	private final Map<Direction, BlockApiCache<Storage<ItemVariant>, Direction>> handlerCache = new MapMaker().weakKeys().weakValues().makeMap();
+	private boolean directionsInitialized = false;
+	private final Map<Direction, BlockApiCache<Storage<ItemVariant>, Direction>> handlerCache = new EnumMap<>(Direction.class);
 
 	private final ContentsFilterLogic inputFilterLogic;
 	private final ContentsFilterLogic outputFilterLogic;
@@ -151,14 +154,17 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}*/
 
 	private void initDirections(Level level, BlockPos pos) {
-		if (upgrade.hasTag()) {
+		if (upgrade.hasTag() && (upgrade.getItem() != ModItems.HOPPER_UPGRADE || directionsInitialized)) {
 			return;
 		}
 		BlockState state = level.getBlockState(pos);
 		if (state.getBlock() instanceof StorageBlockBase storageBlock) {
 			Direction horizontalDirection = storageBlock.getHorizontalDirection(state);
 			VerticalFacing verticalFacing = storageBlock.getVerticalFacing(state);
+			pullDirections.clear();
+			pushDirections.clear();
 			initDirections(BlockSide.BOTTOM.toDirection(horizontalDirection, verticalFacing), BlockSide.TOP.toDirection(horizontalDirection, verticalFacing));
+			directionsInitialized = true;
 		}
 	}
 
@@ -201,12 +207,19 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		return false;
 	}
 
-	private Optional<Storage<ItemVariant>> getItemHandler(Level level, BlockPos pos, Direction direction) {
+	@Override
+	public void onNeighborChange(Level level, BlockPos pos, Direction direction) {
+		if (pushDirections.contains(direction) || pullDirections.contains(direction)) {
+			handlerCache.put(direction, BlockApiCache.create(ItemStorage.SIDED, (ServerLevel) level, pos.relative(direction)));
+		}
+	}
+
+	private LazyOptional<Storage<ItemVariant>> getItemHandler(Level level, BlockPos pos, Direction direction) {
 		if (!handlerCache.containsKey(direction)) {
 			handlerCache.put(direction, BlockApiCache.create(ItemStorage.SIDED, (ServerLevel) level, pos.relative(direction)));
 		}
 
-		return Optional.ofNullable(handlerCache.get(direction).find(direction.getOpposite()));
+		return LazyOptional.ofObject(handlerCache.get(direction).find(direction.getOpposite()));
 	}
 
 	public ContentsFilterLogic getInputFilterLogic() {
@@ -263,9 +276,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	public void initDirections(Direction pushDirection, Direction pullDirection) {
-		if (!upgrade.hasTag()) {
-			setPushingTo(pushDirection, true);
-			setPullingFrom(pullDirection, true);
-		}
+		setPushingTo(pushDirection, true);
+		setPullingFrom(pullDirection, true);
 	}
 }

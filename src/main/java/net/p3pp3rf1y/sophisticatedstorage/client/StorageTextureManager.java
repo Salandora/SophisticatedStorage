@@ -202,6 +202,7 @@ public class StorageTextureManager extends SimpleJsonResourceReloadListener impl
 	public enum ChestMaterial {
 		BASE,
 		WOOD_TIER,
+		COPPER_TIER,
 		IRON_TIER,
 		GOLD_TIER,
 		DIAMOND_TIER,

@@ -1,6 +1,9 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import com.google.common.collect.MapMaker;
+
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.api.IStashStorageItem;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
@@ -33,6 +37,7 @@ import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -89,6 +94,48 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 			InventoryHelper.dropItems(storageWrapper.getInventoryHandler(), level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ());
 			InventoryHelper.dropItems(storageWrapper.getUpgradeHandler(), level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ());
 		});
+	}
+
+	public static ItemApiLookup.ItemApiProvider<LazyOptional<StorageWrapper>, Void> initCapabilities() {
+		return new ItemApiLookup.ItemApiProvider<>() {
+			final Map<ItemStack, StorageWrapper> wrapperMap = new MapMaker().weakKeys().weakValues().makeMap();
+
+			@Override
+			public LazyOptional<StorageWrapper> find(ItemStack stack, Void context) {
+				if (stack.getCount() == 1) {
+					return LazyOptional.of(() -> wrapperMap.computeIfAbsent(stack, this::initWrapper)).cast();
+				}
+
+				return LazyOptional.empty();
+			}
+
+			private StorageWrapper initWrapper(ItemStack stack) {
+				UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
+				StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
+					@Override
+					public String getStorageType() {
+						return "shulker_box";
+					}
+
+					@Override
+					public Component getDisplayName() {
+						return Component.translatable(stack.getItem().getDescriptionId());
+					}
+
+					@Override
+					protected boolean isAllowedInStorage(ItemStack stack) {
+						Block block = Block.byItem(stack.getItem());
+						return !(block instanceof ShulkerBoxBlock) && !(block instanceof net.minecraft.world.level.block.ShulkerBoxBlock) && !Config.SERVER.shulkerBoxDisallowedItems.isItemDisallowed(stack.getItem());
+					}
+				};
+				if (uuid != null) {
+					CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
+					storageWrapper.load(compoundtag);
+					storageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
+				}
+				return storageWrapper;
+			}
+		};
 	}
 
 	@Override
@@ -175,22 +222,5 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		}
 
 		return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
-	}
-
-	public static StorageWrapper initWrapper(ItemStack stack) {
-		UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
-		StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
-			@Override
-			protected boolean isAllowedInStorage(ItemStack stack) {
-				Block block = Block.byItem(stack.getItem());
-				return !(block instanceof ShulkerBoxBlock) && !(block instanceof net.minecraft.world.level.block.ShulkerBoxBlock) && !Config.SERVER.shulkerBoxDisallowedItems.isItemDisallowed(stack.getItem());
-			}
-		};
-		if (uuid != null) {
-			CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
-			storageWrapper.load(compoundtag);
-			storageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
-		}
-		return storageWrapper;
 	}
 }

@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
 public class ModCompat {
 	private ModCompat() {}
 
-	//private static final String SODIUM_MOD_ID = "sodium";
-	private static final String MKB_MOD_ID = "mkb";
+	//public static final String SODIUM = "sodium";
+	public static final String MKB = "mkb";
 
 	private static final Map<CompatInfo, Supplier<Callable<ICompat>>> compatFactories = new HashMap<>();
 
@@ -29,13 +29,23 @@ public class ModCompat {
 		// compatFactories.put(new CompatInfo(CompatModIds.QUARK, null), () -> QuarkCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.CHIPPED, null), () -> ChippedCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.LITEMATICA, null), () -> LitematicaCompat::new);
-		// compatFactories.put(new CompatInfo(SODIUM_MOD_ID, VersionPredicateParser.parse(">=0.4.9 <0.5")), () -> SodiumCompat::new);
-		compatFactories.put(new CompatInfo(MKB_MOD_ID, null), () -> ModernKeyBindingCompat::new);
+		// compatFactories.put(new CompatInfo(SODIUM, fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
+		compatFactories.put(new CompatInfo(MKB, null), () -> ModernKeyBindingCompat::new);
 	}
 
 	public static void compatsSetup() {
 		loadedCompats.values().forEach(ICompat::setup);
 	}
+
+	/*@Nullable
+	private static VersionPredicate fromSpec(String spec) {
+		try {
+			return VersionPredicateParser.parse(spec);
+		}
+		catch (VersionParsingException e) {
+			return null;
+		}
+	}*/
 
 	public static void initCompats() {
 		for (Map.Entry<CompatInfo, Supplier<Callable<ICompat>>> entry : compatFactories.entrySet()) {

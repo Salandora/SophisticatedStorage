@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SophisticatedStorage implements ModInitializer {
-	public static final String ID = "sophisticatedstorage";
-	public static final Logger LOGGER = LoggerFactory.getLogger(ID);
+	public static final String MOD_ID = "sophisticatedstorage";
+	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	private final CommonEventHandler commonEventHandler = new CommonEventHandler();
 
@@ -49,6 +49,6 @@ public class SophisticatedStorage implements ModInitializer {
 	}
 
 	public static String getRegistryName(String regName) {
-		return ID + ":" + regName;
+		return MOD_ID + ":" + regName;
 	}
 }

@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -74,6 +75,7 @@ import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxRenderer;
 import net.p3pp3rf1y.sophisticatedstorage.client.render.SimpleCompositeModel;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolMessage;
@@ -93,7 +95,7 @@ public class ClientEventHandler {
 	public static final KeyMapping SORT_KEYBIND = new KeyMapping(StorageTranslationHelper.INSTANCE.translKeybind("sort"),
 			InputConstants.Type.MOUSE, MIDDLE_BUTTON, KEYBIND_SOPHISTICATEDSTORAGE_CATEGORY); // StorageGuiKeyConflictContext.INSTANCE
 
-	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.ID, "chest");
+	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
 	public static final ModelLayerLocation CHEST_LAYER = new ModelLayerLocation(CHEST_RL, "main");
 
 	public static void registerHandlers() {
@@ -120,10 +122,13 @@ public class ClientEventHandler {
 
 		ClientLifecycleEvent.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
 
-		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-			ScreenKeyboardEvents.allowKeyPress(screen).register(ClientEventHandler::handleGuiKeyPress);
-			ScreenMouseEvents.allowMouseClick(screen).register(ClientEventHandler::handleGuiMouseKeyPress);
-		});
+
+		if (!FabricLoader.getInstance().isModLoaded(ModCompat.MKB)) {
+			ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+				ScreenKeyboardEvents.allowKeyPress(screen).register(ClientEventHandler::handleGuiKeyPress);
+				ScreenMouseEvents.allowMouseClick(screen).register(ClientEventHandler::handleGuiMouseKeyPress);
+			});
+		}
 
 		AttackBlockCallback.EVENT.register(ClientEventHandler::onLimitedBarrelClicked);
 		ClientRawInputEvent.MOUSE_SCROLLED.register(ClientEventHandler::onMouseScrolled);
@@ -136,7 +141,7 @@ public class ClientEventHandler {
 	private static void addBarrelPartModelsToBake(ResourceManager manager, Consumer<ResourceLocation> out) {
 		Map<ResourceLocation, Resource> models = manager.listResources("models/block/barrel_part", fileName -> fileName.getPath().endsWith(".json"));
 		models.forEach((modelName, resource) -> {
-			if (modelName.getNamespace().equals(SophisticatedStorage.ID)) {
+			if (modelName.getNamespace().equals(SophisticatedStorage.MOD_ID)) {
 				out.accept(new ResourceLocation(modelName.getNamespace(), modelName.getPath().substring("models/".length()).replace(".json", "")));
 			}
 		});
@@ -182,7 +187,7 @@ public class ClientEventHandler {
 	}
 
 	public static boolean handleGuiKeyPress(Screen screen, int key, int scancode, int modifiers) {
-		return !SORT_KEYBIND.isDown() || !tryCallSort(screen);
+		return !SORT_KEYBIND.matches(key, scancode) || !tryCallSort(screen);
 	}
 
 	public static boolean handleGuiMouseKeyPress(Screen screen, double mouseX, double mouseY, int button) {
@@ -193,7 +198,7 @@ public class ClientEventHandler {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(StorageTextureManager.INSTANCE);
 	}
 
-	private static boolean tryCallSort(Screen gui) {
+	public static boolean tryCallSort(Screen gui) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player != null && mc.player.containerMenu instanceof StorageContainerMenu container && gui instanceof StorageScreen screen) {
 			MouseHandler mh = mc.mouseHandler;
@@ -252,6 +257,7 @@ public class ClientEventHandler {
 	private static void stitchTextures(TextureAtlas atlas, ClientSpriteRegistryCallback.Registry registry) {
 		stitchBlockAtlasTextures(atlas, registry);
 		registry.register(LockRenderer.LOCK_TEXTURE.texture());
+		registry.register(LimitedBarrelRenderer.FILL_INDICATORS_TEXTURE.texture());
 		registry.register(CompressionInventoryPart.EMPTY_COMPRESSION_SLOT.getSecond());
 		registry.register(HopperUpgradeContainer.EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getSecond());
 		registry.register(HopperUpgradeContainer.EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getSecond());
@@ -259,6 +265,7 @@ public class ClientEventHandler {
 
 	private static void stitchShulkerBoxTextures(TextureAtlas atlas, ClientSpriteRegistryCallback.Registry registry) {
 		registry.register(ShulkerBoxRenderer.BASE_TIER_MATERIAL.texture());
+		registry.register(ShulkerBoxRenderer.COPPER_TIER_MATERIAL.texture());
 		registry.register(ShulkerBoxRenderer.IRON_TIER_MATERIAL.texture());
 		registry.register(ShulkerBoxRenderer.GOLD_TIER_MATERIAL.texture());
 		registry.register(ShulkerBoxRenderer.DIAMOND_TIER_MATERIAL.texture());
@@ -291,12 +298,14 @@ public class ClientEventHandler {
 
 	private static void registerItemRenderers() {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.CHEST_ITEM, ChestItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_CHEST_ITEM, ChestItemRenderer::render);
 
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);

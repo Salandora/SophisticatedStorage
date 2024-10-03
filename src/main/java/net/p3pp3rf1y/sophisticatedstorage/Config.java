@@ -10,23 +10,34 @@ import net.minecraftforge.api.fml.event.config.ModConfigEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilteredUpgradeConfig;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.IUpgradeCountLimitConfig;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeGroup;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoCookingUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.CookingUpgradeConfig;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.ICookingUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeConfig;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeConfig;
+import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeConfig;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import org.jetbrains.annotations.Nullable;
 
 public class Config {
 	private static final Map<ModConfig.Type, BaseConfig> CONFIGS = new EnumMap<>(ModConfig.Type.class);
@@ -58,42 +69,49 @@ public class Config {
 
 	public static class Server extends BaseConfig {
 		public final StorageConfig woodBarrel;
+		public final StorageConfig copperBarrel;
 		public final StorageConfig ironBarrel;
 		public final StorageConfig goldBarrel;
 		public final StorageConfig diamondBarrel;
 		public final StorageConfig netheriteBarrel;
 
 		public final LimitedBarrelConfig limitedBarrel1;
+		public final LimitedBarrelConfig copperLimitedBarrel1;
 		public final LimitedBarrelConfig ironLimitedBarrel1;
 		public final LimitedBarrelConfig goldLimitedBarrel1;
 		public final LimitedBarrelConfig diamondLimitedBarrel1;
 		public final LimitedBarrelConfig netheriteLimitedBarrel1;
 
 		public final LimitedBarrelConfig limitedBarrel2;
+		public final LimitedBarrelConfig copperLimitedBarrel2;
 		public final LimitedBarrelConfig ironLimitedBarrel2;
 		public final LimitedBarrelConfig goldLimitedBarrel2;
 		public final LimitedBarrelConfig diamondLimitedBarrel2;
 		public final LimitedBarrelConfig netheriteLimitedBarrel2;
 
 		public final LimitedBarrelConfig limitedBarrel3;
+		public final LimitedBarrelConfig copperLimitedBarrel3;
 		public final LimitedBarrelConfig ironLimitedBarrel3;
 		public final LimitedBarrelConfig goldLimitedBarrel3;
 		public final LimitedBarrelConfig diamondLimitedBarrel3;
 		public final LimitedBarrelConfig netheriteLimitedBarrel3;
 
 		public final LimitedBarrelConfig limitedBarrel4;
+		public final LimitedBarrelConfig copperLimitedBarrel4;
 		public final LimitedBarrelConfig ironLimitedBarrel4;
 		public final LimitedBarrelConfig goldLimitedBarrel4;
 		public final LimitedBarrelConfig diamondLimitedBarrel4;
 		public final LimitedBarrelConfig netheriteLimitedBarrel4;
 
 		public final StorageConfig woodChest;
+		public final StorageConfig copperChest;
 		public final StorageConfig ironChest;
 		public final StorageConfig goldChest;
 		public final StorageConfig diamondChest;
 		public final StorageConfig netheriteChest;
 
 		public final StorageConfig shulkerBox;
+		public final StorageConfig copperShulkerBox;
 		public final StorageConfig ironShulkerBox;
 		public final StorageConfig goldShulkerBox;
 		public final StorageConfig diamondShulkerBox;
@@ -128,52 +146,68 @@ public class Config {
 		public final HopperUpgradeConfig advancedHopperUpgrade;
 
 		public final ForgeConfigSpec.IntValue tooManyItemEntityDrops;
+		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
 
 		@Override
 		public void onReload() {
+			clearCache();
+		}
+		public void onConfigLoad() {
+			clearCache();
+		}
+
+		private void clearCache() {
 			stackUpgrade.clearNonStackableItems();
+			maxUpgradesPerStorage.clearCache();
 		}
 
 		public Server(ForgeConfigSpec.Builder builder) {
 			builder.comment("Server Settings").push("server");
 
 			woodBarrel = new StorageConfig(builder, "Wood Barrel", 27, 1);
+			copperBarrel = new StorageConfig(builder, "Copper Barrel", 45, 1);
 			ironBarrel = new StorageConfig(builder, "Iron Barrel", 54, 2);
 			goldBarrel = new StorageConfig(builder, "Gold Barrel", 81, 3);
 			diamondBarrel = new StorageConfig(builder, "Diamond Barrel", 108, 4);
 			netheriteBarrel = new StorageConfig(builder, "Netherite Barrel", 132, 5);
 
 			limitedBarrel1 = new LimitedBarrelConfig(builder, "Limited Barrel I", 32, 1);
+			copperLimitedBarrel1 = new LimitedBarrelConfig(builder, "Limited Copper Barrel I", 53, 1);
 			ironLimitedBarrel1 = new LimitedBarrelConfig(builder, "Limited Iron Barrel I", 64, 2);
 			goldLimitedBarrel1 = new LimitedBarrelConfig(builder, "Limited Gold Barrel I", 96, 3);
 			diamondLimitedBarrel1 = new LimitedBarrelConfig(builder, "Limited Diamond Barrel I", 128, 4);
 			netheriteLimitedBarrel1 = new LimitedBarrelConfig(builder, "Limited Netherite Barrel I", 160, 5);
 
 			limitedBarrel2 = new LimitedBarrelConfig(builder, "Limited Barrel II", 16, 1);
+			copperLimitedBarrel2 = new LimitedBarrelConfig(builder, "Limited Copper Barrel II", 27, 1);
 			ironLimitedBarrel2 = new LimitedBarrelConfig(builder, "Limited Iron Barrel II", 32, 2);
 			goldLimitedBarrel2 = new LimitedBarrelConfig(builder, "Limited Gold Barrel II", 48, 3);
 			diamondLimitedBarrel2 = new LimitedBarrelConfig(builder, "Limited Diamond Barrel II", 64, 4);
 			netheriteLimitedBarrel2 = new LimitedBarrelConfig(builder, "Limited Netherite Barrel II", 80, 5);
 
 			limitedBarrel3 = new LimitedBarrelConfig(builder, "Limited Barrel III", 10, 1);
+			copperLimitedBarrel3 = new LimitedBarrelConfig(builder, "Limited Copper Barrel III", 17, 1);
 			ironLimitedBarrel3 = new LimitedBarrelConfig(builder, "Limited Iron Barrel III", 20, 2);
 			goldLimitedBarrel3 = new LimitedBarrelConfig(builder, "Limited Gold Barrel III", 30, 3);
 			diamondLimitedBarrel3 = new LimitedBarrelConfig(builder, "Limited Diamond Barrel III", 40, 4);
 			netheriteLimitedBarrel3 = new LimitedBarrelConfig(builder, "Limited Netherite Barrel III", 50, 5);
 
 			limitedBarrel4 = new LimitedBarrelConfig(builder, "Limited Barrel IV", 8, 1);
+			copperLimitedBarrel4 = new LimitedBarrelConfig(builder, "Limited Copper Barrel IV", 13, 1);
 			ironLimitedBarrel4 = new LimitedBarrelConfig(builder, "Limited Iron Barrel IV", 16, 2);
 			goldLimitedBarrel4 = new LimitedBarrelConfig(builder, "Limited Gold Barrel IV", 24, 3);
 			diamondLimitedBarrel4 = new LimitedBarrelConfig(builder, "Limited Diamond Barrel IV", 32, 4);
 			netheriteLimitedBarrel4 = new LimitedBarrelConfig(builder, "Limited Netherite Barrel IV", 40, 5);
 
 			woodChest = new StorageConfig(builder, "Wood Chest", 27, 1);
+			copperChest = new StorageConfig(builder, "Copper Chest", 45, 1);
 			ironChest = new StorageConfig(builder, "Iron Chest", 54, 2);
 			goldChest = new StorageConfig(builder, "Gold Chest", 81, 3);
 			diamondChest = new StorageConfig(builder, "Diamond Chest", 108, 4);
 			netheriteChest = new StorageConfig(builder, "Netherite Chest", 132, 5);
 
 			shulkerBox = new StorageConfig(builder, "Shulker Box", 27, 1);
+			copperShulkerBox = new StorageConfig(builder, "Copper Shulker Box", 45, 1);
 			ironShulkerBox = new StorageConfig(builder, "Iron Shulker Box", 54, 2);
 			goldShulkerBox = new StorageConfig(builder, "Gold Shulker Box", 81, 3);
 			diamondShulkerBox = new StorageConfig(builder, "Diamond Shulker Box", 108, 4);
@@ -206,6 +240,28 @@ public class Config {
 			compressionUpgrade = new CompressionUpgradeConfig(builder);
 			hopperUpgrade = new HopperUpgradeConfig(builder, "Hopper Upgrade", "hopperUpgrade", 2, 2, 2, 2, 8, 1);
 			advancedHopperUpgrade = new HopperUpgradeConfig(builder, "Advanced Hopper Upgrade", "advancedHopperUpgrade", 4, 4, 4, 4, 2, 4);
+
+			maxUpgradesPerStorage = new MaxUgradesPerStorageConfig(builder, Map.of(
+					ChestBlockEntity.STORAGE_TYPE, Map.of(
+							StackUpgradeItem.UPGRADE_GROUP.name(), 2,
+							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
+							ModItems.JUKEBOX_UPGRADE_NAME, 1
+					),
+					BarrelBlockEntity.STORAGE_TYPE, Map.of(
+							StackUpgradeItem.UPGRADE_GROUP.name(), 2,
+							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
+							ModItems.JUKEBOX_UPGRADE_NAME, 1
+					),
+					ShulkerBoxBlockEntity.STORAGE_TYPE, Map.of(
+							StackUpgradeItem.UPGRADE_GROUP.name(), 2,
+							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
+							ModItems.JUKEBOX_UPGRADE_NAME, 1
+					),
+					LimitedBarrelBlockEntity.STORAGE_TYPE, Map.of(
+							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
+							ModItems.JUKEBOX_UPGRADE_NAME, 1
+					)
+			));
 
 			tooManyItemEntityDrops = builder.comment("Threshold of number of item entities dropped from chest / barrel above which break is canceled (unless shift key is pressed) and message is displayed explaining to player many drops and packing tape use").defineInRange("tooManyItemEntityDrops", 200, 0, 1000);
 			builder.pop();
@@ -277,6 +333,74 @@ public class Config {
 				}
 			}
 		}
+
+		public static class MaxUgradesPerStorageConfig implements IUpgradeCountLimitConfig {
+			private final ForgeConfigSpec.ConfigValue<List<String>> maxUpgradesPerStorageList;
+			@Nullable
+			private Map<String, Map<String, Integer>> maxUpgradesPerStorage = null;
+
+			protected MaxUgradesPerStorageConfig(ForgeConfigSpec.Builder builder, Map<String, Map<String, Integer>> defaultUpgradesPerStorage) {
+				maxUpgradesPerStorageList = builder.comment("Limit of maximum number of upgrades of type per storage in format of \"StorageType|UpgradeRegistryName[or UpgradeGroup]|MaxNumber\"").define("maxUpgradesPerStorage", convertToList(defaultUpgradesPerStorage));
+			}
+
+			private List<String> convertToList(Map<String, Map<String, Integer>> defaultUpgradesPerStorage) {
+				List<String> list = new ArrayList<>();
+				defaultUpgradesPerStorage.forEach((storageType, upgradeMap) ->
+						upgradeMap.forEach((upgradeName, maxNumber) ->
+								list.add(storageType + "|" + upgradeName + "|" + maxNumber)
+						)
+				);
+				return list;
+			}
+
+			public void clearCache() {
+				maxUpgradesPerStorage = null;
+			}
+
+			@Override
+			public int getMaxUpgradesPerStorage(String storageType, @Nullable ResourceLocation upgradeRegistryName) {
+				if (maxUpgradesPerStorage == null) {
+					initMaxUpgradesPerStorage();
+				}
+				if (upgradeRegistryName == null) {
+					return Integer.MAX_VALUE;
+				}
+
+				if (!maxUpgradesPerStorage.containsKey(storageType)) {
+					return Integer.MAX_VALUE;
+				}
+
+				return maxUpgradesPerStorage.get(storageType).getOrDefault(upgradeRegistryName.getPath(), Integer.MAX_VALUE);
+			}
+
+			private void initMaxUpgradesPerStorage() {
+				maxUpgradesPerStorage = new HashMap<>();
+				for (String entry : maxUpgradesPerStorageList.get()) {
+					String[] parts = entry.split("\\|");
+					if (parts.length != 3) {
+						continue;
+					}
+
+					String storageType = parts[0];
+					String upgradeName = parts[1];
+					int maxNumber = Integer.parseInt(parts[2]);
+
+					maxUpgradesPerStorage.computeIfAbsent(storageType, k -> new HashMap<>()).put(upgradeName, maxNumber);
+				}
+			}
+
+			@Override
+			public int getMaxUpgradesInGroupPerStorage(String storageType, UpgradeGroup upgradeGroup) {
+				if (maxUpgradesPerStorage == null) {
+					initMaxUpgradesPerStorage();
+				}
+				if (!maxUpgradesPerStorage.containsKey(storageType)) {
+					return Integer.MAX_VALUE;
+				}
+
+				return maxUpgradesPerStorage.get(storageType).getOrDefault(upgradeGroup.name(), Integer.MAX_VALUE);
+			}
+		}
 	}
 
 	private static <T extends BaseConfig> T register(Function<ForgeConfigSpec.Builder, T> factory, ModConfig.Type side) {
@@ -293,11 +417,11 @@ public class Config {
 		SERVER = register(Server::new, ModConfig.Type.SERVER);
 
 		for (Map.Entry<ModConfig.Type, BaseConfig> pair : CONFIGS.entrySet()) {
-			ModLoadingContext.registerConfig(SophisticatedStorage.ID, pair.getKey(), pair.getValue().specification);
+			ModLoadingContext.registerConfig(SophisticatedStorage.MOD_ID, pair.getKey(), pair.getValue().specification);
 		}
 
-		ModConfigEvents.loading(SophisticatedStorage.ID).register(Config::onLoad);
-		ModConfigEvents.reloading(SophisticatedStorage.ID).register(Config::onReload);
+		ModConfigEvents.loading(SophisticatedStorage.MOD_ID).register(Config::onLoad);
+		ModConfigEvents.reloading(SophisticatedStorage.MOD_ID).register(Config::onReload);
 	}
 
 	public static void onLoad(ModConfig modConfig) {
