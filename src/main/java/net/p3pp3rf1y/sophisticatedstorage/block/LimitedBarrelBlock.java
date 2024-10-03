@@ -58,11 +58,11 @@ public class LimitedBarrelBlock extends BarrelBlock {
 	}
 
 	@Override
-	public BlockState rotate(BlockState state, Rotation rotation) {
+	public BlockState rotate(BlockState state, Rotation direction) {
 		if (getVerticalFacing(state) != VerticalFacing.NO) {
 			return state;
 		}
-		return state.setValue(HORIZONTAL_FACING, rotation.rotate(state.getValue(HORIZONTAL_FACING)));
+		return state.setValue(HORIZONTAL_FACING, direction.rotate(state.getValue(HORIZONTAL_FACING)));
 	}
 
 	@Override

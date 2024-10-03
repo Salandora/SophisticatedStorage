@@ -24,7 +24,7 @@ public enum BarrelMaterial implements StringRepresentable {
 
 	private final String name;
 
-	private final MaterialModelPart materialModelPart;
+	private MaterialModelPart materialModelPart;
 
 	private final BarrelMaterial[] children;
 	BarrelMaterial(String name, MaterialModelPart materialModelPart, BarrelMaterial... children) {

@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.p3pp3rf1y.sophisticatedcore.compat.litematica.LitematicaHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
-import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 
 import java.util.UUID;
 
@@ -43,7 +42,7 @@ public class ItemStorageContentsMessage implements S2CPacket {
 			}
 
 			ItemContentsStorage.get().setStorageContents(this.storageUuid, this.storageContents);
-			CapabilityStorageWrapper.invalidateCache(this.storageUuid);
+			// TODO: CapabilityStorageWrapper.invalidateCache(this.storageUuid);
 			LitematicaHelper.incrementReceived(1);
 		});
 	}

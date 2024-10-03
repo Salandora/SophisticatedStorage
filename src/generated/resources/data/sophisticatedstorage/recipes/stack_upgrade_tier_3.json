@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_3"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": {
+      "tag": "c:gold_blocks"
+    },
+    "G": {
+      "tag": "c:gold_ingots"
+    },
+    "S": {
+      "item": "sophisticatedstorage:stack_upgrade_tier_2"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "GSG",
+    "BGB"
+  ],
+  "result": {
+    "item": "sophisticatedstorage:stack_upgrade_tier_3"
+  }
+}

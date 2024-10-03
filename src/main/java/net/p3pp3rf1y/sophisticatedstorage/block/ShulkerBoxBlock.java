@@ -114,7 +114,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 			}
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_SHULKER_BOX));
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, ctx, pl) -> new StorageContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
+			player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
 					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())));
 			PiglinAi.angerNearbyPiglins(player, true);
 			return InteractionResult.CONSUME;
@@ -143,7 +143,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 				shulkerBoxItem.getAccentColor(stack).ifPresent(storageWrapper::setAccentColor);
 				InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
 				UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
-				storageWrapper.increaseSize(shulkerBoxItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlotCount(),
+				storageWrapper.changeSize(shulkerBoxItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlotCount(),
 						shulkerBoxItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlotCount());
 			}
 

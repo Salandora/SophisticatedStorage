@@ -3,7 +3,6 @@ package net.p3pp3rf1y.sophisticatedstorage.init;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.version.VersionPredicate;
-import net.fabricmc.loader.impl.util.version.VersionPredicateParser;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds;
 import net.p3pp3rf1y.sophisticatedcore.compat.ICompat;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
@@ -21,8 +20,8 @@ import javax.annotation.Nullable;
 public class ModCompat {
 	private ModCompat() {}
 
-	private static final String SODIUM_MOD_ID = "sodium";
-	private static final String MKB_MOD_ID = "mkb";
+	public static final String SODIUM = "sodium";
+	public static final String MKB = "mkb";
 
 	private static final Map<CompatInfo, Supplier<Callable<ICompat>>> compatFactories = new HashMap<>();
 
@@ -32,8 +31,8 @@ public class ModCompat {
 		// compatFactories.put(new CompatInfo(CompatModIds.QUARK, null), () -> QuarkCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.CHIPPED, null), () -> ChippedCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.LITEMATICA, null), () -> LitematicaCompat::new);
-		compatFactories.put(new CompatInfo(SODIUM_MOD_ID, fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
-		compatFactories.put(new CompatInfo(MKB_MOD_ID, null), () -> ModernKeyBindingCompat::new);
+		compatFactories.put(new CompatInfo(SODIUM, fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
+		compatFactories.put(new CompatInfo(MKB, null), () -> ModernKeyBindingCompat::new);
 	}
 
 	public static void compatsSetup() {
@@ -43,7 +42,7 @@ public class ModCompat {
 	@Nullable
 	private static VersionPredicate fromSpec(String spec) {
 		try {
-			return VersionPredicateParser.parse(spec);
+			return VersionPredicate.parse(spec);
 		}
 		catch (VersionParsingException e) {
 			return null;

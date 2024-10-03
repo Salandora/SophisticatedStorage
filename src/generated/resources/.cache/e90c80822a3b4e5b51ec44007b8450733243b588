@@ -1,0 +1,8 @@
+// 1.20.1	2024-10-01T00:02:14.3977006	Sophisticated Storage/Tags for minecraft:block
+2a67afc7078b2923d2ed8eceafb9f65fd57a8e28 data\minecraft\tags\blocks\mineable\pickaxe.json
+a5f92efca33bf16cd5309cebe4f35cdaa46ce3ea data\minecraft\tags\blocks\mineable\axe.json
+8e1d1801ebaf5ddde48cfe11c2e18c77590b71f2 data\c\tags\blocks\barrels.json
+8e1d1801ebaf5ddde48cfe11c2e18c77590b71f2 data\c\tags\blocks\wooden_barrels.json
+2e735db396cda311b8ca79adf0359ffc86df14bf data\c\tags\blocks\chests.json
+ff6844de3d9ad69b5100840b4c2deca8cba771d4 data\minecraft\tags\blocks\guarded_by_piglins.json
+2e735db396cda311b8ca79adf0359ffc86df14bf data\c\tags\blocks\wooden_chests.json

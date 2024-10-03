@@ -43,6 +43,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	private final InventoryHandler parent;
 	private final InventoryPartitioner.SlotRange slotRange;
 	private final Supplier<MemorySettingsCategory> getMemorySettings;
+	@SuppressWarnings("FieldCanBeLocal") //need field instead of local variable because it's wrapped in WeakReference in RecipeHelper
+	private final Runnable recipeChangeListener = () -> calculateStacks(false);
 
 	private Map<Integer, SlotDefinition> slotDefinitions = new HashMap<>();
 	private final Map<Integer, ItemStack> calculatedStacks = new HashMap<>();
@@ -51,6 +53,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		this.parent = parent;
 		this.slotRange = slotRange;
 		this.getMemorySettings = getMemorySettings;
+
+		RecipeHelper.addRecipeChangeListener(recipeChangeListener);
 	}
 
 	@Override
@@ -79,6 +83,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			parent.initFilterItems();
 		} else {
 			parent.onFilterItemsChanged();
+			slotDefinitions.forEach((slot, definition) -> parent.triggerOnChangeListeners(slot));
 		}
 	}
 
@@ -292,11 +297,13 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		return slotDefinition.slotLimit();
 	}
 
+	// TODO: ItemVariant can be null
 	@Override
 	public long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx) {
 		return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
 	}
 
+	// TODO: remove ItemVariant
 	private long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
 		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
 			return 0;
@@ -467,12 +474,15 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			return 0;
 		}
 
+		int limit = 0;
+
 		Map<Integer, SlotDefinition> definitions = slotDefinitions;
+
 		if (definitions.isEmpty()) {
 			definitions = getSlotDefinitions(resource.getItem(), slot, Map.of());
 		}
 
-		int limit = getStackLimit(definitions.get(slot));
+		limit = getStackLimit(definitions.get(slot));
 
 		int currentCalculatedCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
 		long inserted = Math.min(Math.max(parent.getBaseStackLimit(resource) - parent.getSlotStack(slot).getCount(), limit - currentCalculatedCount), maxAmount);

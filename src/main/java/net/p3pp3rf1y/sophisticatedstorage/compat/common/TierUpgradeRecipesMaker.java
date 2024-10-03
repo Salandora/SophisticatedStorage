@@ -56,7 +56,6 @@ public class TierUpgradeRecipesMaker {
 						return false;
 					}
 				}, 3, 3);
-
 				NonNullList<Ingredient> ingredientsCopy = NonNullList.createWithCapacity(ingredients.size());
 				int i = 0;
 				for (Ingredient ingredient : ingredients) {
@@ -66,14 +65,17 @@ public class TierUpgradeRecipesMaker {
 						craftinginventory.setItem(i, storageItem.copy());
 					} else {
 						ingredientsCopy.add(i, ingredient);
-						craftinginventory.setItem(i, ingredientItems[0]);
+						if (!ingredient.isEmpty()) {
+							craftinginventory.setItem(i, ingredientItems[0]);
+						}
 					}
 					i++;
 				}
-
 				ItemStack result = ClientRecipeHelper.assemble(recipe, craftinginventory);
+
+				// Changes made due to emi complaining about multi id recipes
 				//noinspection ConstantConditions
-				ResourceLocation id = new ResourceLocation(SophisticatedStorage.ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + "_to_" + BuiltInRegistries.ITEM.getKey(result.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
 				itemGroupRecipes.add(constructRecipe.construct(recipe, id, ingredientsCopy, result));
 			});
 			return itemGroupRecipes;

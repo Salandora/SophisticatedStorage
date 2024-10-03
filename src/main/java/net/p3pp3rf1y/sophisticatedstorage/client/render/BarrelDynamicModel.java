@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -34,8 +35,8 @@ public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicMode
 		}
 
 		@Override
-		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data) {
-			int hash = super.getInWorldBlockHash(state, data);
+		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data, @Nullable RenderType renderType) {
+			int hash = super.getInWorldBlockHash(state, data, renderType);
 			hash = hash * 31 + (Boolean.TRUE.equals(state.getValue(BarrelBlock.OPEN)) ? 1 : 0);
 			hash = hash * 31 + state.getValue(BarrelBlock.FACING).get3DDataValue();
 

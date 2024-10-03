@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -26,7 +24,6 @@ import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +32,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -45,7 +41,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticle;
 import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticleData;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
@@ -53,7 +48,6 @@ import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -70,7 +64,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	public BarrelBlock(Supplier<Integer> numberOfInventorySlotsSupplier, Supplier<Integer> numberOfUpgradeSlotsSupplier, Properties properties, Function<StateDefinition<Block, BlockState>, BlockState> getDefaultState) {
-		super(properties.noOcclusion(), numberOfInventorySlotsSupplier, numberOfUpgradeSlotsSupplier);
+		super(properties, numberOfInventorySlotsSupplier, numberOfUpgradeSlotsSupplier);
 		registerDefaultState(getDefaultState.apply(stateDefinition));
 	}
 
@@ -110,81 +104,13 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	@Environment(EnvType.CLIENT)
 	@Override
 	public boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
-		if (!(level instanceof ClientLevel clientLevel) || !(target instanceof BlockHitResult blockHitResult)) {
-			return false;
-		}
-		Direction sideHit = blockHitResult.getDirection();
-		BlockPos pos = blockHitResult.getBlockPos();
-		if (state.getRenderShape() != RenderShape.INVISIBLE) {
-			int i = pos.getX();
-			int j = pos.getY();
-			int k = pos.getZ();
-			AABB aabb = state.getShape(level, pos).bounds();
-			Random random = new Random();
-			double d0 = i + random.nextDouble() * (aabb.maxX - aabb.minX - 0.2F) + 0.1F + aabb.minX;
-			double d1 = j + random.nextDouble() * (aabb.maxY - aabb.minY - 0.2F) + 0.1F + aabb.minY;
-			double d2 = k + random.nextDouble() * (aabb.maxZ - aabb.minZ - 0.2F) + 0.1F + aabb.minZ;
-			if (sideHit == Direction.DOWN) {
-				d1 = j + aabb.minY - 0.1F;
-			}
-
-			if (sideHit == Direction.UP) {
-				d1 = j + aabb.maxY + 0.1F;
-			}
-
-			if (sideHit == Direction.NORTH) {
-				d2 = k + aabb.minZ - 0.1F;
-			}
-
-			if (sideHit == Direction.SOUTH) {
-				d2 = k + aabb.maxZ + 0.1F;
-			}
-
-			if (sideHit == Direction.WEST) {
-				d0 = i + aabb.minX - 0.1F;
-			}
-
-			if (sideHit == Direction.EAST) {
-				d0 = i + aabb.maxX + 0.1F;
-			}
-
-			manager.add((new CustomTintTerrainParticle(clientLevel, d0, d1, d2, 0.0D, 0.0D, 0.0D, state, pos).sophisticatedCore$updateSprite(state, pos)).setPower(0.2F).scale(0.6F));
-		}
-
-		return true;
+		return BarrelBlockClientExtensions.addHitEffects(this, state, level, target, manager);
 	}
 
 	@Environment(EnvType.CLIENT)
 	@Override
 	public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
-		if (!(level instanceof ClientLevel clientLevel)) {
-			return false;
-		}
-
-		VoxelShape voxelshape = state.getShape(level, pos);
-		voxelshape.forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> {
-			double d1 = Math.min(1.0D, maxX - minX);
-			double d2 = Math.min(1.0D, maxY - minY);
-			double d3 = Math.min(1.0D, maxZ - minZ);
-			int i = Math.max(2, Mth.ceil(d1 / 0.25D));
-			int j = Math.max(2, Mth.ceil(d2 / 0.25D));
-			int k = Math.max(2, Mth.ceil(d3 / 0.25D));
-
-			for (int l = 0; l < i; ++l) {
-				for (int i1 = 0; i1 < j; ++i1) {
-					for (int j1 = 0; j1 < k; ++j1) {
-						double d4 = (l + 0.5D) / i;
-						double d5 = (i1 + 0.5D) / j;
-						double d6 = (j1 + 0.5D) / k;
-						double d7 = d4 * d1 + minX;
-						double d8 = d5 * d2 + minY;
-						double d9 = d6 * d3 + minZ;
-						manager.add(new CustomTintTerrainParticle(clientLevel, pos.getX() + d7, pos.getY() + d8, pos.getZ() + d9, d4 - 0.5D, d5 - 0.5D, d6 - 0.5D, state, pos).sophisticatedCore$updateSprite(state, pos));
-					}
-				}
-			}
-		});
-		return true;
+		return BarrelBlockClientExtensions.addDestroyEffects(this, state, level, pos, manager);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -205,7 +131,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 
 			player.awardStat(Stats.OPEN_BARREL);
 
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, ctx, pl) -> instantiateContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
+			player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> instantiateContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
 					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())));
 			PiglinAi.angerNearbyPiglins(player, true);
 			return InteractionResult.CONSUME;
@@ -251,10 +177,10 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-		ItemStack cloneItemStack = super.getCloneItemStack(level, pos, state);
+	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
+		ItemStack cloneItemStack = super.getCloneItemStack(world, pos, state);
 		BarrelBlockItem.setFlatTop(cloneItemStack, state.getValue(FLAT_TOP));
-		WorldHelper.getBlockEntity(level, pos, BarrelBlockEntity.class).ifPresent(barrelBlockEntity -> {
+		WorldHelper.getBlockEntity(world, pos, BarrelBlockEntity.class).ifPresent(barrelBlockEntity -> {
 			Map<BarrelMaterial, ResourceLocation> materials = barrelBlockEntity.getMaterials();
 			if (!materials.isEmpty()) {
 				BarrelBlockItem.setMaterials(cloneItemStack, materials);
@@ -312,5 +238,15 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	@Override
 	public Direction getFacing(BlockState state) {
 		return state.getValue(FACING);
+	}
+
+	@Override
+	public VoxelShape getOcclusionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+		return Shapes.block();
+	}
+
+	@Override
+	public boolean useShapeForLightOcclusion(BlockState pState) {
+		return true;
 	}
 }

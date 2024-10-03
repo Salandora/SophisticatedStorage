@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_2"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": {
+      "tag": "c:iron_blocks"
+    },
+    "I": {
+      "tag": "c:iron_ingots"
+    },
+    "S": {
+      "item": "sophisticatedstorage:stack_upgrade_tier_1"
+    }
+  },
+  "pattern": [
+    "III",
+    "ISI",
+    "BIB"
+  ],
+  "result": {
+    "item": "sophisticatedstorage:stack_upgrade_tier_2"
+  }
+}
