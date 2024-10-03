@@ -297,11 +297,13 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		return slotDefinition.slotLimit();
 	}
 
+	// TODO: ItemVariant can be null
 	@Override
 	public long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx) {
 		return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
 	}
 
+	// TODO: remove ItemVariant
 	private long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
 		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
 			return 0;
