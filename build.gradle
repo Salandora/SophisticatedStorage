@@ -243,7 +243,7 @@ dependencies {
         transitive = false
     }
 
-    modImplementation(include("me.luligabi:NoIndium:1.1.0+1.20"))
+    modImplementation(include("me.luligabi:NoIndium:${project.noindium_version}"))
 
     testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.+'
