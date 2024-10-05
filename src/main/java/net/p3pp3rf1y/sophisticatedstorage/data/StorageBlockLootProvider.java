@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.data;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -11,6 +9,8 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import java.util.List;

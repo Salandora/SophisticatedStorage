@@ -7,16 +7,12 @@ import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
-import net.p3pp3rf1y.sophisticatedstorage.block.IStorageBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
-import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
+import net.p3pp3rf1y.sophisticatedstorage.common.StorageWrapperLookup;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 public class StackStorageWrapper extends StorageWrapper {
 	private static final String CONTENTS_TAG = "contents";
@@ -27,7 +23,9 @@ public class StackStorageWrapper extends StorageWrapper {
 	}
 
 	public static StackStorageWrapper fromData(ItemStack stack) {
-		StackStorageWrapper stackStorageWrapper = stack.getAttachedOrCreate(ModItems.STACK_STORAGE_WRAPPER);
+		StackStorageWrapper stackStorageWrapper = StorageWrapperLookup.getOrCreate(stack);
+		// TODO: Switch to this if fabric adds ItemStack attachments
+		//StackStorageWrapper stackStorageWrapper = stack.getAttachedOrCreate(ModItems.STACK_STORAGE_WRAPPER);
 		stackStorageWrapper.setStorageStack(stack);
 		UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
 		if (uuid != null) {

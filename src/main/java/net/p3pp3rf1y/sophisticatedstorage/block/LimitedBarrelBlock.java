@@ -1,9 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.mojang.math.Axis;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,11 +36,13 @@ import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public class LimitedBarrelBlock extends BarrelBlock {
 	public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;

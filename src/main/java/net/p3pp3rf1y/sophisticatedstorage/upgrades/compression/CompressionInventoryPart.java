@@ -2,16 +2,15 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
 import com.mojang.datafixers.util.Function4;
 import com.mojang.datafixers.util.Pair;
-
-import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IInventoryPartHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartitioner;
@@ -20,19 +19,14 @@ import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 
 import static net.p3pp3rf1y.sophisticatedcore.util.MathHelper.intMaxCappedAddition;
 import static net.p3pp3rf1y.sophisticatedcore.util.MathHelper.intMaxCappedMultiply;

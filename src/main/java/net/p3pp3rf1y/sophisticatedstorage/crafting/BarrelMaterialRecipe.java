@@ -16,11 +16,7 @@ import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BarrelMaterialRecipe extends CustomRecipe {

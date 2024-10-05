@@ -1,11 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.sodium;
 
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.p3pp3rf1y.sophisticatedstorage.client.render.TranslucentVertexConsumer;
 import net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter;
 import net.caffeinemc.mods.sodium.api.vertex.format.VertexFormatDescription;
 import org.lwjgl.system.MemoryStack;
-
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.TranslucentVertexConsumer;
 
 public class SodiumTranslucentVertexConsumer extends TranslucentVertexConsumer implements VertexBufferWriter {
 	public static void register() {

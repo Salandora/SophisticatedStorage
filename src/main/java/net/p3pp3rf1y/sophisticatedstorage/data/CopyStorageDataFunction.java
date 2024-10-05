@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;

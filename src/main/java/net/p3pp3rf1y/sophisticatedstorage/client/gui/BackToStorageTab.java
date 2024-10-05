@@ -4,11 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.Tab;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.ImageButton;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Dimension;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Position;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TextureBlitData;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.UV;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.*;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
 import net.p3pp3rf1y.sophisticatedstorage.network.OpenStorageInventoryPacket;
 

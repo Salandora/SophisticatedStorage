@@ -1,11 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.jade;
 
+import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
-
-import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 @SuppressWarnings("unused") //used by Jade's reflection
 @WailaPlugin

@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
@@ -14,6 +12,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticle;
 
 import java.util.Random;

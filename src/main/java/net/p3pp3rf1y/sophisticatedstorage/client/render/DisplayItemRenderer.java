@@ -4,9 +4,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -33,6 +30,8 @@ import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuaternionHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.List;

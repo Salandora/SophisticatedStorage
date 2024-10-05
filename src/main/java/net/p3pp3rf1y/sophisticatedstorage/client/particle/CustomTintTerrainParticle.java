@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.particle;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -9,6 +7,8 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 
 import javax.annotation.Nullable;

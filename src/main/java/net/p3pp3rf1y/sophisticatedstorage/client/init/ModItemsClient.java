@@ -39,32 +39,7 @@ import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageButtonDefinitions;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeTab;
 
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_COMPACTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_FEEDING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_HOPPER_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_PUMP_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_VOID_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.AUTO_BLASTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.AUTO_SMELTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.AUTO_SMOKING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.BATTERY_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.BLASTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.COMPACTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.CRAFTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.FEEDING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.HOPPER_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.JUKEBOX_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.MAGNET_ADVANCED_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.MAGNET_BASIC_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.PICKUP_ADVANCED_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.PICKUP_BASIC_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.PUMP_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.SMELTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.SMOKING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.STONECUTTER_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.TANK_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.VOID_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.XP_PUMP_TYPE;
+import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.*;
 
 public class ModItemsClient {
 

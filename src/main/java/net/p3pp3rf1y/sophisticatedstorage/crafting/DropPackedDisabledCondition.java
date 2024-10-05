@@ -1,9 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
 import com.google.gson.JsonObject;
-
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 

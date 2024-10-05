@@ -1,8 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.data;
 
+import net.minecraft.core.HolderLookup;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.core.HolderLookup;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import java.util.concurrent.CompletableFuture;

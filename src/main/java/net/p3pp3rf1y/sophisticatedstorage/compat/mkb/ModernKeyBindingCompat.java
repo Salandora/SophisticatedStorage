@@ -1,14 +1,13 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.mkb;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import committee.nova.mkb.api.IKeyBinding;
-
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.Screen;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.Screen;
 import net.p3pp3rf1y.sophisticatedcore.compat.ICompat;
+import committee.nova.mkb.api.IKeyBinding;
 
 import static net.p3pp3rf1y.sophisticatedstorage.client.ClientEventHandler.SORT_KEYBIND;
 import static net.p3pp3rf1y.sophisticatedstorage.client.ClientEventHandler.tryCallSort;

@@ -1,24 +1,26 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
+import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public class ControllerBlockEntity extends ControllerBlockEntityBase implements ILockable, ICountDisplay, ITierDisplay, IUpgradeDisplay, IFillLevelDisplay {
 	private long lastDepositTime = -100;
@@ -38,28 +40,18 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 		boolean doubleClick = gameTime - lastDepositTime < 10;
 		lastDepositTime = gameTime;
 		if (doubleClick) {
-			// TODO:
-			/*CapabilityHelper.runOnCapability(player, Capabilities.ItemHandler.ENTITY, null,
+			CapabilityHelper.runOnCapability(player, CapabilityHelper.ENTITY, null,
 					playerInventory -> InventoryHelper.iterate(playerInventory, (slot, stack) -> {
 						if (canDepositStack(stack)) {
-							ItemStack resultStack = insertItem(stack, true, false);
-							int countToExtract = stack.getCount() - resultStack.getCount();
-							if (countToExtract > 0 && playerInventory.extractItem(slot, countToExtract, true).getCount() == countToExtract) {
-								insertItem(playerInventory.extractItem(slot, countToExtract, false), false, false);
+							try(Transaction ctx = Transaction.openOuter()) {
+								ItemVariant resource = ItemVariant.of(stack);
+								long inserted = insert(resource, stack.getCount(), ctx, false);
+								if (inserted > 0 && playerInventory.extract(resource, inserted, ctx) == inserted) {
+									ctx.commit();
+								}
 							}
 						}
-					}));*/
-			PlayerInventoryStorage playerInventory = PlayerInventoryStorage.of(player);
-			for (var view : playerInventory.nonEmptyViews()) {
-				if (canDepositStack(view.getResource().toStack((int) view.getAmount()))) {
-					try(Transaction ctx = Transaction.openOuter()) {
-						long inserted = insert(view.getResource(), view.getAmount(), ctx, false);
-						if (inserted > 0 && view.extract(view.getResource(), inserted, ctx) == inserted) {
-							ctx.commit();
-						}
-					}
-				}
-			}
+					}));
 			return;
 		}
 

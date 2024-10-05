@@ -5,7 +5,6 @@
     "package": "net.p3pp3rf1y.sophisticatedstorage.mixin",
     "compatibilityLevel": "JAVA_17",
     "mixins": [
-        "common.BlockEntityMixin",
         "common.accessor.BarrelBlockEntityAccessor",
         "common.accessor.ChestBlockEntityAccessor",
         "common.accessor.ShulkerBoxBlockEntityAccessor"

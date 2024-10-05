@@ -1,14 +1,14 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import org.jetbrains.annotations.NotNull;

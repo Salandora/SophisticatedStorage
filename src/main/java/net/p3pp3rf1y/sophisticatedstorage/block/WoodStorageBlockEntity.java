@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,12 +9,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	private static final String PACKED_TAG = "packed";

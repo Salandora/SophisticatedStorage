@@ -4,11 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.p3pp3rf1y.sophisticatedstorage.network.OpenStorageInventoryPacket;
-import net.p3pp3rf1y.sophisticatedstorage.network.RequestPlayerSettingsPacket;
-import net.p3pp3rf1y.sophisticatedstorage.network.RequestStorageContentsPacket;
-import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPacket;
-import net.p3pp3rf1y.sophisticatedstorage.network.StorageContentsPacket;
+import net.p3pp3rf1y.sophisticatedstorage.network.*;
 
 public class ModPackets {
 	private ModPackets() {

@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +14,7 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.DisplaySide;
 import net.p3pp3rf1y.sophisticatedcore.settings.ISettingsCategory;
@@ -27,10 +27,10 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import javax.annotation.Nullable;
 
 public class ChestBlockEntity extends WoodStorageBlockEntity {
 	public static final String STORAGE_TYPE = "chest";

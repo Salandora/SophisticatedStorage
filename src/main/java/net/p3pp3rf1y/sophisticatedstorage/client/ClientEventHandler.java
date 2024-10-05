@@ -2,24 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -49,6 +31,18 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
@@ -61,21 +55,7 @@ import net.p3pp3rf1y.sophisticatedstorage.client.gui.ToolInfoOverlay;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModBlockColors;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModItemColors;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModParticles;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelBakedModelBase;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelDynamicModelBase;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ChestDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ChestItemRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ChestRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ClientStorageContentsTooltip;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ControllerRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.LimitedBarrelDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.LimitedBarrelRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxItemRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.SimpleCompositeModel;
+import net.p3pp3rf1y.sophisticatedstorage.client.render.*;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
@@ -86,10 +66,10 @@ import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.LevelRendererAcc
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPacket;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 
 public class ClientEventHandler {
 	private ClientEventHandler() {}

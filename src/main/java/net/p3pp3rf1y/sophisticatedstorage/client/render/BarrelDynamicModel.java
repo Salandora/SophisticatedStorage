@@ -13,10 +13,10 @@ import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuadTransformers;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicModel> {
 

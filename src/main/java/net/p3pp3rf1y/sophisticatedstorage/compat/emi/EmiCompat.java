@@ -1,17 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.emi;
 
-import dev.emi.emi.api.EmiPlugin;
-import dev.emi.emi.api.EmiRegistry;
-import dev.emi.emi.api.recipe.EmiCraftingRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import dev.emi.emi.api.stack.Comparison;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.Bounds;
-
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandler;
@@ -36,6 +26,15 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import dev.emi.emi.api.EmiPlugin;
+import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
+import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.stack.Comparison;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
 
 import java.util.ArrayList;
 import java.util.Collection;

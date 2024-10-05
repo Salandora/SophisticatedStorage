@@ -1,14 +1,13 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.util;
 
 import com.mojang.math.Transformation;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.impl.client.indigo.renderer.mesh.EncodingFormat;
 import net.fabricmc.fabric.impl.client.indigo.renderer.mesh.MutableQuadViewImpl;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;

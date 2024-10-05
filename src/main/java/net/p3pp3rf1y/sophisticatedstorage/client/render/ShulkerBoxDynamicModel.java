@@ -2,9 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -24,14 +21,16 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynamicModel> {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";

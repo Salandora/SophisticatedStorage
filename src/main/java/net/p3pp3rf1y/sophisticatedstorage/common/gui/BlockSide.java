@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
 import com.google.common.collect.ImmutableMap;
-
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;

@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
 import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

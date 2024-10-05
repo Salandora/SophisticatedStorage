@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
 import com.google.common.collect.ImmutableMap;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -31,27 +30,16 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
-import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.BarrelBlockEntityAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ChestBlockEntityAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ShulkerBoxBlockEntityAccessor;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class StorageTierUpgradeItem extends ItemBase {
 

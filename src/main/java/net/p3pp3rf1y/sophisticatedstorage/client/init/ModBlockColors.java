@@ -1,22 +1,21 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.init;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MinecraftAccessor;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class ModBlockColors {
 	private ModBlockColors() {}

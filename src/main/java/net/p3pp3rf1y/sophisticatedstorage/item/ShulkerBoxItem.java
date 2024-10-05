@@ -1,10 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -18,16 +13,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.loader.api.FabricLoader;
 import net.p3pp3rf1y.sophisticatedcore.api.IStashStorageItem;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageItem {
 	public ShulkerBoxItem(Block block) {
@@ -82,15 +82,16 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		return Optional.of(new StorageContentsTooltip(stack));
 	}
 
-	public ItemStack stash(ItemStack storageStack, ItemStack stack, @Nullable Transaction ctx) {
+	@Override
+	public ItemStack stash(ItemStack storageStack, ItemStack stack) {
 		StackStorageWrapper wrapper = StackStorageWrapper.fromData(storageStack);
 		if (wrapper.getContentsUuid().isEmpty()) {
 			wrapper.setContentsUuid(UUID.randomUUID());
 		}
-		try (Transaction inner = Transaction.openNested(ctx)) {
-			long inserted = wrapper.getInventoryForUpgradeProcessing().insert(ItemVariant.of(stack), stack.getCount(), inner);
+		try (Transaction inner = Transaction.openOuter()) {
+			ItemStack stashResult = stack.copyWithCount(stack.getCount() - (int) wrapper.getInventoryForUpgradeProcessing().insert(ItemVariant.of(stack), stack.getCount(), inner));
 			inner.commit();
-			return stack.copyWithCount(stack.getCount() - (int) inserted);
+			return stashResult;
 		}
 	}
 
@@ -133,15 +134,10 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		}
 
 		ItemStack stackToStash = slot.getItem();
-		ItemStack stashResult;
-		try (Transaction simulate = Transaction.openOuter()) {
-			stashResult = stash(storageStack, stackToStash, simulate);
-		}
-
-		if (stashResult.getCount() < stackToStash.getCount()) {
-			int countToTake = stackToStash.getCount() - stashResult.getCount();
-			ItemStack takeResult = slot.safeTake(countToTake, countToTake, player);
-			stash(storageStack, takeResult, null);
+		ItemStack stashResult = stash(storageStack, stackToStash);
+		if (stashResult.getCount() != stackToStash.getCount()) {
+			slot.set(stashResult);
+			slot.onTake(player, stashResult);
 			return true;
 		}
 
@@ -154,7 +150,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 			return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 		}
 
-		ItemStack result = stash(storageStack, otherStack, null);
+		ItemStack result = stash(storageStack, otherStack);
 		if (result.getCount() != otherStack.getCount()) {
 			carriedAccess.set(result);
 			slot.set(storageStack);

@@ -1,13 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.gui;
 
 import com.mojang.blaze3d.platform.Window;
-
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;

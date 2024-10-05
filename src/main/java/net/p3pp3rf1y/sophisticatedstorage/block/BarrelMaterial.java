@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.google.common.collect.ImmutableMap;
-
 import net.minecraft.util.StringRepresentable;
 
 import java.util.List;

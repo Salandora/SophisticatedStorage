@@ -1,12 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.rei;
 
-import me.shedaniel.rei.api.common.entry.comparison.EntryComparator;
-import me.shedaniel.rei.api.common.entry.comparison.ItemComparatorRegistry;
-import me.shedaniel.rei.api.common.plugins.REIServerPlugin;
-import me.shedaniel.rei.api.common.transfer.info.MenuInfoRegistry;
-import me.shedaniel.rei.api.common.transfer.info.simple.SimpleMenuInfoProvider;
-import me.shedaniel.rei.plugin.common.BuiltinPlugin;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +9,12 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import me.shedaniel.rei.api.common.entry.comparison.EntryComparator;
+import me.shedaniel.rei.api.common.entry.comparison.ItemComparatorRegistry;
+import me.shedaniel.rei.api.common.plugins.REIServerPlugin;
+import me.shedaniel.rei.api.common.transfer.info.MenuInfoRegistry;
+import me.shedaniel.rei.api.common.transfer.info.simple.SimpleMenuInfoProvider;
+import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 
 public class REICompat implements REIServerPlugin {
     @Override

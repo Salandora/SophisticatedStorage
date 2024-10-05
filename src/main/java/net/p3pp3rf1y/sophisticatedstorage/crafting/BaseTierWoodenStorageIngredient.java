@@ -3,18 +3,18 @@ package net.p3pp3rf1y.sophisticatedstorage.crafting;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-
-import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
-import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
-import java.util.List;
 import org.jetbrains.annotations.Nullable;
+import java.util.List;
+
 public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 	public static final BaseTierWoodenStorageIngredient INSTANCE = new BaseTierWoodenStorageIngredient();
 	public static final Codec<BaseTierWoodenStorageIngredient> CODEC = MapCodec.unit(INSTANCE).stable().codec();

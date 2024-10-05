@@ -1,10 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.data;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.tags.BlockTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.tags.BlockTags;
 import net.p3pp3rf1y.sophisticatedcore.api.Tags;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 

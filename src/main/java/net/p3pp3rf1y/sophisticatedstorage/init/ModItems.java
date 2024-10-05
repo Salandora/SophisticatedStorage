@@ -1,9 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
-import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +17,8 @@ import net.minecraft.world.item.crafting.SmokingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerRegistry;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerType;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilteredUpgradeContainer;
@@ -30,16 +28,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.battery.BatteryUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeWrapper;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoBlastingUpgradeItem;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoCookingUpgradeContainer;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoCookingUpgradeWrapper;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmeltingUpgradeItem;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmokingUpgradeItem;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.BlastingUpgradeItem;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.CookingUpgradeContainer;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.CookingUpgradeWrapper;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmeltingUpgradeItem;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmokingUpgradeItem;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.*;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeWrapper;
@@ -86,13 +75,13 @@ import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeContainer
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeItem;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeWrapper;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public class ModItems {
 	private ModItems() {
@@ -216,7 +205,8 @@ public class ModItems {
 	public static final Item INACCESSIBLE_SLOT = register("inaccessible_slot", () -> new Item(new Item.Properties().stacksTo(1)));
 	public static final LootItemFunctionType COPY_STORAGE_DATA = registerLootFunction("copy_storage_data", () -> new LootItemFunctionType(CopyStorageDataFunction.CODEC));
 
-	public static AttachmentType<StackStorageWrapper> STACK_STORAGE_WRAPPER = AttachmentRegistry.createDefaulted(new ResourceLocation(SophisticatedStorage.MOD_ID, "stack_storage_wrapper"), StackStorageWrapper::new);
+	// TODO: Switch to this if fabric adds ItemStack attachments
+	// public static AttachmentType<StackStorageWrapper> STACK_STORAGE_WRAPPER = AttachmentRegistry.createDefaulted(new ResourceLocation(SophisticatedStorage.MOD_ID, "stack_storage_wrapper"), StackStorageWrapper::new);
 
 	@SuppressWarnings("unused")
 	public static final CreativeModeTab CREATIVE_TAB = FabricItemGroup.builder()

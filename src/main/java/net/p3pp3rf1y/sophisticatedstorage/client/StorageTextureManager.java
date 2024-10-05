@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
@@ -14,15 +12,12 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Supplier;
 
 @SuppressWarnings("java:S6548") //singleton is intended here
 public class StorageTextureManager extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {

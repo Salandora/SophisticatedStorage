@@ -1,13 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage;
 
-import fuzs.forgeconfigapiport.api.config.v3.ModConfigEvents;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import org.apache.commons.lang3.tuple.Pair;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilteredUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IUpgradeCountLimitConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeGroup;
@@ -27,14 +24,11 @@ import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeConfig;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import fuzs.forgeconfigapiport.api.config.v3.ModConfigEvents;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 public class Config {
 	private Config() {

@@ -1,16 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.chipped;
 
-import earth.terrarium.chipped.common.compat.jei.WorkbenchCategory;
-import earth.terrarium.chipped.common.registry.ModBlocks;
-import earth.terrarium.chipped.common.registry.ModRecipeTypes;
-import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import me.shedaniel.rei.api.common.util.EntryStacks;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerRegistry;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerType;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds;
@@ -23,8 +17,14 @@ import net.p3pp3rf1y.sophisticatedstorage.compat.emi.EmiCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.StoragePlugin;
 import net.p3pp3rf1y.sophisticatedstorage.compat.rei.REIClientCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import earth.terrarium.chipped.common.compat.jei.WorkbenchCategory;
+import earth.terrarium.chipped.common.registry.ModBlocks;
+import earth.terrarium.chipped.common.registry.ModRecipeTypes;
+import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.util.EntryStacks;
 
 public class ChippedCompat implements ICompat {
+
 	public static final BlockTransformationUpgradeItem BOTANIST_WORKBENCH_UPGRADE = ModItems.register("chipped/botanist_workbench_upgrade",
 			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.WORKBENCH, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem GLASSBLOWER_UPGRADE = ModItems.register("chipped/glassblower_upgrade",

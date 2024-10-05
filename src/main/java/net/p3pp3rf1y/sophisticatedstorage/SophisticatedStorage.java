@@ -1,16 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage;
 
+import net.minecraft.resources.ResourceLocation;
+import net.fabricmc.api.ModInitializer;
+import net.p3pp3rf1y.sophisticatedstorage.common.CommonEventHandler;
+import net.p3pp3rf1y.sophisticatedstorage.init.*;
 import fuzs.forgeconfigapiport.api.config.v3.ForgeConfigRegistry;
 import net.neoforged.fml.config.ModConfig;
-
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.ResourceLocation;
-import net.p3pp3rf1y.sophisticatedstorage.common.CommonEventHandler;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModPackets;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModParticles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +26,6 @@ public class SophisticatedStorage implements ModInitializer {
 		ForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.COMMON, Config.COMMON_SPEC);
 		Config.SERVER.initListeners();
 		commonEventHandler.registerHandlers();
-		ModCompat.register();
 		ModBlocks.register();
 		ModItems.register();
 		ModPackets.registerPackets();

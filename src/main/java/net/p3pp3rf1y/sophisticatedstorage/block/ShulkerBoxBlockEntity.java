@@ -19,8 +19,8 @@ import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	public static final String STORAGE_TYPE = "shulker_box";
