@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public class StorageInputBlockEntity extends StorageIOBlockEntity {
+
 	public StorageInputBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE, pos, state);
 	}

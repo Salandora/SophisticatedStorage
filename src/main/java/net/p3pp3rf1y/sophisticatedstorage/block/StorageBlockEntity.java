@@ -115,7 +115,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 
 			@Override
 			protected void onUpgradeRefresh() {
-				if (!isDroppingContents && level != null && !level.isClientSide && getBlockState().getBlock() instanceof IStorageBlock storageBlock) {
+				if (canRefreshUpgrades() && getBlockState().getBlock() instanceof IStorageBlock storageBlock) {
 					storageBlock.setTicking(level, getBlockPos(), getBlockState(), !storageWrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class).isEmpty());
 				}
 			}
@@ -181,6 +181,10 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 				invalidateCaps();
 			}
 		});
+	}
+
+	protected boolean canRefreshUpgrades() {
+		return !isDroppingContents && level != null && !level.isClientSide;
 	}
 
 	@SuppressWarnings("java:S1172") //parameter used in override

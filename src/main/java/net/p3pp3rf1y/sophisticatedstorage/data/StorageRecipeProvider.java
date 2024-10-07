@@ -456,6 +456,15 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.unlockedBy(HAS_REDSTONE_TORCH_CRITERION_NAME, has(Items.REDSTONE_TORCH))
 				.save(consumer);
 
+		ShapeBasedRecipeBuilder.shaped(ModItems.BASIC_TO_IRON_TIER_UPGRADE)
+				.pattern(" I ")
+				.pattern("IRI")
+				.pattern(" I ")
+				.define('R', ModItems.BASIC_TO_COPPER_TIER_UPGRADE)
+				.define('I', ConventionalItemTags.IRON_INGOTS)
+				.unlockedBy(HAS_REDSTONE_TORCH_CRITERION_NAME, has(Items.REDSTONE_TORCH))
+				.save(consumer, SophisticatedStorage.getRL("basic_to_iron_tier_from_basic_to_copper_tier"));
+
 		ShapeBasedRecipeBuilder.shaped(ModItems.BASIC_TO_GOLD_TIER_UPGRADE)
 				.pattern("GGG")
 				.pattern("GTG")

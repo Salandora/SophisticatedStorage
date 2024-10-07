@@ -4,21 +4,17 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Axis;
 import com.mojang.math.Transformation;
-import org.joml.Vector3f;
-
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.FaceBakery;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -32,10 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -56,25 +49,16 @@ import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.BakedQuadAccessor;
+import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
-import static net.p3pp3rf1y.sophisticatedstorage.client.render.DisplayItemRenderer.BIG_2D_ITEM_SCALE;
-import static net.p3pp3rf1y.sophisticatedstorage.client.render.DisplayItemRenderer.SMALL_2D_ITEM_SCALE;
-import static net.p3pp3rf1y.sophisticatedstorage.client.render.DisplayItemRenderer.SMALL_3D_ITEM_SCALE;
-import static net.p3pp3rf1y.sophisticatedstorage.client.render.DisplayItemRenderer.getNorthBasedRotation;
+import static net.p3pp3rf1y.sophisticatedstorage.client.render.DisplayItemRenderer.*;
 
 public abstract class BarrelBakedModelBase implements BakedModel, CustomParticleIcon {
 	private static final RenderContext.QuadTransform MOVE_TO_CORNER = QuadTransformers.applying(new Transformation(new Vector3f(-.5f, -.5f, -.5f), null, null, null));
@@ -510,7 +494,6 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 			return true;
 		}
 
-		// TODO:
 		/*if (item.getItem() instanceof BlockItem blockItem) {
 			ChunkRenderTypeSet renderTypes = model.getRenderTypes(blockItem.getBlock().defaultBlockState(), clientLevel.getRandom(), ModelData.EMPTY);
 			if (renderTypes.contains(RenderType.translucent())) {
@@ -754,6 +737,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		private final BarrelBakedModelBase barrelBakedModel;
 		@Nullable
 		private final BakedModel flatTopModel;
+		private Cache<Integer, BakedModel> resolvedModels = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
 
 		public BarrelItemOverrides(BarrelBakedModelBase barrelBakedModel, @Nullable BakedModel flatTopModel) {
 			this.barrelBakedModel = barrelBakedModel;
@@ -768,16 +752,77 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 				return flatTopModel.getOverrides().resolve(flatTopModel, stack, level, entity, seed);
 			}
 
-			barrelBakedModel.barrelHasMainColor = StorageBlockItem.getMainColorFromStack(stack).isPresent();
-			barrelBakedModel.barrelHasAccentColor = StorageBlockItem.getAccentColorFromStack(stack).isPresent();
-			barrelBakedModel.barrelWoodName = WoodStorageBlockItem.getWoodType(stack).map(WoodType::name)
+			boolean hasMainColor = StorageBlockItem.getMainColorFromStack(stack).isPresent();
+			boolean hasAccentColor = StorageBlockItem.getAccentColorFromStack(stack).isPresent();
+			String woodName = WoodStorageBlockItem.getWoodType(stack).map(WoodType::name)
 					.orElse(barrelBakedModel.barrelHasAccentColor && barrelBakedModel.barrelHasMainColor ? null : WoodType.ACACIA.name());
-			barrelBakedModel.barrelIsPacked = WoodStorageBlockItem.isPacked(stack);
-			barrelBakedModel.barrelShowsTier = StorageBlockItem.showsTier(stack);
-			barrelBakedModel.barrelItem = stack.getItem();
-			barrelBakedModel.flatTop = flatTop;
-			barrelBakedModel.barrelMaterials = BarrelBlockItem.getMaterials(stack);
-			return barrelBakedModel;
+			boolean packed = WoodStorageBlockItem.isPacked(stack);
+			boolean barrelShowsTier = StorageBlockItem.showsTier(stack);
+			Item item = stack.getItem();
+			Map<BarrelMaterial, ResourceLocation> materials = BarrelBlockItem.getMaterials(stack);
+
+			int hash = Objects.hash(item, woodName, hasMainColor, hasAccentColor, packed, barrelShowsTier, materials);
+
+			BakedModel resolvedModel = resolvedModels.getIfPresent(hash);
+			if (resolvedModel == null) {
+				resolvedModel = new ResolvedModel(hasMainColor, hasAccentColor, woodName, packed, barrelShowsTier, materials, flatTop, item);
+				resolvedModels.put(hash, resolvedModel);
+			}
+
+			return resolvedModel;
+		}
+
+		private class ResolvedModel extends ForwardingBakedModel {
+			private final boolean hasMainColor;
+			private final boolean hasAccentColor;
+			@Nullable
+			private final String woodName;
+			private final boolean packed;
+			private final boolean barrelShowsTier;
+			private final Map<BarrelMaterial, ResourceLocation> materials;
+			private final boolean flatTop;
+			private final Item item;
+
+			public ResolvedModel(boolean hasMainColor, boolean hasAccentColor, @Nullable String woodName, boolean packed, boolean barrelShowsTier, Map<BarrelMaterial, ResourceLocation> materials, boolean flatTop, Item item) {
+				this.wrapped = BarrelItemOverrides.this.barrelBakedModel;
+				this.hasMainColor = hasMainColor;
+				this.hasAccentColor = hasAccentColor;
+				this.woodName = woodName;
+				this.packed = packed;
+				this.barrelShowsTier = barrelShowsTier;
+				this.materials = materials;
+				this.flatTop = flatTop;
+				this.item = item;
+			}
+
+			@Override
+			public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
+				setProperties();
+				super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
+			}
+
+			@Override
+			public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
+				setProperties();
+				super.emitItemQuads(stack, randomSupplier, context);
+			}
+
+			@Override
+			public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
+				setProperties();
+				return super.getQuads(state, side, rand);
+			}
+
+			private void setProperties() {
+				barrelBakedModel.barrelHasMainColor = hasMainColor;
+				barrelBakedModel.barrelHasAccentColor = hasAccentColor;
+				barrelBakedModel.barrelWoodName = woodName;
+				barrelBakedModel.barrelIsPacked = packed;
+				barrelBakedModel.barrelShowsTier = barrelShowsTier;
+				barrelBakedModel.barrelMaterials = materials;
+				barrelBakedModel.flatTop = flatTop;
+				barrelBakedModel.barrelItem = item;
+			}
 		}
 	}
 }

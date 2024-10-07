@@ -1,16 +1,16 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.mojang.math.Axis;
-import org.joml.Vector3f;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Cat;
@@ -22,23 +22,14 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.ChestType;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
@@ -52,15 +43,17 @@ import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
+import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterloggedBlock, IDisplaySideStorage {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -140,7 +133,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			}
 		} else if (getConnectedDirection(state) == facing) {
 			level.getBlockEntity(currentPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(be -> {
-				if (!level.isClientSide() && !be.isBeingUpgraded()) {
+				if (!level.isClientSide() && !be.isBeingUpgraded() && !be.isPacked()) {
 					if (be.isMainChest() && state.getBlock() instanceof ChestBlock chestBlock) {
 						be.dropSecondPartContents(chestBlock, facingPos);
 					} else if (!be.isMainChest()) {
@@ -203,6 +196,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 
 		Direction direction = context.getHorizontalDirection().getOpposite();
 		return CapabilityStorageWrapper.get(chestBeingPlaced)
+				.filter(wrapper -> wrapper.getContentsUuid().isPresent())
 				.map(wrapper ->
 						getStateForPlacement(context, direction, fluidstate,
 								StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
@@ -355,11 +349,18 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		if (state.getValue(TYPE) != ChestType.SINGLE) {
 			level.getBlockEntity(pos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(be -> {
 				be.setDestroyedByPlayer();
-				if (be.isPacked() && !be.isMainChest()) {
+				if ((be.isPacked() || Boolean.TRUE.equals(Config.COMMON.dropPacked.get())) && !be.isMainChest()) {
 					//copy storage wrapper to "not main" chest so that its data can be transferred to stack properly
 					BlockPos otherPartPos = pos.relative(getConnectedDirection(state));
 					level.getBlockEntity(otherPartPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE)
-							.ifPresent(mainBe -> be.getStorageWrapper().load(mainBe.getStorageWrapper().save(new CompoundTag())));
+							.ifPresent(mainBe -> {
+								be.getStorageWrapper().load(mainBe.getStorageWrapper().save(new CompoundTag()));
+
+								//remove main chest contents
+								CompoundTag contentsTag = new CompoundTag();
+								contentsTag.put(StorageWrapper.CONTENTS_TAG, new CompoundTag());
+								mainBe.getStorageWrapper().load(contentsTag);
+							});
 				}
 			});
 		}
@@ -453,14 +454,17 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 	}
 
 	@Override
-	public BlockPos getNeighborPos(BlockState state, BlockPos origin, Direction facing) {
+	public List<BlockPos> getNeighborPos(BlockState state, BlockPos origin, Direction facing) {
 		if (state.getValue(TYPE) == ChestType.SINGLE) {
-			return origin.relative(facing);
+			return List.of(origin.relative(facing));
 		} else {
-			if (getConnectedDirection(state) == facing) {
-				return origin.relative(facing).relative(facing);
+			Direction connectedDirection = getConnectedDirection(state);
+			if (connectedDirection == facing) {
+				return List.of(origin.relative(facing).relative(facing));
+			} else if (connectedDirection.getOpposite() == facing) {
+				return List.of(origin.relative(facing));
 			}
-			return origin.relative(facing);
+			return List.of(origin.relative(facing), origin.relative(connectedDirection).relative(facing));
 		}
 	}
 

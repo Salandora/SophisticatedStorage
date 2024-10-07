@@ -14,10 +14,10 @@ import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
-import java.util.Objects;
-import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.Optional;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	private static final String PACKED_TAG = "packed";
@@ -111,6 +111,11 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	@Override
 	public boolean canBeLinked() {
 		return !packed;
+	}
+
+	@Override
+	protected boolean canRefreshUpgrades() {
+		return super.canRefreshUpgrades() && !packed;
 	}
 
 	@Override

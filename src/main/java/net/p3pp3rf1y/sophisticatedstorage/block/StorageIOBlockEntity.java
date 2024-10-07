@@ -1,13 +1,17 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllerBoundable;
@@ -16,20 +20,20 @@ import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import javax.annotation.Nullable;
+import java.util.*;
 
 public class StorageIOBlockEntity extends BlockEntity implements IControllerBoundable, ILinkable {
 	@Nullable
 	private BlockPos controllerPos = null;
 	private boolean isLinkedToController = false;
+	private boolean chunkBeingUnloaded = false;
 	private Map<BlockApiLookup<?, Direction>, Map<Direction, LazyOptional<?>>> capabilitySideCache = new HashMap<>();
 	protected StorageIOBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+
+		ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> onChunkUnloaded());
+		ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> onChunkUnloaded());
 	}
 
 	public StorageIOBlockEntity(BlockPos pos, BlockState state) {
@@ -185,5 +189,18 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	@Nullable
 	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt, ControllerBlockEntity c) {
 		return c.getCapability(cap, opt);
+	}
+
+	public void onChunkUnloaded() {
+		chunkBeingUnloaded = true;
+	}
+
+	@Override
+	public void setRemoved() {
+		if (!chunkBeingUnloaded && level != null) {
+			unlinkFromController();
+		}
+
+		super.setRemoved();
 	}
 }

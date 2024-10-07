@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.common;
 
 import com.google.common.collect.Queues;
-
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -29,6 +28,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsMessage;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
@@ -36,19 +36,16 @@ import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
-import net.p3pp3rf1y.sophisticatedstorage.block.ISneakItemInteractionBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
-import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nullable;
 
 public class CommonEventHandler {
 	private static final int AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT = 20;
@@ -144,8 +141,19 @@ public class CommonEventHandler {
 			}
 
 			AtomicInteger droppedItemEntityCount = new AtomicInteger(0);
-			InventoryHelper.iterate(wbe.getStorageWrapper().getInventoryHandler(), (slot, stack) -> {
-				if (stack.isEmpty()) {
+
+			int startCountingFromSlot;
+			InventoryHandler inventoryHandler;
+			if (wbe instanceof ChestBlockEntity cbe && !cbe.isMainChest() && level.getBlockState(pos).getBlock() instanceof ChestBlock chestBlock) {
+				startCountingFromSlot = chestBlock.getNumberOfInventorySlots();
+				inventoryHandler = cbe.getMainStorageWrapper().getInventoryHandler();
+			} else {
+				startCountingFromSlot = 0;
+				inventoryHandler = wbe.getStorageWrapper().getInventoryHandler();
+			}
+
+			InventoryHelper.iterate(inventoryHandler, (slot, stack) -> {
+				if (stack.isEmpty() || slot < startCountingFromSlot) {
 					return;
 				}
 				droppedItemEntityCount.addAndGet((int) Math.ceil(stack.getCount() / (double) Math.min(stack.getMaxStackSize(), AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT)));

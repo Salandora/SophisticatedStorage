@@ -1,18 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.SharedConstants;
@@ -28,30 +15,25 @@ import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.MathHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.AssertionFailureBuilder.assertionFailure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CompressionInventoryPartTest {
 	private static MockedStatic<RecipeHelper> recipeHelperMock;
@@ -104,6 +86,7 @@ public class CompressionInventoryPartTest {
 		when(inventoryHandler.getBaseSlotLimit()).thenReturn(baseSlotLimit);
 
 		Map<Integer, ItemStack> internalStacks = new HashMap<>();
+
 		doAnswer(i -> {
 			internalStacks.put(i.getArgument(0), i.getArgument(1));
 			return null;
@@ -118,7 +101,8 @@ public class CompressionInventoryPartTest {
 	}
 
 	private static MemorySettingsCategory getMemorySettings(InventoryHandler invHandler, Map<Integer, ItemStack> slotFilterStacks) {
-		MemorySettingsCategory memorySettingsCategory = Mockito.spy(new MemorySettingsCategory(() -> invHandler, new CompoundTag(), compoundTag -> {}));
+		MemorySettingsCategory memorySettingsCategory = Mockito.spy(new MemorySettingsCategory(() -> invHandler, new CompoundTag(), compoundTag -> {
+		}));
 		when(memorySettingsCategory.getSlotFilterStack(anyInt(), anyBoolean())).thenAnswer(i -> Optional.ofNullable(slotFilterStacks.get((int) i.getArgument(0))));
 		return memorySettingsCategory;
 	}
@@ -175,7 +159,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] compactsStacksOnInit() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.IRON_INGOT, 10), 2, ItemStack.EMPTY),
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 1)),
@@ -218,7 +202,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] calculatedStacksCorrectOnInit() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.IRON_INGOT, 10), 2, ItemStack.EMPTY),
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 10), 2, new ItemStack(Items.IRON_NUGGET, 90)),
@@ -278,7 +262,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] extractItemUpdatesStacks() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 1), 2, ItemStack.EMPTY),
 						64,
@@ -402,7 +386,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] simulatedExtractItemDoesNotUpdateStacks() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 1), 2, ItemStack.EMPTY),
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 10), 2, new ItemStack(Items.IRON_NUGGET, 90)),
@@ -619,14 +603,15 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(internalStacksBefore, invHandler, minSlot);
 
-		part.setStackInSlot(insertSlot, stack, (slot, itemStack) -> {});
+		part.setStackInSlot(insertSlot, stack, (slot, itemStack) -> {
+		});
 
 		assertCalculatedStacks(calculatedStacksAfter, minSlot, part);
 		assertInternalStacks(internalStacksAfter, invHandler);
 	}
 
 	public static Object[][] setStackInSlotUpdatesStacks() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, ItemStack.EMPTY, 1, ItemStack.EMPTY, 2, ItemStack.EMPTY),
 						64,
@@ -774,9 +759,11 @@ public class CompressionInventoryPartTest {
 		assertInternalStacks(params.expectedStacksSet(), invHandler);
 	}
 
-	private record InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams(Map<Integer, ItemStack> stacks, int baseLimit,
+	private record InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams(Map<Integer, ItemStack> stacks,
+																					   int baseLimit,
 																					   Pair<Integer, ItemStack> insertedStack,
-																					   Map<Integer, ItemStack> expectedStacksSet) {}
+																					   Map<Integer, ItemStack> expectedStacksSet) {
+	}
 
 	private static List<InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams> insertingAdditionalUncompressibleItemsProperlyCalculatesCount() {
 		return List.of(
@@ -814,9 +801,11 @@ public class CompressionInventoryPartTest {
 		assertCalculatedStacks(params.expectedCalculatedStacks(), 0, part);
 	}
 
-	private record ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(Map<Integer, ItemStack> stacks, int baseLimit,
+	private record ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(Map<Integer, ItemStack> stacks,
+																				int baseLimit,
 																				Pair<Integer, Integer> extractedStack,
-																				Map<Integer, ItemStack> expectedCalculatedStacks) {}
+																				Map<Integer, ItemStack> expectedCalculatedStacks) {
+	}
 
 	private static List<ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams> extractingFromFullyFilledSlotsProperlyCalculatesCounts() {
 		return List.of(
@@ -864,7 +853,9 @@ public class CompressionInventoryPartTest {
 		assertCalculatedStacks(params.calculatedStacks(), 0, part);
 	}
 
-	private record InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams(Map<Integer, ItemStack> stacks, int baseLimit, Map<Integer, ItemStack> calculatedStacks) {}
+	private record InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams(
+			Map<Integer, ItemStack> stacks, int baseLimit, Map<Integer, ItemStack> calculatedStacks) {
+	}
 
 	private static List<InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams> initializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacks() {
 		return List.of(
