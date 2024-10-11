@@ -568,13 +568,14 @@ modrinth {
     gameVersions = "${release_versions}".split(',').collect {e -> e}
     loaders = ["fabric"]
     dependencies {
+        required.project "sophisticated-core-(unofficial-fabric-port)"
         required.project "fabric-api"
         embedded.project "forge-config-api-port"
         embedded.project "porting_lib"
         optional.project "jei"
         optional.project "emi"
         optional.project "rei"
-        optional.project "crafting-tweaks-fabric"
+        optional.project "crafting-tweaks"
         optional.project "modernkeybinding"
     }
     changelog = provider {
