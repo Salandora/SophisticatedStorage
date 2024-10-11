@@ -78,16 +78,8 @@ public class StorageContainerMenu extends StorageContainerMenuBase<IStorageWrapp
 			sendToServer(data -> data.putString(ACTION_TAG, "openSettings"));
 			return;
 		}
-
-		getBlockPosition().ifPresent(pos ->
-				player.openMenu(
-						MenuProviderHelper.createMenuProvider(
-								(w, ctx, pl) -> instantiateSettingsContainerMenu(w, pl, pos),
-								buffer -> buffer.writeBlockPos(pos),
-								Component.translatable(StorageTranslationHelper.INSTANCE.translGui("settings.title"))
-						)
-				)
-		);
+		getBlockPosition().ifPresent(pos -> player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> instantiateSettingsContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
+				Component.translatable(StorageTranslationHelper.INSTANCE.translGui("settings.title")))));
 	}
 
 	protected StorageSettingsContainerMenu instantiateSettingsContainerMenu(int windowId, Player player, BlockPos pos) {
@@ -123,5 +115,9 @@ public class StorageContainerMenu extends StorageContainerMenuBase<IStorageWrapp
 				memorySettings.selectSlot(slotIndex);
 			}
 		}
+	}
+
+	public float getSlotFillPercentage(int slot) {
+		return storageBlockEntity.getSlotFillPercentage(slot);
 	}
 }

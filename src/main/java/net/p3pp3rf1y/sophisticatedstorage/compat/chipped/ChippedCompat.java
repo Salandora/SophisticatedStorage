@@ -22,6 +22,7 @@ import net.p3pp3rf1y.sophisticatedcore.compat.chipped.BlockTransformationUpgrade
 import net.p3pp3rf1y.sophisticatedcore.compat.chipped.BlockTransformationUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.compat.chipped.BlockTransformationUpgradeTab;
 import net.p3pp3rf1y.sophisticatedcore.compat.chipped.BlockTransformationUpgradeWrapper;
+import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageButtonDefinitions;
 import net.p3pp3rf1y.sophisticatedstorage.compat.emi.EmiCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.StoragePlugin;
@@ -30,19 +31,19 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 
 public class ChippedCompat implements ICompat {
 	public static final BlockTransformationUpgradeItem BOTANIST_WORKBENCH_UPGRADE = ModItems.register("chipped/botanist_workbench_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.BOTANIST_WORKBENCH));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.BOTANIST_WORKBENCH, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem GLASSBLOWER_UPGRADE = ModItems.register("chipped/glassblower_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.GLASSBLOWER));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.GLASSBLOWER, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem CARPENTERS_TABLE_UPGRADE = ModItems.register("chipped/carpenters_table_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.CARPENTERS_TABLE));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.CARPENTERS_TABLE, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem LOOM_TABLE_UPGRADE = ModItems.register("chipped/loom_table_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.LOOM_TABLE));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.LOOM_TABLE, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem MASON_TABLE_UPGRADE = ModItems.register("chipped/mason_table_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.MASON_TABLE));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.MASON_TABLE, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem ALCHEMY_BENCH_UPGRADE = ModItems.register("chipped/alchemy_bench_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.ALCHEMY_BENCH));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.ALCHEMY_BENCH, Config.SERVER.maxUpgradesPerStorage));
 	public static final BlockTransformationUpgradeItem TINKERING_TABLE_UPGRADE = ModItems.register("chipped/tinkering_table_upgrade",
-			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.TINKERING_TABLE));
+			() -> new BlockTransformationUpgradeItem(ModRecipeTypes.TINKERING_TABLE, Config.SERVER.maxUpgradesPerStorage));
 
 	@Override
 	public void init() {

@@ -127,7 +127,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 				@Override
 				public boolean isItemValid(int slot, ItemVariant resource, int count) {
 					//noinspection ConstantConditions - by this time the upgrade has registryName so it can't be null
-					return super.isItemValid(slot, resource, count) && (resource.isBlank() || SophisticatedStorage.ID.equals(BuiltInRegistries.ITEM.getKey(resource.getItem()).getNamespace()) || resource.toStack(count).is(ModItems.STORAGE_UPGRADE_TAG));
+					return super.isItemValid(slot, resource, count) && (resource.isBlank() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(resource.getItem()).getNamespace()) || resource.toStack(count).is(ModItems.STORAGE_UPGRADE_TAG));
 				}
 
 				@Override
@@ -187,10 +187,10 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		if (numberOfUpgradeSlots > -1) {
 			tag.putInt("numberOfUpgradeSlots", numberOfUpgradeSlots);
 		}
-		if (mainColor != 0) {
+		if (mainColor > -1) {
 			tag.putInt(MAIN_COLOR_TAG, mainColor);
 		}
-		if (accentColor != 0) {
+		if (accentColor > -1) {
 			tag.putInt(ACCENT_COLOR_TAG, accentColor);
 		}
 		return tag;
@@ -199,6 +199,9 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	public void load(CompoundTag tag) {
 		loadContents(tag);
 		loadData(tag);
+
+		initInventoryHandler();
+		getUpgradeHandler().refreshUpgradeWrappers();
 		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlotCount()) {
 			getUpgradeHandler().setRenderUpgradeItems();
 		}
@@ -386,6 +389,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 			case COUNT -> InventorySorter.BY_COUNT;
 			case TAGS -> InventorySorter.BY_TAGS;
 			case NAME -> InventorySorter.BY_NAME;
+			case MOD -> InventorySorter.BY_MOD;
 		};
 	}
 
@@ -433,16 +437,12 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		return columnsTaken;
 	}
 
-	public void increaseSize(int additionalInventorySlots, int additionalUpgradeSlots) {
-		if (additionalInventorySlots > 0) {
-			numberOfInventorySlots += additionalInventorySlots;
-			getInventoryHandler().changeSlots(additionalInventorySlots);
-		}
+	public void changeSize(int additionalInventorySlots, int additionalUpgradeSlots) {
+		numberOfInventorySlots += additionalInventorySlots;
+		getInventoryHandler().changeSlots(additionalInventorySlots);
 
-		if (additionalUpgradeSlots > 0) {
-			numberOfUpgradeSlots += additionalUpgradeSlots;
-			getUpgradeHandler().increaseSize(additionalUpgradeSlots);
-		}
+		numberOfUpgradeSlots += additionalUpgradeSlots;
+		getUpgradeHandler().increaseSize(additionalUpgradeSlots);
 	}
 
 	public <T extends IUpgradeWrapper> void registerUpgradeDefaultsHandler(Class<T> upgradeClass, Consumer<T> defaultsHandler) {

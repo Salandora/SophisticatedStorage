@@ -10,26 +10,27 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartRegistry;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartitioner;
 import net.p3pp3rf1y.sophisticatedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.IUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeItemBase;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeType;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeItem.Wrapper> {
 	public static final UpgradeType<CompressionUpgradeItem.Wrapper> TYPE = new UpgradeType<>(CompressionUpgradeItem.Wrapper::new);
 	private static final String FIRST_INVENTORY_SLOT_TAG = "firstInventorySlot";
+	public static final List<UpgradeConflictDefinition> UPGRADE_CONFLICT_DEFINITIONS = List.of(new UpgradeConflictDefinition(CompactingUpgradeItem.class::isInstance, 0, StorageTranslationHelper.INSTANCE.translError("add.compacting_exists")));
 
 	public CompressionUpgradeItem() {
-		super();
+		super(Config.SERVER.maxUpgradesPerStorage);
 		InventoryPartRegistry.registerFactory(CompressionInventoryPart.NAME, CompressionInventoryPart::new);
 	}
 
@@ -38,15 +39,25 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
 		return TYPE;
 	}
 
+	private UpgradeSlotChangeResult checkCompressionSpace(IStorageWrapper storageWrapper) {
+		Optional<InventoryPartitioner.SlotRange> slotRange = storageWrapper.getInventoryHandler().getInventoryPartitioner().getFirstSpace(Config.SERVER.compressionUpgrade.maxNumberOfSlots.get());
+
+		return slotRange.map(range -> canUseForCompression(storageWrapper, range))
+				.orElseGet(() -> new UpgradeSlotChangeResult.Fail(StorageTranslationHelper.INSTANCE.translError("add.compression_no_space"), Collections.emptySet(), Collections.emptySet(), Collections.emptySet()));
+	}
+
 	@Override
-	public UpgradeSlotChangeResult canAddUpgradeTo(IStorageWrapper storageWrapper, ItemStack upgradeStack, boolean firstLevelStorage, boolean isClientSide) {
+	public UpgradeSlotChangeResult checkExtraInsertConditions(ItemStack upgradeStack, IStorageWrapper storageWrapper, boolean isClientSide, @Nullable IUpgradeItem<?> upgradeInSlot) {
 		if (isClientSide) {
 			return new UpgradeSlotChangeResult.Success();
 		}
 
-		Optional<InventoryPartitioner.SlotRange> slotRange = storageWrapper.getInventoryHandler().getInventoryPartitioner().getFirstSpace(Config.SERVER.compressionUpgrade.maxNumberOfSlots.get());
-		return slotRange.map(range -> canUseForCompression(storageWrapper, range))
-				.orElseGet(() -> new UpgradeSlotChangeResult.Fail(StorageTranslationHelper.INSTANCE.translError("add.compression_no_space"), Collections.emptySet(), Collections.emptySet(), Collections.emptySet()));
+		return checkCompressionSpace(storageWrapper);
+	}
+
+	@Override
+	public List<UpgradeConflictDefinition> getUpgradeConflicts() {
+		return UPGRADE_CONFLICT_DEFINITIONS;
 	}
 
 	private UpgradeSlotChangeResult canUseForCompression(IStorageWrapper storageWrapper, InventoryPartitioner.SlotRange slotRange) {

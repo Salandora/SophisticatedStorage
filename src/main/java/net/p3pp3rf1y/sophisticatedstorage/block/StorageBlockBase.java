@@ -71,16 +71,21 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		return typeExpected == typePassedIn ? (BlockEntityTicker<A>) blockEntityTicker : null;
 	}
 
-	protected static void renderUpgrades(Level level, RandomSource rand, BlockPos pos, Direction facing, RenderInfo renderInfo) {
+	protected void renderUpgrades(Level level, RandomSource rand, BlockPos pos, Direction facing, RenderInfo renderInfo, BlockState storageBlockState) {
 		if (Minecraft.getInstance().isPaused()) {
 			return;
 		}
 
 		Map<UpgradeRenderDataType<?>, IUpgradeRenderData> upgradeRenderData = new HashMap<>(renderInfo.getUpgradeRenderData());
-		upgradeRenderData.forEach((type, data) -> UpgradeRenderRegistry.getUpgradeRenderer(type).ifPresent(renderer -> StorageBlockBase.renderUpgrade(renderer, level, rand, pos, facing, type, data)));
+		upgradeRenderData.forEach((type, data) -> UpgradeRenderRegistry.getUpgradeRenderer(type).ifPresent(renderer -> {
+			if (storageBlockState.getBlock() instanceof StorageBlockBase storageBlock) {
+				storageBlock.renderUpgrade(renderer, level, rand, pos, facing, type, data, storageBlockState, storageBlock);
+			}
+
+		}));
 	}
 
-	private static Vector3f getMiddleFacePoint(BlockPos pos, Direction facing, Vector3f vector) {
+	protected Vector3f getMiddleFacePoint(BlockState state, BlockPos pos, Direction facing, Vector3f vector) {
 		Vector3f point = new Vector3f(vector);
 		point.add(0, 0, 0.6f);
 		point.rotate(Axis.XP.rotationDegrees(-90.0F));
@@ -89,9 +94,9 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		return point;
 	}
 
-	private static <T extends IUpgradeRenderData> void renderUpgrade(IUpgradeRenderer<T> renderer, Level level, RandomSource rand, BlockPos pos, Direction facing, UpgradeRenderDataType<?> type, IUpgradeRenderData data) {
+	private <T extends IUpgradeRenderData> void renderUpgrade(IUpgradeRenderer<T> renderer, Level level, RandomSource rand, BlockPos pos, Direction facing, UpgradeRenderDataType<?> type, IUpgradeRenderData data, BlockState state, StorageBlockBase storageBlock) {
 		//noinspection unchecked
-		type.cast(data).ifPresent(renderData -> renderer.render(level, rand, vector -> StorageBlockBase.getMiddleFacePoint(pos, facing, vector), (T) renderData));
+		type.cast(data).ifPresent(renderData -> renderer.render(level, rand, vector -> storageBlock.getMiddleFacePoint(state, pos, facing, vector), (T) renderData));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -103,7 +108,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		}
 	}
 
-	private void tryToPickup(Level world, ItemEntity itemEntity, IStorageWrapper w) {
+	protected void tryToPickup(Level world, ItemEntity itemEntity, IStorageWrapper w) {
 		ItemStack remainingStack = itemEntity.getItem().copy();
 		try (Transaction ctx = Transaction.openOuter()) {
 			remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(world, w.getUpgradeHandler(), remainingStack, ctx);
@@ -175,7 +180,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource rand) {
 		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(be -> {
 			RenderInfo renderInfo = be.getStorageWrapper().getRenderInfo();
-			renderUpgrades(level, rand, pos, getFacing(state), renderInfo);
+			renderUpgrades(level, rand, pos, getFacing(state), renderInfo, state);
 		});
 
 	}
@@ -232,15 +237,13 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		return tryAddSingleUpgrade(player, hand, b, itemInHand);
 	}
 
-	private static boolean isStorageUpgrade(ItemStack itemInHand) {
-		return itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem && RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.ID)).orElse(false);
-	}
-
 	public boolean tryAddSingleUpgrade(Player player, InteractionHand hand, StorageBlockEntity b, ItemStack itemInHand) {
-		if (isStorageUpgrade(itemInHand)) {
+		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem
+				&& RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
 			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
 			ItemVariant resource = ItemVariant.of(itemInHand);
-			if (InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource,1, null).getCount() != itemInHand.getCount()) {
+			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).isSuccessful()
+					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != 0) {
 				try (Transaction ctx = Transaction.openOuter()) {
 					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);
 					ctx.commit();
@@ -276,5 +279,10 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 			}
 			return result;
 		}).orElse(false);
+	}
+
+	@SuppressWarnings("java:S1172") // Parameter used in overrides
+	public List<BlockPos> getNeighborPos(BlockState state, BlockPos origin, Direction facing) {
+		return List.of(origin.relative(facing));
 	}
 }

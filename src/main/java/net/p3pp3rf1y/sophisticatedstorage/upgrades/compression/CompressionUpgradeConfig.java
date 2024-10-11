@@ -66,4 +66,8 @@ public class CompressionUpgradeConfig {
 		}
 		return Optional.ofNullable(additionalDecompressibleItemsMap.get(item));
 	}
+
+	public void clearCache() {
+		additionalDecompressibleItemsMap = null;
+	}
 }

@@ -1,12 +1,15 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.BlockFamilies;
 import net.minecraft.data.BlockFamily;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
@@ -25,23 +29,26 @@ import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public abstract class WoodStorageBlockBase extends StorageBlockBase implements IAdditionalDropDataBlock {
-	public static final Map<WoodType, BlockFamily> CUSTOM_TEXTURE_WOOD_TYPES = Map.of(
-			WoodType.ACACIA, BlockFamilies.ACACIA_PLANKS,
-			WoodType.BIRCH, BlockFamilies.BIRCH_PLANKS,
-			WoodType.CRIMSON, BlockFamilies.CRIMSON_PLANKS,
-			WoodType.DARK_OAK, BlockFamilies.DARK_OAK_PLANKS,
-			WoodType.JUNGLE, BlockFamilies.JUNGLE_PLANKS,
-			WoodType.OAK, BlockFamilies.OAK_PLANKS,
-			WoodType.SPRUCE, BlockFamilies.SPRUCE_PLANKS,
-			WoodType.WARPED, BlockFamilies.WARPED_PLANKS,
-			WoodType.MANGROVE, BlockFamilies.MANGROVE_PLANKS);
+	public static final Map<WoodType, BlockFamily> CUSTOM_TEXTURE_WOOD_TYPES = ImmutableMap.<WoodType, BlockFamily>builder()
+			.put(WoodType.ACACIA, BlockFamilies.ACACIA_PLANKS)
+			.put(WoodType.BIRCH, BlockFamilies.BIRCH_PLANKS)
+			.put(WoodType.CRIMSON, BlockFamilies.CRIMSON_PLANKS)
+			.put(WoodType.DARK_OAK, BlockFamilies.DARK_OAK_PLANKS)
+			.put(WoodType.JUNGLE, BlockFamilies.JUNGLE_PLANKS)
+			.put(WoodType.OAK, BlockFamilies.OAK_PLANKS)
+			.put(WoodType.SPRUCE, BlockFamilies.SPRUCE_PLANKS)
+			.put(WoodType.WARPED, BlockFamilies.WARPED_PLANKS)
+			.put(WoodType.MANGROVE, BlockFamilies.MANGROVE_PLANKS)
+			.put(WoodType.CHERRY, BlockFamilies.CHERRY_PLANKS)
+			.put(WoodType.BAMBOO, BlockFamilies.BAMBOO_PLANKS)
+			.build();
 
 	protected WoodStorageBlockBase(Properties properties, Supplier<Integer> numberOfInventorySlotsSupplier, Supplier<Integer> numberOfUpgradeSlotsSupplier) {
 		super(properties, numberOfInventorySlotsSupplier, numberOfUpgradeSlotsSupplier);
@@ -54,7 +61,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 	public void addDropData(ItemStack stack, StorageBlockEntity be) {
 		if (be instanceof WoodStorageBlockEntity wbe) {
 			addNameWoodAndTintData(stack, wbe);
-			if (wbe.isPacked()) {
+			if (wbe.isPacked() || shouldNonEmptyDropPacked(wbe)) {
 				StorageWrapper storageWrapper = be.getStorageWrapper();
 				UUID storageUuid = storageWrapper.getContentsUuid().orElse(UUID.randomUUID());
 				CompoundTag storageContents = wbe.getStorageContentsTag();
@@ -64,8 +71,18 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				}
 				WoodStorageBlockItem.setPacked(stack, true);
 				StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
+				WoodStorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlotCount());
+				WoodStorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlotCount());
 			}
 		}
+	}
+
+	private static boolean shouldNonEmptyDropPacked(WoodStorageBlockEntity wbe) {
+		if (Boolean.FALSE.equals(Config.COMMON.dropPacked.get())) {
+			return false;
+		}
+
+		return !InventoryHelper.isEmpty(wbe.getStorageWrapper().getInventoryHandler()) || !InventoryHelper.isEmpty(wbe.getStorageWrapper().getUpgradeHandler());
 	}
 
 	private void addNameWoodAndTintData(ItemStack stack, WoodStorageBlockEntity wbe) {
@@ -87,9 +104,13 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 
 	@Override
 	public void addCreativeTabItems(Consumer<ItemStack> itemConsumer) {
-		CUSTOM_TEXTURE_WOOD_TYPES.keySet().forEach(woodType -> itemConsumer.accept(WoodStorageBlockItem.setWoodType(new ItemStack(this), woodType)));
+		if (!Config.CLIENT_SPEC.isLoaded() || Boolean.TRUE.equals(Config.CLIENT.showSingleWoodVariantOnly.get())) {
+			itemConsumer.accept(WoodStorageBlockItem.setWoodType(new ItemStack(this), WoodType.ACACIA));
+		} else {
+			CUSTOM_TEXTURE_WOOD_TYPES.keySet().forEach(woodType -> itemConsumer.accept(WoodStorageBlockItem.setWoodType(new ItemStack(this), woodType)));
+		}
 
-		if (isBasicTier() || Boolean.TRUE.equals(Config.CLIENT.showHigherTierTintedVariants.get())) {
+		if (isBasicTier() || Boolean.TRUE.equals(!Config.CLIENT_SPEC.isLoaded() || Config.CLIENT.showHigherTierTintedVariants.get())) {
 			for (DyeColor color : DyeColor.values()) {
 				ItemStack storageStack = new ItemStack(this);
 				if (storageStack.getItem() instanceof ITintableBlockItem tintableBlockItem) {
@@ -114,9 +135,9 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
 		ItemStack stack = new ItemStack(this);
-		addNameWoodAndTintData(stack, level, pos);
+		addNameWoodAndTintData(stack, world, pos);
 		return stack;
 	}
 
@@ -125,6 +146,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 		WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).ifPresent(be -> {
 			NBTHelper.getUniqueId(stack, "uuid").ifPresent(uuid -> {
 				ItemContentsStorage itemContentsStorage = ItemContentsStorage.get();
+				be.setBeingUpgraded(true);
 				be.load(itemContentsStorage.getOrCreateStorageContents(uuid));
 				itemContentsStorage.removeStorageContents(uuid);
 			});
@@ -132,9 +154,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 			if (stack.hasCustomHoverName()) {
 				be.setCustomName(stack.getHoverName());
 			}
-			WoodStorageBlockItem.getWoodType(stack).ifPresent(be::setWoodType);
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(be.getStorageWrapper()::setMainColor);
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(be.getStorageWrapper()::setAccentColor);
+			setRenderBlockRenderProperties(stack, be);
 
 			be.getStorageWrapper().onInit();
 			be.tryToAddToController();
@@ -142,25 +162,63 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 			if (placer != null && placer.getOffhandItem().getItem() == ModItems.STORAGE_TOOL) {
 				StorageToolItem.useOffHandOnPlaced(placer.getOffhandItem(), be);
 			}
+			be.setBeingUpgraded(false);
 		});
+	}
+
+	protected void setRenderBlockRenderProperties(ItemStack stack, WoodStorageBlockEntity be) {
+		WoodStorageBlockItem.getWoodType(stack).ifPresent(be::setWoodType);
+		StorageBlockItem.getMainColorFromStack(stack).ifPresent(be.getStorageWrapper()::setMainColor);
+		StorageBlockItem.getAccentColorFromStack(stack).ifPresent(be.getStorageWrapper()::setAccentColor);
+	}
+
+	@Override
+	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+		super.playerWillDestroy(level, pos, state, player);
+		WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class)
+				.ifPresent(wbe -> {
+					if (Boolean.TRUE.equals(Config.COMMON.dropPacked.get())) {
+						wbe.setPacked(true);
+
+						if (player.isCreative() && (
+								!InventoryHelper.isEmpty(wbe.getStorageWrapper().getInventoryHandler()) || !InventoryHelper.isEmpty(wbe.getStorageWrapper().getUpgradeHandler())
+						)) {
+							ItemStack drop = new ItemStack(this);
+							addDropData(drop, wbe);
+							ItemEntity itementity = new ItemEntity(level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, drop);
+							itementity.setDefaultPickUpDelay();
+							level.addFreshEntity(itementity);
+						}
+					}
+				});
 	}
 
 	@SuppressWarnings("java:S1172") //parameter is used in override
 	protected boolean tryItemInteraction(Player player, InteractionHand hand, WoodStorageBlockEntity b, ItemStack stackInHand, Direction facing, BlockHitResult hitResult) {
 		if (stackInHand.getItem() == ModItems.PACKING_TAPE) {
-			packStorage(player, hand, b, stackInHand);
+			if (Boolean.TRUE.equals(Config.COMMON.dropPacked.get())) {
+				player.displayClientMessage(Component.translatable("gui.sophisticatedstorage.status.packing_tape_disabled"), true);
+			} else {
+				packStorage(player, hand, b, stackInHand);
+			}
 			return true;
 		}
 		return tryAddUpgrade(player, hand, b, stackInHand, facing, hitResult);
 	}
 
-	private static void packStorage(Player player, InteractionHand hand, WoodStorageBlockEntity b, ItemStack stackInHand) {
+	protected void packStorage(Player player, InteractionHand hand, WoodStorageBlockEntity b, ItemStack stackInHand) {
 		if (!player.isCreative()) {
 			stackInHand.setDamageValue(stackInHand.getDamageValue() + 1);
 			if (stackInHand.getDamageValue() >= stackInHand.getMaxDamage()) {
 				player.setItemInHand(hand, ItemStack.EMPTY);
 			}
 		}
+
+		BlockState blockState = b.getBlockState();
+		if (blockState.getBlock() instanceof StorageBlockBase storageBlock && blockState.getValue(StorageBlockBase.TICKING)) {
+			storageBlock.setTicking(player.level(), b.getBlockPos(), blockState, false);
+		}
+
 		b.setPacked(true);
 
 		b.removeFromController();

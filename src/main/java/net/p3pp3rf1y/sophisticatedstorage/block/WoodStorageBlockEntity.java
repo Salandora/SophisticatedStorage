@@ -10,12 +10,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	private static final String PACKED_TAG = "packed";
@@ -86,11 +88,11 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 		return !isPacked();
 	}
 
-	@Nullable
+	@Nonnull
 	@Override
-	public <T, C> T getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
+	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
 		if (isPacked() && cap == ItemStorage.SIDED) {
-			return null;
+			return LazyOptional.empty();
 		}
 
 		return super.getCapability(cap, opt);
@@ -109,6 +111,11 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	@Override
 	public boolean canBeLinked() {
 		return !packed;
+	}
+
+	@Override
+	protected boolean canRefreshUpgrades() {
+		return super.canRefreshUpgrades() && !packed;
 	}
 
 	@Override
