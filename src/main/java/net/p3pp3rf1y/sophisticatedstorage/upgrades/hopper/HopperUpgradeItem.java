@@ -3,6 +3,7 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 import net.minecraft.world.item.CreativeModeTab;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeItemBase;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeType;
+import net.p3pp3rf1y.sophisticatedstorage.Config;
 
 import java.util.function.IntSupplier;
 
@@ -15,7 +16,7 @@ public class HopperUpgradeItem extends UpgradeItemBase<HopperUpgradeWrapper> {
 	public static final UpgradeType<HopperUpgradeWrapper> TYPE = new UpgradeType<>(HopperUpgradeWrapper::new);
 
 	public HopperUpgradeItem(CreativeModeTab itemGroup, IntSupplier inputFilterSlotCount, IntSupplier outputFilterSlotCount, IntSupplier transferSpeedTicks, IntSupplier maxTransferStackSize) {
-		super(itemGroup);
+		super(itemGroup, Config.SERVER.maxUpgradesPerStorage);
 		this.inputFilterSlotCount = inputFilterSlotCount;
 		this.outputFilterSlotCount = outputFilterSlotCount;
 		this.transferSpeedTicks = transferSpeedTicks;

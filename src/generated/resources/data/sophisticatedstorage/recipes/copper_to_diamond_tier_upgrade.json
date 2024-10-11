@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:copper_to_diamond_tier_upgrade"
+    }
+  ],
+  "key": {
+    "D": {
+      "tag": "c:diamonds"
+    },
+    "T": {
+      "item": "sophisticatedstorage:copper_to_gold_tier_upgrade"
+    }
+  },
+  "pattern": [
+    "DDD",
+    "DTD",
+    "DDD"
+  ],
+  "result": {
+    "item": "sophisticatedstorage:copper_to_diamond_tier_upgrade"
+  }
+}

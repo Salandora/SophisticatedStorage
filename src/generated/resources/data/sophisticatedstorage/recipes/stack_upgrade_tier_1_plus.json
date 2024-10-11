@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_1_plus"
+    }
+  ],
+  "key": {
+    "B": {
+      "tag": "c:copper_blocks"
+    },
+    "C": {
+      "tag": "c:copper_ingots"
+    },
+    "S": {
+      "item": "sophisticatedstorage:stack_upgrade_tier_1"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "CSC",
+    "BCB"
+  ],
+  "result": {
+    "item": "sophisticatedstorage:stack_upgrade_tier_1_plus"
+  }
+}

@@ -224,15 +224,13 @@ public abstract class StorageBlockBase extends Block implements IStorageBlock, I
 		return tryAddSingleUpgrade(player, hand, b, itemInHand);
 	}
 
-	private static boolean isStorageUpgrade(ItemStack itemInHand) {
-		return itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem && RegistryHelper.getRegistryName(Registry.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.ID)).orElse(false);
-	}
-
 	public boolean tryAddSingleUpgrade(Player player, InteractionHand hand, StorageBlockEntity b, ItemStack itemInHand) {
-		if (isStorageUpgrade(itemInHand)) {
+		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem
+				&& RegistryHelper.getRegistryName(Registry.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
 			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
 			ItemVariant resource = ItemVariant.of(itemInHand);
-			if (InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource,1, null).getCount() != itemInHand.getCount()) {
+			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).isSuccessful()
+					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != 0) {
 				try (Transaction ctx = Transaction.openOuter()) {
 					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);
 					ctx.commit();
