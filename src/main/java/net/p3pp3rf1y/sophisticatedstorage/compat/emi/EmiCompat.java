@@ -1,30 +1,22 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.emi;
 
-import dev.emi.emi.api.EmiPlugin;
-import dev.emi.emi.api.EmiRegistry;
-import dev.emi.emi.api.recipe.EmiCraftingRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import dev.emi.emi.api.stack.Comparison;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.Bounds;
-
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ControllerRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
@@ -34,6 +26,15 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import dev.emi.emi.api.EmiPlugin;
+import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
+import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.stack.Comparison;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,7 +75,6 @@ public class EmiCompat implements EmiPlugin {
         registerCraftingRecipes(registry, DyeRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
 		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
-		registerCraftingRecipes(registry, ControllerRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes());
 		registerCraftingRecipes(registry, FlatBarrelRecipesMaker.getRecipes());
 
@@ -97,37 +97,12 @@ public class EmiCompat implements EmiPlugin {
 			return tag;
 		});
 
-		registry.setDefaultComparison(ModBlocks.BARREL_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.IRON_BARREL_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.GOLD_BARREL_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.DIAMOND_BARREL_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.NETHERITE_BARREL_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.CHEST_ITEM, woodStorageNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.IRON_CHEST_ITEM, woodStorageNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.GOLD_CHEST_ITEM, woodStorageNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.DIAMOND_CHEST_ITEM, woodStorageNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.NETHERITE_CHEST_ITEM, woodStorageNbtInterpreter);
-
-		registry.setDefaultComparison(ModBlocks.LIMITED_BARREL_1_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_BARREL_2_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_BARREL_3_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_BARREL_4_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_IRON_BARREL_1_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_IRON_BARREL_2_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_IRON_BARREL_3_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_IRON_BARREL_4_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_GOLD_BARREL_1_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_GOLD_BARREL_2_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_GOLD_BARREL_3_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_GOLD_BARREL_4_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM, barrelNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM, barrelNbtInterpreter);
+		for (BlockItem item : ModBlocks.ALL_BARREL_ITEMS) {
+			registry.setDefaultComparison(item, barrelNbtInterpreter);
+		}
+		for (BlockItem item : ModBlocks.CHEST_ITEMS) {
+			registry.setDefaultComparison(item, woodStorageNbtInterpreter);
+		}
 
 		Comparison shulkerBoxNbtInterpreter = Comparison.compareData(emiStack -> {
 			CompoundTag tag = new CompoundTag();
@@ -136,11 +111,9 @@ public class EmiCompat implements EmiPlugin {
 			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
 			return tag;
 		});
-		registry.setDefaultComparison(ModBlocks.SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.IRON_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.GOLD_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
-		registry.setDefaultComparison(ModBlocks.NETHERITE_SHULKER_BOX_ITEM, shulkerBoxNbtInterpreter);
+		for (BlockItem item : ModBlocks.SHULKER_BOX_ITEMS) {
+			registry.setDefaultComparison(item, shulkerBoxNbtInterpreter);
+		}
 
 		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, new EmiGridMenuInfo<>());
 
@@ -154,12 +127,13 @@ public class EmiCompat implements EmiPlugin {
 		}
     }
 
-    private static void registerCraftingRecipes(EmiRegistry registry, Collection<CraftingRecipe> recipes) {
+    private static void registerCraftingRecipes(EmiRegistry registry, Collection<RecipeHolder<CraftingRecipe>> recipes) {
+		Minecraft mc = Minecraft.getInstance();
         recipes.forEach(r -> registry.addRecipe(
             new EmiCraftingRecipe(
-                r.getIngredients().stream().map(EmiIngredient::of).toList(),
-                EmiStack.of(r.getResultItem(null)),
-                r.getId())
+                r.value().getIngredients().stream().map(EmiIngredient::of).toList(),
+                EmiStack.of(r.value().getResultItem(mc.level.registryAccess())),
+                r.id())
             )
         );
     }

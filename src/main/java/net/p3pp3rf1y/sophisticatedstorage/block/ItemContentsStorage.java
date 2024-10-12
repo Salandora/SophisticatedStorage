@@ -17,19 +17,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ItemContentsStorage extends SavedData {
-	private static final String SAVED_DATA_NAME = SophisticatedStorage.ID;
+	private static final String SAVED_DATA_NAME = SophisticatedStorage.MOD_ID;
 
 	private final Map<UUID, CompoundTag> storageContents = new HashMap<>();
 	private static final ItemContentsStorage clientStorageCopy = new ItemContentsStorage();
 
-	private ItemContentsStorage() {}
+	private ItemContentsStorage() {
+	}
 
 	public static ItemContentsStorage get() {
 		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread()) {
 			ServerLevel overworld = SophisticatedCore.getCurrentServer().getLevel(Level.OVERWORLD);
 			//noinspection ConstantConditions - by this time overworld is loaded
 			DimensionDataStorage storage = overworld.getDataStorage();
-			return storage.computeIfAbsent(ItemContentsStorage::load, ItemContentsStorage::new, SAVED_DATA_NAME);
+			return storage.computeIfAbsent(new Factory<>(ItemContentsStorage::new, ItemContentsStorage::load, null), SAVED_DATA_NAME);
 		}
 		return clientStorageCopy;
 	}
@@ -41,7 +42,7 @@ public class ItemContentsStorage extends SavedData {
 	}
 
 	private static void readStorageContents(CompoundTag nbt, ItemContentsStorage storage) {
-		ListTag storageContents =  nbt.getList(nbt.contains("shulkerBoxContents") ? "shulkerBoxContents" : "storageContents", Tag.TAG_COMPOUND);
+		ListTag storageContents = nbt.getList(nbt.contains("shulkerBoxContents") ? "shulkerBoxContents" : "storageContents", Tag.TAG_COMPOUND);
 		for (Tag n : storageContents) {
 			CompoundTag uuidContentsPair = (CompoundTag) n;
 			UUID uuid = NbtUtils.loadUUID(Objects.requireNonNull(uuidContentsPair.get("uuid")));

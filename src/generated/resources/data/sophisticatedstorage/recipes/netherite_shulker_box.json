@@ -1,0 +1,21 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:netherite_shulker_box"
+    }
+  ],
+  "type": "sophisticatedstorage:storage_tier_upgrade_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "sophisticatedstorage:diamond_shulker_box"
+    },
+    {
+      "tag": "c:netherite_ingots"
+    }
+  ],
+  "result": {
+    "item": "sophisticatedstorage:netherite_shulker_box"
+  }
+}

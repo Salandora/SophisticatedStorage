@@ -32,15 +32,17 @@ public class QuarkCompat implements ICompat {
 			Block chest = BuiltInRegistries.BLOCK.get(new ResourceLocation(CompatModIds.QUARK, name));
 			if (chest != null) {
 				StorageTierUpgradeItem.TierUpgrade.BASIC.addTierUpgradeDefinition(chest,
-						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, chestBlockEntity -> chestBlockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.CHEST, woodType, ChestBlock.FACING));
+						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, chestBlockEntity -> chestBlockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.CHEST, woodType, ChestBlock.FACING, ChestBlock.WATERLOGGED, ChestBlock.TYPE));
+				StorageTierUpgradeItem.TierUpgrade.BASIC_TO_COPPER.addTierUpgradeDefinition(chest,
+						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.COPPER_CHEST, woodType, ChestBlock.FACING, ChestBlock.WATERLOGGED, ChestBlock.TYPE));
 				StorageTierUpgradeItem.TierUpgrade.BASIC_TO_IRON.addTierUpgradeDefinition(chest,
-						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.IRON_CHEST, woodType, ChestBlock.FACING));
+						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.IRON_CHEST, woodType, ChestBlock.FACING, ChestBlock.WATERLOGGED, ChestBlock.TYPE));
 				StorageTierUpgradeItem.TierUpgrade.BASIC_TO_GOLD.addTierUpgradeDefinition(chest,
-						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.GOLD_CHEST, woodType, ChestBlock.FACING));
+						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.GOLD_CHEST, woodType, ChestBlock.FACING, ChestBlock.WATERLOGGED, ChestBlock.TYPE));
 				StorageTierUpgradeItem.TierUpgrade.BASIC_TO_DIAMOND.addTierUpgradeDefinition(chest,
-						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.DIAMOND_CHEST, woodType, ChestBlock.FACING));
+						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.DIAMOND_CHEST, woodType, ChestBlock.FACING, ChestBlock.WATERLOGGED, ChestBlock.TYPE));
 				StorageTierUpgradeItem.TierUpgrade.BASIC_TO_NETHERITE.addTierUpgradeDefinition(chest,
-						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.NETHERITE_CHEST, woodType, ChestBlock.FACING));
+						new StorageTierUpgradeItem.VanillaTierUpgradeDefinition<>(ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.NETHERITE_CHEST, woodType, ChestBlock.FACING, ChestBlock.WATERLOGGED, ChestBlock.TYPE));
 			}
 		});
 	}

@@ -1,5 +1,16 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.rei;
 
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.Rect2i;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.SettingsGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.StorageGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
+import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -10,19 +21,6 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import me.shedaniel.rei.plugin.common.BuiltinPlugin;
-
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.Rect2i;
-import net.p3pp3rf1y.sophisticatedcore.compat.rei.SettingsGhostIngredientHandler;
-import net.p3pp3rf1y.sophisticatedcore.compat.rei.StorageGhostIngredientHandler;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ControllerRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +70,6 @@ public class REIClientCompat implements REIClientPlugin {
         registerRecipes(registry, DyeRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes(), BuiltinPlugin.CRAFTING);
-		registerRecipes(registry, ControllerRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, FlatBarrelRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
     }

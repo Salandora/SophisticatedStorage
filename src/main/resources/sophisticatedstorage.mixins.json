@@ -7,8 +7,6 @@
     "mixins": [
         "common.accessor.BarrelBlockEntityAccessor",
         "common.accessor.ChestBlockEntityAccessor",
-        "common.accessor.ShapedRecipeAccessor",
-        "common.accessor.ShapelessRecipeAccessor",
         "common.accessor.ShulkerBoxBlockEntityAccessor"
     ],
     "client": [

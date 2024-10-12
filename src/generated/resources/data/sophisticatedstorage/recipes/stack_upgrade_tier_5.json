@@ -1,0 +1,29 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_5"
+    }
+  ],
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "tag": "c:netherite_blocks"
+    },
+    "N": {
+      "tag": "c:netherite_ingots"
+    },
+    "S": {
+      "item": "sophisticatedstorage:stack_upgrade_tier_4"
+    }
+  },
+  "pattern": [
+    "NNN",
+    "NSN",
+    "BNB"
+  ],
+  "result": {
+    "id": "sophisticatedstorage:stack_upgrade_tier_5"
+  }
+}

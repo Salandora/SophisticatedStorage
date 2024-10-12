@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:storage_link"
+    }
+  ],
+  "type": "sophisticatedcore:shapless_recipe",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "sophisticatedstorage:controller"
+    },
+    {
+      "item": "minecraft:ender_pearl"
+    }
+  ],
+  "result": {
+    "count": 3,
+    "id": "sophisticatedstorage:storage_link"
+  }
+}

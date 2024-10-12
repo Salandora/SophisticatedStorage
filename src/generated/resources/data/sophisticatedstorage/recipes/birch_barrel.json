@@ -1,0 +1,30 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:barrel"
+    }
+  ],
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "P": {
+      "item": "minecraft:birch_planks"
+    },
+    "R": {
+      "item": "minecraft:redstone_torch"
+    },
+    "S": {
+      "item": "minecraft:birch_slab"
+    }
+  },
+  "pattern": [
+    "PSP",
+    "PRP",
+    "PSP"
+  ],
+  "result": {
+    "id": "sophisticatedstorage:barrel",
+    "nbt": "{woodType:\"birch\"}"
+  }
+}

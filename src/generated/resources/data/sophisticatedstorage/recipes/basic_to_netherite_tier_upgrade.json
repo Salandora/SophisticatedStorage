@@ -1,0 +1,21 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:basic_to_netherite_tier_upgrade"
+    }
+  ],
+  "type": "sophisticatedcore:shapless_recipe",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "sophisticatedstorage:basic_to_diamond_tier_upgrade"
+    },
+    {
+      "tag": "c:netherite_ingots"
+    }
+  ],
+  "result": {
+    "id": "sophisticatedstorage:basic_to_netherite_tier_upgrade"
+  }
+}

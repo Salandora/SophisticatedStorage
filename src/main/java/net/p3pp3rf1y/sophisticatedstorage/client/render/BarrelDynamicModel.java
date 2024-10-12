@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -12,10 +13,10 @@ import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuadTransformers;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicModel> {
 
@@ -34,8 +35,8 @@ public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicMode
 		}
 
 		@Override
-		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data) {
-			int hash = super.getInWorldBlockHash(state, data);
+		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data, @Nullable RenderType renderType) {
+			int hash = super.getInWorldBlockHash(state, data, renderType);
 			hash = hash * 31 + (Boolean.TRUE.equals(state.getValue(BarrelBlock.OPEN)) ? 1 : 0);
 			hash = hash * 31 + state.getValue(BarrelBlock.FACING).get3DDataValue();
 
@@ -67,7 +68,7 @@ public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicMode
 
 	@SuppressWarnings("java:S6548") //singleton is intended here
 	public static final class Loader extends BarrelDynamicModelBase.Loader<BarrelDynamicModel> {
-		public static final BarrelDynamicModel.Loader INSTANCE = new BarrelDynamicModel.Loader();
+		public static final Loader INSTANCE = new Loader();
 
 		@Override
 		protected BarrelDynamicModel instantiateModel(@Nullable ResourceLocation parentLocation, Map<String, Map<BarrelModelPart, BarrelModelPartDefinition>> woodOverrides, @Nullable ResourceLocation flatTopModelName, Map<DynamicBarrelBakingData.DynamicPart, ResourceLocation> dynamicPartModels, Map<String, Map<BarrelModelPart, BarrelModelPartDefinition>> woodPartitionedModelPartDefinitions) {

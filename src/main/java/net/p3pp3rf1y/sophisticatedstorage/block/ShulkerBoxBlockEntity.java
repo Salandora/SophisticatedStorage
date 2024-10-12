@@ -19,10 +19,11 @@ import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class ShulkerBoxBlockEntity extends StorageBlockEntity {
+	public static final String STORAGE_TYPE = "shulker_box";
 	private AnimationStatus animationStatus = AnimationStatus.CLOSED;
 	private float progress;
 	private float progressOld;
@@ -98,7 +99,7 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 		state.updateNeighbourShapes(level, pos, 3);
 	}
 
-	public ShulkerBoxBlockEntity.AnimationStatus getAnimationStatus() {
+	public AnimationStatus getAnimationStatus() {
 		return animationStatus;
 	}
 
@@ -124,6 +125,11 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	@Override
 	protected ContainerOpenersCounter getOpenersCounter() {
 		return openersCounter;
+	}
+
+	@Override
+	protected String getStorageType() {
+		return STORAGE_TYPE;
 	}
 
 	public float getProgress(float partialTicks) {

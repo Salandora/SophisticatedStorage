@@ -1,0 +1,26 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:copper_shulker_box"
+    }
+  ],
+  "type": "sophisticatedstorage:shulker_box_from_chest",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "sophisticatedstorage:copper_chest"
+    },
+    "S": {
+      "item": "minecraft:shulker_shell"
+    }
+  },
+  "pattern": [
+    "S",
+    "C",
+    "S"
+  ],
+  "result": {
+    "item": "sophisticatedstorage:copper_shulker_box"
+  }
+}

@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import org.joml.Vector3f;
-
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -15,11 +14,12 @@ import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuadTransformers;
+import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 import static net.p3pp3rf1y.sophisticatedstorage.client.render.DisplayItemRenderer.getNorthBasedRotation;
 
@@ -44,8 +44,8 @@ public class LimitedBarrelDynamicModel extends BarrelDynamicModelBase<LimitedBar
 		}
 
 		@Override
-		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data) {
-			int hash = super.getInWorldBlockHash(state, data);
+		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data, @Nullable RenderType renderType) {
+			int hash = super.getInWorldBlockHash(state, data, renderType);
 			hash = hash * 31 + state.getValue(LimitedBarrelBlock.HORIZONTAL_FACING).get2DDataValue();
 			hash = hash * 31 + state.getValue(LimitedBarrelBlock.VERTICAL_FACING).getIndex();
 			return hash;

@@ -9,46 +9,44 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.p3pp3rf1y.sophisticatedcore.compat.common.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageTierUpgradeRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageTierUpgradeShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 
 public class TierUpgradeRecipesMaker {
 	private TierUpgradeRecipesMaker() {}
 
-	public static List<CraftingRecipe> getShapedCraftingRecipes() {
-		RecipeConstructor<StorageTierUpgradeRecipe> constructRecipe = (originalRecipe, id, ingredients, result) -> new ShapedRecipe(id, "", CraftingBookCategory.MISC, originalRecipe.getWidth(), originalRecipe.getHeight(), ingredients, result);
-		return getCraftingRecipes(constructRecipe, StorageTierUpgradeRecipe.REGISTERED_RECIPES, StorageTierUpgradeRecipe.class);
+	public static List<RecipeHolder<CraftingRecipe>> getShapedCraftingRecipes() {
+		RecipeConstructor<StorageTierUpgradeRecipe> constructRecipe = (originalRecipe, ingredients, result) -> {
+			ShapedRecipePattern pattern = new ShapedRecipePattern(originalRecipe.getWidth(), originalRecipe.getHeight(), ingredients, Optional.empty());
+			return new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result);
+		};
+		return getCraftingRecipes(constructRecipe, StorageTierUpgradeRecipe.class);
 	}
 
-	public static List<CraftingRecipe> getShapelessCraftingRecipes() {
-		RecipeConstructor<StorageTierUpgradeShapelessRecipe> constructRecipe = (originalRecipe, id, ingredients, result) -> new ShapelessRecipe(id, "", CraftingBookCategory.MISC, result, ingredients);
-		return getCraftingRecipes(constructRecipe, StorageTierUpgradeShapelessRecipe.REGISTERED_RECIPES, StorageTierUpgradeShapelessRecipe.class);
+	public static List<RecipeHolder<CraftingRecipe>> getShapelessCraftingRecipes() {
+		RecipeConstructor<StorageTierUpgradeShapelessRecipe> constructRecipe = (originalRecipe, ingredients, result) -> new ShapelessRecipe("", CraftingBookCategory.MISC, result, ingredients);
+		return getCraftingRecipes(constructRecipe, StorageTierUpgradeShapelessRecipe.class);
 	}
 
 	@NotNull
-	private static <T extends CraftingRecipe> List<CraftingRecipe> getCraftingRecipes(RecipeConstructor<T> constructRecipe, Set<ResourceLocation> registeredRecipes, Class<T> originalRecipeClass) {
-		return ClientRecipeHelper.getAndTransformAvailableItemGroupRecipes(registeredRecipes, originalRecipeClass, recipe -> {
-			List<CraftingRecipe> itemGroupRecipes = new ArrayList<>();
+	private static <T extends CraftingRecipe> List<RecipeHolder<CraftingRecipe>> getCraftingRecipes(RecipeConstructor<T> constructRecipe, Class<T> originalRecipeClass) {
+		return ClientRecipeHelper.transformAllRecipesOfTypeIntoMultiple(RecipeType.CRAFTING, originalRecipeClass, recipe -> {
+			List<RecipeHolder<CraftingRecipe>> itemGroupRecipes = new ArrayList<>();
 			getStorageItems(recipe).forEach(storageItem -> {
 				NonNullList<Ingredient> ingredients = recipe.getIngredients();
 				CraftingContainer craftinginventory = new TransientCraftingContainer(new AbstractContainerMenu(null, -1) {
 					@Override
-					public ItemStack quickMoveStack(Player pPlayer, int pIndex) {
+					public ItemStack quickMoveStack(Player player, int index) {
 						return ItemStack.EMPTY;
 					}
 
@@ -56,7 +54,6 @@ public class TierUpgradeRecipesMaker {
 						return false;
 					}
 				}, 3, 3);
-
 				NonNullList<Ingredient> ingredientsCopy = NonNullList.createWithCapacity(ingredients.size());
 				int i = 0;
 				for (Ingredient ingredient : ingredients) {
@@ -66,15 +63,17 @@ public class TierUpgradeRecipesMaker {
 						craftinginventory.setItem(i, storageItem.copy());
 					} else {
 						ingredientsCopy.add(i, ingredient);
-						craftinginventory.setItem(i, ingredientItems[0]);
+						if (!ingredient.isEmpty()) {
+							craftinginventory.setItem(i, ingredientItems[0]);
+						}
 					}
 					i++;
 				}
-
 				ItemStack result = ClientRecipeHelper.assemble(recipe, craftinginventory);
-				//noinspection ConstantConditions
-				ResourceLocation id = new ResourceLocation(SophisticatedStorage.ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
-				itemGroupRecipes.add(constructRecipe.construct(recipe, id, ingredientsCopy, result));
+
+				// Changes made due to emi complaining about multi id recipes
+				ResourceLocation id = new ResourceLocation(SophisticatedStorage.MOD_ID, "tier_upgrade_" + BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath() + "_to_" + BuiltInRegistries.ITEM.getKey(result.getItem()).getPath() + result.getOrCreateTag().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}: ]", "_"));
+				itemGroupRecipes.add(new RecipeHolder<>(id, constructRecipe.construct(recipe, ingredientsCopy, result)));
 			});
 			return itemGroupRecipes;
 		});
@@ -97,6 +96,6 @@ public class TierUpgradeRecipesMaker {
 	}
 
 	private interface RecipeConstructor<T extends Recipe<?>> {
-		CraftingRecipe construct(T originalRecipe, ResourceLocation id, NonNullList<Ingredient> ingredients, ItemStack result);
+		CraftingRecipe construct(T originalRecipe, NonNullList<Ingredient> ingredients, ItemStack result);
 	}
 }

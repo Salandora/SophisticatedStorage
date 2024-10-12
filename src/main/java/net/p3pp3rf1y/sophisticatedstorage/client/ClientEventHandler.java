@@ -1,23 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import committee.nova.mkb.api.IKeyBinding;
-import committee.nova.mkb.api.IKeyConflictContext;
-
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -43,8 +27,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvent;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
+import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
@@ -54,35 +55,21 @@ import net.p3pp3rf1y.sophisticatedstorage.client.gui.ToolInfoOverlay;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModBlockColors;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModItemColors;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModParticles;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelBakedModelBase;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelDynamicModelBase;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.BarrelRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ChestDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ChestItemRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ChestRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ClientStorageContentsTooltip;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ControllerRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.LimitedBarrelDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.LimitedBarrelRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxDynamicModel;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxItemRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxRenderer;
-import net.p3pp3rf1y.sophisticatedstorage.client.render.SimpleCompositeModel;
+import net.p3pp3rf1y.sophisticatedstorage.client.render.*;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
+import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.LevelRendererAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
-import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolMessage;
-import net.p3pp3rf1y.sophisticatedstorage.network.StoragePacketHandler;
+import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPacket;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
-
-import static committee.nova.mkb.keybinding.KeyConflictContext.GUI;
 
 public class ClientEventHandler {
 	private ClientEventHandler() {}
@@ -92,23 +79,12 @@ public class ClientEventHandler {
 	public static final KeyMapping SORT_KEYBIND = new KeyMapping(StorageTranslationHelper.INSTANCE.translKeybind("sort"),
 			InputConstants.Type.MOUSE, MIDDLE_BUTTON, KEYBIND_SOPHISTICATEDSTORAGE_CATEGORY); // StorageGuiKeyConflictContext.INSTANCE
 
-	@SuppressWarnings("java:S6548") //singleton is intended here
-	private static class StorageGuiKeyConflictContext implements IKeyConflictContext {
-		public static final StorageGuiKeyConflictContext INSTANCE = new StorageGuiKeyConflictContext();
-
-		@Override
-		public boolean isActive() {
-			return GUI.isActive() && Minecraft.getInstance().screen instanceof StorageScreen;
-		}
-
-		@Override
-		public boolean conflicts(IKeyConflictContext other) {
-			return this == other;
-		}
-	}
-
-	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.ID, "chest");
+	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
+	private static final ResourceLocation CHEST_LEFT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_left");
+	private static final ResourceLocation CHEST_RIGHT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_right");
 	public static final ModelLayerLocation CHEST_LAYER = new ModelLayerLocation(CHEST_RL, "main");
+	public static final ModelLayerLocation CHEST_LEFT_LAYER = new ModelLayerLocation(CHEST_LEFT_RL, "main");
+	public static final ModelLayerLocation CHEST_RIGHT_LAYER = new ModelLayerLocation(CHEST_RIGHT_RL, "main");
 
 	public static void registerHandlers() {
 		RegisterGeometryLoadersCallback.EVENT.register(ClientEventHandler::onModelRegistry);
@@ -128,15 +104,43 @@ public class ClientEventHandler {
 		ModItemColors.registerItemColorHandlers();
 		ModBlockColors.registerBlockColorHandlers();
 
-		ClientLifecycleEvent.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
+		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
 
-		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-			ScreenKeyboardEvents.allowKeyPress(screen).register(ClientEventHandler::handleGuiKeyPress);
-			ScreenMouseEvents.allowMouseClick(screen).register(ClientEventHandler::handleGuiMouseKeyPress);
-		});
+		if (!FabricLoader.getInstance().isModLoaded(ModCompat.MKB)) {
+			ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+				ScreenKeyboardEvents.allowKeyPress(screen).register(ClientEventHandler::handleGuiKeyPress);
+				ScreenMouseEvents.allowMouseClick(screen).register(ClientEventHandler::handleGuiMouseKeyPress);
+			});
+		}
 
 		AttackBlockCallback.EVENT.register(ClientEventHandler::onLimitedBarrelClicked);
 		ClientRawInputEvent.MOUSE_SCROLLED.register(ClientEventHandler::onMouseScrolled);
+
+		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(ClientEventHandler::onRenderHighlight);
+	}
+
+	@SuppressWarnings("SameReturnValue")
+	private static boolean onRenderHighlight(WorldRenderContext context, @Nullable HitResult hitResult) {
+		Minecraft minecraft = Minecraft.getInstance();
+		LocalPlayer player = minecraft.player;
+		if (player == null) {
+			return true;
+		}
+
+		if (player.getMainHandItem().getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(player.getMainHandItem())) {
+			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+			BlockPos otherPos = blockHitResult.getBlockPos().relative(player.getDirection().getClockWise());
+			Level level = player.level();
+			BlockState blockState = level.getBlockState(otherPos);
+			if (!blockState.isAir() && level.getWorldBorder().isWithinBounds(otherPos)) {
+				VertexConsumer vertexConsumer = context.consumers().getBuffer(RenderType.lines());
+				Vec3 cameraPos = context.camera().getPosition();
+				LevelRendererAccessor.renderShape(context.matrixStack(), vertexConsumer, blockState.getShape(level, otherPos, CollisionContext.of(context.camera().getEntity())),
+						otherPos.getX() - cameraPos.x, otherPos.getY() - cameraPos.y, otherPos.getZ() - cameraPos.z, 0.0F, 0.0F, 0.0F, 0.4F);
+			}
+		}
+
+		return true;
 	}
 
 	private static void onRegisterAdditionalModels(ResourceManager manager, Consumer<ResourceLocation> out) {
@@ -146,17 +150,16 @@ public class ClientEventHandler {
 	private static void addBarrelPartModelsToBake(ResourceManager manager, Consumer<ResourceLocation> out) {
 		Map<ResourceLocation, Resource> models = manager.listResources("models/block/barrel_part", fileName -> fileName.getPath().endsWith(".json"));
 		models.forEach((modelName, resource) -> {
-			if (modelName.getNamespace().equals(SophisticatedStorage.ID)) {
+			if (modelName.getNamespace().equals(SophisticatedStorage.MOD_ID)) {
 				out.accept(new ResourceLocation(modelName.getNamespace(), modelName.getPath().substring("models/".length()).replace(".json", "")));
 			}
 		});
 	}
 
-	private static InteractionResult onMouseScrolled(Minecraft mc, double delta) {
+	private static InteractionResult onMouseScrolled(Minecraft mc, double deltaX, double deltaY) {
 		if (mc.screen != null) {
 			return InteractionResult.PASS;
 		}
-
 		LocalPlayer player = mc.player;
 		if (player == null || !player.isShiftKeyDown()) {
 			return InteractionResult.PASS;
@@ -165,7 +168,7 @@ public class ClientEventHandler {
 		if (stack.getItem() != ModItems.STORAGE_TOOL) {
 			return InteractionResult.PASS;
 		}
-		StoragePacketHandler.sendToServer(new ScrolledToolMessage(delta > 0));
+		PacketHelper.sendToServer(new ScrolledToolPacket(deltaY > 0));
 		return InteractionResult.SUCCESS;
 	}
 
@@ -187,24 +190,22 @@ public class ClientEventHandler {
 				}
 			}
 		}
-
 		return InteractionResult.PASS;
 	}
 
 	public static boolean handleGuiKeyPress(Screen screen, int key, int scancode, int modifiers) {
-		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(InputConstants.getKey(key, scancode)) || !tryCallSort(screen);
+		return !SORT_KEYBIND.matches(key, scancode) || !tryCallSort(screen);
 	}
 
 	public static boolean handleGuiMouseKeyPress(Screen screen, double mouseX, double mouseY, int button) {
-		InputConstants.Key input = InputConstants.Type.MOUSE.getOrCreate(button);
-		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(input) || !tryCallSort(screen);
+		return !SORT_KEYBIND.matchesMouse(button) || !tryCallSort(screen);
 	}
 
 	private static void registerStorageLayerLoader() {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(StorageTextureManager.INSTANCE);
 	}
 
-	private static boolean tryCallSort(Screen gui) {
+	public static boolean tryCallSort(Screen gui) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player != null && mc.player.containerMenu instanceof StorageContainerMenu container && gui instanceof StorageScreen screen) {
 			MouseHandler mh = mc.mouseHandler;
@@ -220,11 +221,11 @@ public class ClientEventHandler {
 	}
 
 	private static void onModelRegistry(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
-		loaders.put(SophisticatedStorage.getRL("barrel"), BarrelDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("limited_barrel"), LimitedBarrelDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("chest"), ChestDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("shulker_box"), ShulkerBoxDynamicModel.Loader.INSTANCE);
-		loaders.put(SophisticatedStorage.getRL("simple_composite"), SimpleCompositeModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "barrel"), BarrelDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "limited_barrel"), LimitedBarrelDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "chest"), ChestDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_box"), ShulkerBoxDynamicModel.Loader.INSTANCE);
+		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "simple_composite"), SimpleCompositeModel.Loader.INSTANCE);
 	}
 
 	private static void onRegisterReloadListeners() {
@@ -239,11 +240,11 @@ public class ClientEventHandler {
 
 	public static void registerLayer() {
 		EntityModelLayerRegistry.registerModelLayer(CHEST_LAYER, () -> ChestRenderer.createSingleBodyLayer(true));
+		EntityModelLayerRegistry.registerModelLayer(CHEST_LEFT_LAYER, ChestRenderer::createDoubleBodyLeftLayer);
+		EntityModelLayerRegistry.registerModelLayer(CHEST_RIGHT_LAYER, ChestRenderer::createDoubleBodyRightLayer);
 	}
 
 	private static void registerKeyMappings() {
-		((IKeyBinding)SORT_KEYBIND).setKeyConflictContext(StorageGuiKeyConflictContext.INSTANCE);
-
 		KeyBindingHelper.registerKeyBinding(SORT_KEYBIND);
 	}
 
@@ -274,12 +275,14 @@ public class ClientEventHandler {
 
 	private static void registerItemRenderers() {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.CHEST_ITEM, ChestItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_CHEST_ITEM, ChestItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_CHEST_ITEM, ChestItemRenderer::render);
 
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
+		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);

@@ -1,0 +1,32 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:jukebox_upgrade"
+    }
+  ],
+  "type": "sophisticatedcore:shaped_recipe",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "sophisticatedstorage:upgrade_base"
+    },
+    "I": {
+      "tag": "c:iron_ingots"
+    },
+    "J": {
+      "item": "minecraft:jukebox"
+    },
+    "R": {
+      "tag": "c:redstone_dusts"
+    }
+  },
+  "pattern": [
+    " J ",
+    "IBI",
+    " R "
+  ],
+  "result": {
+    "id": "sophisticatedstorage:jukebox_upgrade"
+  }
+}

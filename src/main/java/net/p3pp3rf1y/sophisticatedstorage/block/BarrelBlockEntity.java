@@ -18,14 +18,15 @@ import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	private static final String MATERIALS_TAG = "materials";
+	public static final String STORAGE_TYPE = "barrel";
 	private Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
 	private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
 		protected void onOpen(Level level, BlockPos pos, BlockState state) {
@@ -56,6 +57,11 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	@Override
 	protected ContainerOpenersCounter getOpenersCounter() {
 		return openersCounter;
+	}
+
+	@Override
+	protected String getStorageType() {
+		return STORAGE_TYPE;
 	}
 
 	protected BarrelBlockEntity(BlockPos pos, BlockState state, BlockEntityType<? extends BarrelBlockEntity> blockEntityType) {
