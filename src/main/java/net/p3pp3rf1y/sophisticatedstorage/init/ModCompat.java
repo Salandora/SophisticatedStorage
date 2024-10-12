@@ -1,12 +1,13 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.chipped.ChippedCompat;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.litematica.LitematicaCompat;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatRegistry;
+import net.p3pp3rf1y.sophisticatedstorage.compat.chipped.ChippedCompat;
+import net.p3pp3rf1y.sophisticatedstorage.compat.litematica.LitematicaCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.mkb.ModernKeyBindingCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.sodium.SodiumCompat;
+
 public class ModCompat {
 	private ModCompat() {
 	}
