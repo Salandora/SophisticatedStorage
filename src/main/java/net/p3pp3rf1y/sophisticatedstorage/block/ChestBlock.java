@@ -5,10 +5,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Cat;
@@ -20,6 +22,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -39,6 +42,7 @@ import net.p3pp3rf1y.sophisticatedcore.api.IDisplaySideStorage;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
@@ -129,7 +133,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			}
 		} else if (getConnectedDirection(state) == facing) {
 			level.getBlockEntity(currentPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(be -> {
-				if (!level.isClientSide() && !be.isBeingUpgraded()) {
+				if (!level.isClientSide() && !be.isBeingUpgraded() && !be.isPacked()) {
 					if (be.isMainChest() && state.getBlock() instanceof ChestBlock chestBlock) {
 						be.dropSecondPartContents(chestBlock, facingPos);
 					} else if (!be.isMainChest()) {
@@ -341,11 +345,18 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		if (state.getValue(TYPE) != ChestType.SINGLE) {
 			level.getBlockEntity(pos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(be -> {
 				be.setDestroyedByPlayer();
-				if (be.isPacked() && !be.isMainChest()) {
+				if ((be.isPacked() || Boolean.TRUE.equals(Config.COMMON.dropPacked.get())) && !be.isMainChest()) {
 					//copy storage wrapper to "not main" chest so that its data can be transferred to stack properly
 					BlockPos otherPartPos = pos.relative(getConnectedDirection(state));
 					level.getBlockEntity(otherPartPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE)
-							.ifPresent(mainBe -> be.getStorageWrapper().load(mainBe.getStorageWrapper().save(new CompoundTag())));
+							.ifPresent(mainBe -> {
+								be.getStorageWrapper().load(mainBe.getStorageWrapper().save(new CompoundTag()));
+
+								//remove main chest contents
+								CompoundTag contentsTag = new CompoundTag();
+								contentsTag.put(StorageWrapper.CONTENTS_TAG, new CompoundTag());
+								mainBe.getStorageWrapper().load(contentsTag);
+							});
 				}
 			});
 		}
@@ -439,14 +450,17 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 	}
 
 	@Override
-	public BlockPos getNeighborPos(BlockState state, BlockPos origin, Direction facing) {
+	public List<BlockPos> getNeighborPos(BlockState state, BlockPos origin, Direction facing) {
 		if (state.getValue(TYPE) == ChestType.SINGLE) {
-			return origin.relative(facing);
+			return List.of(origin.relative(facing));
 		} else {
-			if (getConnectedDirection(state) == facing) {
-				return origin.relative(facing).relative(facing);
+			Direction connectedDirection = getConnectedDirection(state);
+			if (connectedDirection == facing) {
+				return List.of(origin.relative(facing).relative(facing));
+			} else if (connectedDirection.getOpposite() == facing) {
+				return List.of(origin.relative(facing));
 			}
-			return origin.relative(facing);
+			return List.of(origin.relative(facing), origin.relative(connectedDirection).relative(facing));
 		}
 	}
 

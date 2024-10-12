@@ -13,6 +13,7 @@ import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackSto
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,6 +109,11 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	@Override
 	public boolean canBeLinked() {
 		return !packed;
+	}
+
+	@Override
+	protected boolean canRefreshUpgrades() {
+		return super.canRefreshUpgrades() && !packed;
 	}
 
 	@Override

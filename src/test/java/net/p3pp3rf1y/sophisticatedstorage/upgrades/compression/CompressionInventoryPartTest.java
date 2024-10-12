@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -7,8 +9,6 @@ import net.minecraft.server.Bootstrap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartitioner;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
@@ -86,6 +86,7 @@ public class CompressionInventoryPartTest {
 		when(inventoryHandler.getBaseSlotLimit()).thenReturn(baseSlotLimit);
 
 		Map<Integer, ItemStack> internalStacks = new HashMap<>();
+
 		doAnswer(i -> {
 			internalStacks.put(i.getArgument(0), i.getArgument(1));
 			return null;
@@ -100,7 +101,8 @@ public class CompressionInventoryPartTest {
 	}
 
 	private static MemorySettingsCategory getMemorySettings(InventoryHandler invHandler, Map<Integer, ItemStack> slotFilterStacks) {
-		MemorySettingsCategory memorySettingsCategory = Mockito.spy(new MemorySettingsCategory(() -> invHandler, new CompoundTag(), compoundTag -> {}));
+		MemorySettingsCategory memorySettingsCategory = Mockito.spy(new MemorySettingsCategory(() -> invHandler, new CompoundTag(), compoundTag -> {
+		}));
 		when(memorySettingsCategory.getSlotFilterStack(anyInt(), anyBoolean())).thenAnswer(i -> Optional.ofNullable(slotFilterStacks.get((int) i.getArgument(0))));
 		return memorySettingsCategory;
 	}
@@ -157,7 +159,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] compactsStacksOnInit() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.IRON_INGOT, 10), 2, ItemStack.EMPTY),
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 1)),
@@ -200,7 +202,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] calculatedStacksCorrectOnInit() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.IRON_INGOT, 10), 2, ItemStack.EMPTY),
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 10), 2, new ItemStack(Items.IRON_NUGGET, 90)),
@@ -260,7 +262,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] extractItemUpdatesStacks() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 1), 2, ItemStack.EMPTY),
 						64,
@@ -384,7 +386,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	public static Object[][] simulatedExtractItemDoesNotUpdateStacks() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 1), 2, ItemStack.EMPTY),
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 1), 1, new ItemStack(Items.IRON_INGOT, 10), 2, new ItemStack(Items.IRON_NUGGET, 90)),
@@ -601,14 +603,15 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(internalStacksBefore, invHandler, minSlot);
 
-		part.setStackInSlot(insertSlot, stack, (slot, itemStack) -> {});
+		part.setStackInSlot(insertSlot, stack, (slot, itemStack) -> {
+		});
 
 		assertCalculatedStacks(calculatedStacksAfter, minSlot, part);
 		assertInternalStacks(internalStacksAfter, invHandler);
 	}
 
 	public static Object[][] setStackInSlotUpdatesStacks() {
-		return new Object[][] {
+		return new Object[][]{
 				{
 						Map.of(0, ItemStack.EMPTY, 1, ItemStack.EMPTY, 2, ItemStack.EMPTY),
 						64,
@@ -756,9 +759,11 @@ public class CompressionInventoryPartTest {
 		assertInternalStacks(params.expectedStacksSet(), invHandler);
 	}
 
-	private record InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams(Map<Integer, ItemStack> stacks, int baseLimit,
+	private record InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams(Map<Integer, ItemStack> stacks,
+																					   int baseLimit,
 																					   Pair<Integer, ItemStack> insertedStack,
-																					   Map<Integer, ItemStack> expectedStacksSet) {}
+																					   Map<Integer, ItemStack> expectedStacksSet) {
+	}
 
 	private static List<InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams> insertingAdditionalUncompressibleItemsProperlyCalculatesCount() {
 		return List.of(
@@ -796,9 +801,11 @@ public class CompressionInventoryPartTest {
 		assertCalculatedStacks(params.expectedCalculatedStacks(), 0, part);
 	}
 
-	private record ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(Map<Integer, ItemStack> stacks, int baseLimit,
+	private record ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(Map<Integer, ItemStack> stacks,
+																				int baseLimit,
 																				Pair<Integer, Integer> extractedStack,
-																				Map<Integer, ItemStack> expectedCalculatedStacks) {}
+																				Map<Integer, ItemStack> expectedCalculatedStacks) {
+	}
 
 	private static List<ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams> extractingFromFullyFilledSlotsProperlyCalculatesCounts() {
 		return List.of(
@@ -846,7 +853,9 @@ public class CompressionInventoryPartTest {
 		assertCalculatedStacks(params.calculatedStacks(), 0, part);
 	}
 
-	private record InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams(Map<Integer, ItemStack> stacks, int baseLimit, Map<Integer, ItemStack> calculatedStacks) {}
+	private record InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams(
+			Map<Integer, ItemStack> stacks, int baseLimit, Map<Integer, ItemStack> calculatedStacks) {
+	}
 
 	private static List<InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams> initializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacks() {
 		return List.of(
