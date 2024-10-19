@@ -656,7 +656,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 	@Override
 	public ItemStack getStackInSlot(int slot, IntFunction<ItemStack> getStackInSlotSuper) {
-		return slotDefinitions.containsKey(slot) && slotDefinitions.get(slot).isAccessible() && calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot) : ItemStack.EMPTY;
+		return slotDefinitions.containsKey(slot) && slotDefinitions.get(slot).isAccessible() && calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).copy() : ItemStack.EMPTY;
 	}
 
 	@Override
