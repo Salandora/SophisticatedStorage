@@ -2,15 +2,15 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
 import com.mojang.datafixers.util.Function4;
 import com.mojang.datafixers.util.Pair;
+import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IInventoryPartHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartitioner;
@@ -37,7 +37,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	private final InventoryHandler parent;
 	private final InventoryPartitioner.SlotRange slotRange;
 	private final Supplier<MemorySettingsCategory> getMemorySettings;
-	@SuppressWarnings("FieldCanBeLocal") //need field instead of local variable because it's wrapped in WeakReference in RecipeHelper
+	@SuppressWarnings("FieldCanBeLocal")
+	//need field instead of local variable because it's wrapped in WeakReference in RecipeHelper
 	private final Runnable recipeChangeListener = () -> calculateStacks(false);
 
 	private Map<Integer, SlotDefinition> slotDefinitions = new HashMap<>();
@@ -244,7 +245,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 	}
 
-	public Optional<RecipeHelper.UncompactingResult> getDecompressionResultFromConfig(Item currentItem) {
+	Optional<RecipeHelper.UncompactingResult> getDecompressionResultFromConfig(Item currentItem) {
 		return Config.SERVER.compressionUpgrade.getDecompressionResult(currentItem);
 	}
 
@@ -291,14 +292,18 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		return slotDefinition.slotLimit();
 	}
 
-	// TODO: ItemVariant can be null
+	// TODO:
+	/*@Override
+	public ItemStack extractItem(int slot, long amount, boolean simulate) {
+		return extractItem(slot, amount, simulate, s -> s.isEmpty() ? 64 : s.getMaxStackSize());
+	}*/
+
 	@Override
 	public long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx) {
-		return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
+		return extractItem(slot, amount, ctx, s -> resource.isBlank() ? 64 : resource.toStack().getMaxStackSize());
 	}
 
-	// TODO: remove ItemVariant
-	private long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
+	private long extractItem(int slot, long amount, @Nullable TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
 		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
 			return 0;
 		}
@@ -308,7 +313,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			SlotDefinition slotDefinition = slotDefinitions.get(slot);
 			ItemStack slotStack = parent.getSlotStack(slot);
 			toExtract = Math.min(toExtract, getLimit.applyAsInt(slotStack));
-			//ItemStack result = slotDefinition.isCompressible() ? new ItemStack(slotDefinition.item(), toExtract) : ItemHandlerHelper.copyStackWithSize(slotStack, toExtract);
+			//ItemStack result = slotDefinition.isCompressible() ? new ItemStack(slotDefinition.item(), toExtract) : slotStack.copyWithCount(toExtract);
 
 			int finalToExtract = toExtract;
 			onSuccessOrRun(ctx, () -> {
@@ -458,10 +463,75 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 	}
 
+	// TODO:
+	/*@Override
+	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate, TriFunction<Integer, ItemStack, Boolean, ItemStack> insertSuper) {
+		return insertItem(slot, stack, simulate);
+	}*/
+
 	@Override
 	public long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx, Function4<Integer, ItemVariant, Long, TransactionContext, Long> insertSuper) {
 		return insertItem(slot, resource, maxAmount, ctx);
 	}
+
+	// TODO:
+	/*private ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+		if (canNotBeInserted(slot, stack)) {
+			return stack;
+		}
+
+		Map<Integer, SlotDefinition> definitions = slotDefinitions;
+
+		if (definitions.isEmpty()) {
+			definitions = getSlotDefinitions(stack.getItem(), slot, Map.of());
+		}
+
+		int limit = getStackLimit(definitions.get(slot));
+
+		int currentCalculatedCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
+		int inserted = Math.min(Math.max(parent.getBaseStackLimit(stack) - parent.getSlotStack(slot).getCount(), limit - currentCalculatedCount), stack.getCount());
+
+		if (inserted == 0) {
+			return stack;
+		}
+
+		ItemStack result = stack.copyWithCount(stack.getCount() - inserted);
+
+		if (simulate) {
+			return result;
+		}
+
+		if (!slotDefinitions.containsKey(slot)) {
+			setSlotDefinitions(definitions, false);
+			compactInternalSlots();
+			updateCalculatedStacks();
+		}
+
+		if (slotDefinitions.get(slot).isCompressible()) {
+			insertIntoInternalAndCalculated(slot, inserted);
+		} else if (inserted > 0) {
+			calculatedStacks.compute(slot, (s, st) -> {
+				if (st == null || st.isEmpty()) {
+					ItemStack copy = stack.copy();
+					copy.setCount(inserted);
+					return copy;
+				}
+				st.grow(inserted);
+				return st;
+			});
+			ItemStack slotStack = parent.getSlotStack(slot);
+			if (slotStack.isEmpty()) {
+				ItemStack copy = stack.copy();
+				copy.setCount(inserted);
+				parent.setSlotStack(slot, copy);
+			} else {
+				slotStack.grow(inserted);
+				parent.setSlotStack(slot, slotStack);
+			}
+		}
+
+		return result;
+	}*/
 
 	private long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx) {
 		if (canNotBeInserted(slot, resource)) {
@@ -621,13 +691,15 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack, BiConsumer<Integer, ItemStack> setStackInSlotSuper) {
-		// We want this to always run, but  we might come from a closing transaction, so we can not open a new one hence why we,
+		// We want this to always run, but  we might come from a closing transaction, so we can not open a new one hence why
 		// by passing null we later check if there is a transaction and either attach to it or run directly
 		int currentCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
 		if (currentCount < stack.getCount()) {
+			// TODO: insertItem(slot, stack.copyWithCount(stack.getCount() - currentCount), false);
 			insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, null);
 		} else if (currentCount > stack.getCount()) {
-			extractItem(slot, ItemVariant.of(stack), currentCount - stack.getCount(), null, s -> Integer.MAX_VALUE);
+			// TODO: extractItem(slot, currentCount - stack.getCount(), false, s -> Integer.MAX_VALUE);
+			extractItem(slot, currentCount - stack.getCount(), null, s -> Integer.MAX_VALUE);
 		}
 	}
 
@@ -745,13 +817,21 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			isCompressible = compressible;
 		}
 
-		public Item item() {return item;}
+		public Item item() {
+			return item;
+		}
 
-		public int prevSlotMultiplier() {return prevSlotMultiplier;}
+		public int prevSlotMultiplier() {
+			return prevSlotMultiplier;
+		}
 
-		public int slotLimit() {return slotLimit;}
+		public int slotLimit() {
+			return slotLimit;
+		}
 
-		public boolean isAccessible() {return isAccessible;}
+		public boolean isAccessible() {
+			return isAccessible;
+		}
 
 		public boolean isCompressible() {
 			return isCompressible;

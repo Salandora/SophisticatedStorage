@@ -1,9 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -26,16 +28,19 @@ public class ItemContentsStorage extends SavedData {
 	}
 
 	public static ItemContentsStorage get() {
-		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread()) {
-			ServerLevel overworld = SophisticatedCore.getCurrentServer().getLevel(Level.OVERWORLD);
-			//noinspection ConstantConditions - by this time overworld is loaded
-			DimensionDataStorage storage = overworld.getDataStorage();
-			return storage.computeIfAbsent(new Factory<>(ItemContentsStorage::new, ItemContentsStorage::load, null), SAVED_DATA_NAME);
+		if (SophisticatedCore.isLogicalServerThread()) {
+			MinecraftServer server = SophisticatedCore.getCurrentServer();
+			if (server != null) {
+				ServerLevel overworld = server.getLevel(Level.OVERWORLD);
+				//noinspection ConstantConditions - by this time overworld is loaded
+				DimensionDataStorage storage = overworld.getDataStorage();
+				return storage.computeIfAbsent(new Factory<>(ItemContentsStorage::new, ItemContentsStorage::load, null), SAVED_DATA_NAME);
+			}
 		}
 		return clientStorageCopy;
 	}
 
-	public static ItemContentsStorage load(CompoundTag nbt) {
+	public static ItemContentsStorage load(CompoundTag nbt, HolderLookup.Provider registries) {
 		ItemContentsStorage storage = new ItemContentsStorage();
 		readStorageContents(nbt, storage);
 		return storage;
@@ -52,7 +57,7 @@ public class ItemContentsStorage extends SavedData {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public CompoundTag save(CompoundTag compound, HolderLookup.Provider registries) {
 		CompoundTag ret = new CompoundTag();
 		writeStorageContents(ret);
 		return ret;

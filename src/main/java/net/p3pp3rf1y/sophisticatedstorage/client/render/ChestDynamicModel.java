@@ -2,10 +2,12 @@ package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -13,23 +15,22 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
@@ -42,7 +43,7 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 	}
 
 	@Override
-	public BakedModel bake(BlockModel context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+	public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
 		return new ChestBakedModel();
 	}
 
@@ -85,18 +86,29 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 			return model.getParticleIcon();
 		}
 
+		/*@Nonnull
 		@Override
-		public TextureAtlasSprite getParticleIcon(BlockState state, BlockAndTintGetter blockView, BlockPos pos) {
-			Object attachment = blockView.getBlockEntityRenderData(pos);
-			if (attachment instanceof WoodStorageBlockEntity.ModelData data) {
-				ResourceLocation texture = TINTABLE_BREAK_TEXTURE;
-				if (Boolean.FALSE.equals(data.hasMainColor()) && data.woodName() != null && WOOD_BREAK_TEXTURES.containsKey(data.woodName())) {
-					texture = WOOD_BREAK_TEXTURES.get(data.woodName());
-				}
-				return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
+		public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
+			return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class)
+					.map(be -> {
+						ModelData.Builder builder = ModelData.builder();
+						builder.with(HAS_MAIN_COLOR, be.getStorageWrapper().getMainColor() > -1);
+						be.getWoodType().ifPresent(n -> builder.with(WOOD_NAME, n.name()));
+						return builder.build();
+					}).orElse(ModelData.EMPTY);
+		}*/
+
+		@Override
+		public TextureAtlasSprite getParticleIcon(Object attachment) {
+			if (!(attachment instanceof WoodStorageBlockEntity.ModelData data)) {
+				return getParticleIcon();
 			}
 
-			return getParticleIcon();
+			ResourceLocation texture = TINTABLE_BREAK_TEXTURE;
+			if (Boolean.FALSE.equals(data.hasMainColor()) && data.woodName() != null && WOOD_BREAK_TEXTURES.containsKey(data.woodName())) {
+				texture = WOOD_BREAK_TEXTURES.get(data.woodName());
+			}
+			return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
 		}
 
 		@Override

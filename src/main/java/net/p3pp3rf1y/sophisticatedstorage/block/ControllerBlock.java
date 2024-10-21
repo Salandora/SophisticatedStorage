@@ -5,11 +5,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -34,7 +35,7 @@ public class ControllerBlock extends BlockBase implements ISneakItemInteractionB
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltipComponents, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag flag) {
 		tooltipComponents.addAll(StorageTranslationHelper.INSTANCE.getTranslatedLines(stack.getItem().getDescriptionId() + TranslationHelper.TOOLTIP_SUFFIX, null, ChatFormatting.DARK_GRAY));
 	}
 
@@ -44,7 +45,6 @@ public class ControllerBlock extends BlockBase implements ISneakItemInteractionB
 		return new ControllerBlockEntity(pos, state);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
 		WorldHelper.getBlockEntity(level, pos, ControllerBlockEntityBase.class).ifPresent(ControllerBlockEntityBase::detachFromStoragesAndUnlinkBlocks);
@@ -60,22 +60,20 @@ public class ControllerBlock extends BlockBase implements ISneakItemInteractionB
 		WorldHelper.getBlockEntity(level, pos, ControllerBlockEntity.class).ifPresent(ControllerBlockEntityBase::searchAndAddBoundables);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		if (level.isClientSide()) {
-			return InteractionResult.SUCCESS;
+			return ItemInteractionResult.SUCCESS;
 		}
 
 		WorldHelper.getBlockEntity(level, pos, ControllerBlockEntity.class).ifPresent(controller -> {
 			AtomicBoolean appliedUpgrade = new AtomicBoolean(false);
 			controller.getStoragePositions().forEach(storagePos -> WorldHelper.getBlockEntity(level, storagePos, StorageBlockEntity.class).ifPresent(be -> {
 				if (be.getBlockState().getBlock() instanceof StorageBlockBase storageblock) {
-					ItemStack itemInHand = player.getItemInHand(hand);
-					if (storageblock.tryAddSingleUpgrade(player, hand, be, itemInHand)) {
+					if (storageblock.tryAddSingleUpgrade(player, hand, be, stack)) {
 						appliedUpgrade.set(true);
-					} else if (itemInHand.getItem() instanceof StorageTierUpgradeItem storageTierUpgradeItem
-							&& storageTierUpgradeItem.tryUpgradeStorage(itemInHand, level, storagePos, be.getBlockState(), player) == InteractionResult.SUCCESS) {
+					} else if (stack.getItem() instanceof StorageTierUpgradeItem storageTierUpgradeItem
+							&& storageTierUpgradeItem.tryUpgradeStorage(stack, level, storagePos, be.getBlockState(), player) == InteractionResult.SUCCESS) {
 						appliedUpgrade.set(true);
 					}
 				}
@@ -86,7 +84,7 @@ public class ControllerBlock extends BlockBase implements ISneakItemInteractionB
 			}
 		});
 
-		return InteractionResult.SUCCESS;
+		return ItemInteractionResult.SUCCESS;
 	}
 
 	@Override

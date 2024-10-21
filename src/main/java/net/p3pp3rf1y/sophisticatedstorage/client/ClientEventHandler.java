@@ -2,13 +2,29 @@ package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
@@ -23,31 +39,20 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.rendering.v1.*;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
@@ -62,61 +67,61 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.LevelRendererAccessor;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
-import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPacket;
+import net.p3pp3rf1y.sophisticatedstorage.network.RequestPlayerSettingsPayload;
+import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPayload;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class ClientEventHandler {
-	private ClientEventHandler() {}
+	private ClientEventHandler() {
+	}
 
 	private static final String KEYBIND_SOPHISTICATEDSTORAGE_CATEGORY = "keybind.sophisticatedstorage.category";
 	private static final int MIDDLE_BUTTON = 2;
 	public static final KeyMapping SORT_KEYBIND = new KeyMapping(StorageTranslationHelper.INSTANCE.translKeybind("sort"),
 			InputConstants.Type.MOUSE, MIDDLE_BUTTON, KEYBIND_SOPHISTICATEDSTORAGE_CATEGORY); // StorageGuiKeyConflictContext.INSTANCE
 
-	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
-	private static final ResourceLocation CHEST_LEFT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_left");
-	private static final ResourceLocation CHEST_RIGHT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_right");
+	private static final ResourceLocation CHEST_RL = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "chest");
+	private static final ResourceLocation CHEST_LEFT_RL = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "chest_left");
+	private static final ResourceLocation CHEST_RIGHT_RL = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "chest_right");
 	public static final ModelLayerLocation CHEST_LAYER = new ModelLayerLocation(CHEST_RL, "main");
 	public static final ModelLayerLocation CHEST_LEFT_LAYER = new ModelLayerLocation(CHEST_LEFT_RL, "main");
 	public static final ModelLayerLocation CHEST_RIGHT_LAYER = new ModelLayerLocation(CHEST_RIGHT_RL, "main");
 
 	public static void registerHandlers() {
 		RegisterGeometryLoadersCallback.EVENT.register(ClientEventHandler::onModelRegistry);
-
 		ClientEventHandler.registerLayer();
 		ClientEventHandler.registerTooltipComponent();
 		ClientEventHandler.registerOverlay();
 		ClientEventHandler.registerEntityRenderers();
-		ClientEventHandler.registerItemRenderers();
-		ClientEventHandler.registerKeyMappings();
-		ClientEventHandler.registerStorageLayerLoader();
-		ClientEventHandler.onRegisterReloadListeners();
-
-		PreparableModelLoadingPlugin.register(((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager)), (resourceManager, context) -> onRegisterAdditionalModels(resourceManager, context::addModels));
-
 		ModParticles.registerProviders();
+		ClientEventHandler.registerKeyMappings();
 		ModItemColors.registerItemColorHandlers();
 		ModBlockColors.registerBlockColorHandlers();
-
+		ClientEventHandler.registerStorageLayerLoader();
+		PreparableModelLoadingPlugin.register(((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager)), (resourceManager, context) -> onRegisterAdditionalModels(resourceManager, context::addModels));
+		ClientEventHandler.onRegisterReloadListeners();
+		ClientEventHandler.registerStorageClientExtensions();
+		
 		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
-
 		if (!FabricLoader.getInstance().isModLoaded(ModCompat.MKB)) {
 			ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 				ScreenKeyboardEvents.allowKeyPress(screen).register(ClientEventHandler::handleGuiKeyPress);
 				ScreenMouseEvents.allowMouseClick(screen).register(ClientEventHandler::handleGuiMouseKeyPress);
 			});
 		}
-
 		AttackBlockCallback.EVENT.register(ClientEventHandler::onLimitedBarrelClicked);
 		ClientRawInputEvent.MOUSE_SCROLLED.register(ClientEventHandler::onMouseScrolled);
-
 		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(ClientEventHandler::onRenderHighlight);
+		ClientPlayConnectionEvents.JOIN.register(ClientEventHandler::onPlayerLoggingIn);
+	}
+
+	private static void onPlayerLoggingIn(ClientPacketListener clientPacketListener, PacketSender packetSender, Minecraft minecraft) {
+		PacketDistributor.sendToServer(new RequestPlayerSettingsPayload());
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -135,7 +140,7 @@ public class ClientEventHandler {
 			if (!blockState.isAir() && level.getWorldBorder().isWithinBounds(otherPos)) {
 				VertexConsumer vertexConsumer = context.consumers().getBuffer(RenderType.lines());
 				Vec3 cameraPos = context.camera().getPosition();
-				LevelRendererAccessor.renderShape(context.matrixStack(), vertexConsumer, blockState.getShape(level, otherPos, CollisionContext.of(context.camera().getEntity())),
+				LevelRenderer.renderShape(context.matrixStack(), vertexConsumer, blockState.getShape(level, otherPos, CollisionContext.of(context.camera().getEntity())),
 						otherPos.getX() - cameraPos.x, otherPos.getY() - cameraPos.y, otherPos.getZ() - cameraPos.z, 0.0F, 0.0F, 0.0F, 0.4F);
 			}
 		}
@@ -151,7 +156,7 @@ public class ClientEventHandler {
 		Map<ResourceLocation, Resource> models = manager.listResources("models/block/barrel_part", fileName -> fileName.getPath().endsWith(".json"));
 		models.forEach((modelName, resource) -> {
 			if (modelName.getNamespace().equals(SophisticatedStorage.MOD_ID)) {
-				out.accept(new ResourceLocation(modelName.getNamespace(), modelName.getPath().substring("models/".length()).replace(".json", "")));
+				out.accept(ResourceLocation.fromNamespaceAndPath(modelName.getNamespace(), modelName.getPath().substring("models/".length()).replace(".json", "")));
 			}
 		});
 	}
@@ -168,7 +173,7 @@ public class ClientEventHandler {
 		if (stack.getItem() != ModItems.STORAGE_TOOL) {
 			return InteractionResult.PASS;
 		}
-		PacketHelper.sendToServer(new ScrolledToolPacket(deltaY > 0));
+		PacketDistributor.sendToServer(new ScrolledToolPayload(deltaY > 0));
 		return InteractionResult.SUCCESS;
 	}
 
@@ -182,11 +187,10 @@ public class ClientEventHandler {
 				return InteractionResult.SUCCESS;
 			} else {
 				if (player.getDestroySpeed(state) < 2) {
-					((MultiPlayerGameModeAccessor) Minecraft.getInstance().gameMode).setDestroyDelay(5);
 					// Necessary cause fabrics version does stop the attack from happening
 					// and there is no full equivalent to forges event
 					state.getBlock().attack(state, level, pos, player);
-					return InteractionResult.SUCCESS;
+					Minecraft.getInstance().gameMode.destroyDelay = 5;
 				}
 			}
 		}
@@ -197,12 +201,12 @@ public class ClientEventHandler {
 		return !SORT_KEYBIND.matches(key, scancode) || !tryCallSort(screen);
 	}
 
-	public static boolean handleGuiMouseKeyPress(Screen screen, double mouseX, double mouseY, int button) {
-		return !SORT_KEYBIND.matchesMouse(button) || !tryCallSort(screen);
-	}
-
 	private static void registerStorageLayerLoader() {
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(StorageTextureManager.INSTANCE);
+	}
+
+	public static boolean handleGuiMouseKeyPress(Screen screen, double mouseX, double mouseY, int button) {
+		return !SORT_KEYBIND.matchesMouse(button) || !tryCallSort(screen);
 	}
 
 	public static boolean tryCallSort(Screen gui) {
@@ -221,11 +225,11 @@ public class ClientEventHandler {
 	}
 
 	private static void onModelRegistry(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
-		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "barrel"), BarrelDynamicModel.Loader.INSTANCE);
-		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "limited_barrel"), LimitedBarrelDynamicModel.Loader.INSTANCE);
-		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "chest"), ChestDynamicModel.Loader.INSTANCE);
-		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "shulker_box"), ShulkerBoxDynamicModel.Loader.INSTANCE);
-		loaders.put(new ResourceLocation(SophisticatedStorage.MOD_ID, "simple_composite"), SimpleCompositeModel.Loader.INSTANCE);
+		loaders.put(ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "barrel"), BarrelDynamicModel.Loader.INSTANCE);
+		loaders.put(ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "limited_barrel"), LimitedBarrelDynamicModel.Loader.INSTANCE);
+		loaders.put(ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "chest"), ChestDynamicModel.Loader.INSTANCE);
+		loaders.put(ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "shulker_box"), ShulkerBoxDynamicModel.Loader.INSTANCE);
+		loaders.put(ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "simple_composite"), SimpleCompositeModel.Loader.INSTANCE);
 	}
 
 	private static void onRegisterReloadListeners() {
@@ -264,28 +268,35 @@ public class ClientEventHandler {
 	}
 
 	private static void registerEntityRenderers() {
-		BlockEntityRenderers.register(ModBlocks.BARREL_BLOCK_ENTITY_TYPE, context -> new BarrelRenderer<>());
-		BlockEntityRenderers.register(ModBlocks.LIMITED_BARREL_BLOCK_ENTITY_TYPE, context -> new LimitedBarrelRenderer());
-		BlockEntityRenderers.register(ModBlocks.CHEST_BLOCK_ENTITY_TYPE, ChestRenderer::new);
-		BlockEntityRenderers.register(ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE, ShulkerBoxRenderer::new);
-		BlockEntityRenderers.register(ModBlocks.CONTROLLER_BLOCK_ENTITY_TYPE, context -> new ControllerRenderer());
+		BlockEntityRenderers.register(ModBlocks.BARREL_BLOCK_ENTITY_TYPE.get(), context -> new BarrelRenderer<>());
+		BlockEntityRenderers.register(ModBlocks.LIMITED_BARREL_BLOCK_ENTITY_TYPE.get(), context -> new LimitedBarrelRenderer());
+		BlockEntityRenderers.register(ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get(), ChestRenderer::new);
+		BlockEntityRenderers.register(ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE.get(), ShulkerBoxRenderer::new);
+		BlockEntityRenderers.register(ModBlocks.CONTROLLER_BLOCK_ENTITY_TYPE.get(), context -> new ControllerRenderer());
 
-		BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), ModBlocks.getBlocksByPredicate((id, block) -> id.getPath().contains("barrel")).toArray(new Block[0]));
+		BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), ModBlocks.ALL_BARRELS.stream().map(Supplier::get).toArray(BarrelBlock[]::new));
 	}
 
-	private static void registerItemRenderers() {
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.CHEST_ITEM, ChestItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_CHEST_ITEM, ChestItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_CHEST_ITEM, ChestItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_CHEST_ITEM, ChestItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_CHEST_ITEM, ChestItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_CHEST_ITEM, ChestItemRenderer::render);
+	private static void registerStorageClientExtensions() {
+		/*registerBarrelClientExtensions(event,
+				ModBlocks.BARREL.get(), ModBlocks.COPPER_BARREL.get(), ModBlocks.IRON_BARREL.get(), ModBlocks.GOLD_BARREL.get(), ModBlocks.DIAMOND_BARREL.get(), ModBlocks.NETHERITE_BARREL.get(),
+				ModBlocks.LIMITED_BARREL_1.get(), ModBlocks.LIMITED_COPPER_BARREL_1.get(), ModBlocks.LIMITED_IRON_BARREL_1.get(), ModBlocks.LIMITED_GOLD_BARREL_1.get(), ModBlocks.LIMITED_DIAMOND_BARREL_1.get(), ModBlocks.LIMITED_NETHERITE_BARREL_1.get(),
+				ModBlocks.LIMITED_BARREL_2.get(), ModBlocks.LIMITED_COPPER_BARREL_2.get(), ModBlocks.LIMITED_IRON_BARREL_2.get(), ModBlocks.LIMITED_GOLD_BARREL_2.get(), ModBlocks.LIMITED_DIAMOND_BARREL_2.get(), ModBlocks.LIMITED_NETHERITE_BARREL_2.get(),
+				ModBlocks.LIMITED_BARREL_3.get(), ModBlocks.LIMITED_COPPER_BARREL_3.get(), ModBlocks.LIMITED_IRON_BARREL_3.get(), ModBlocks.LIMITED_GOLD_BARREL_3.get(), ModBlocks.LIMITED_DIAMOND_BARREL_3.get(), ModBlocks.LIMITED_NETHERITE_BARREL_3.get(),
+				ModBlocks.LIMITED_BARREL_4.get(), ModBlocks.LIMITED_COPPER_BARREL_4.get(), ModBlocks.LIMITED_IRON_BARREL_4.get(), ModBlocks.LIMITED_GOLD_BARREL_4.get(), ModBlocks.LIMITED_DIAMOND_BARREL_4.get(), ModBlocks.LIMITED_NETHERITE_BARREL_4.get()
+		);*/
+		for (Supplier<BlockItem> item : ModBlocks.CHEST_ITEMS) {
+			BuiltinItemRendererRegistry.INSTANCE.register(item.get(), ChestItemRenderer::render);
+		}
 
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.COPPER_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
-		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
+		for (Supplier<BlockItem> item : ModBlocks.SHULKER_BOX_ITEMS) {
+			BuiltinItemRendererRegistry.INSTANCE.register(item.get(), ShulkerBoxItemRenderer::render);
+		}
 	}
+
+	/*private static void registerBarrelClientExtensions(RegisterClientExtensionsEvent event, BarrelBlock... barrelBlocks) {
+		for (int i = 0; i < barrelBlocks.length; i++) {
+			event.registerBlock(new BarrelBlockClientExtensions(barrelBlocks[i]), barrelBlocks[i]);
+		}
+	}*/
 }

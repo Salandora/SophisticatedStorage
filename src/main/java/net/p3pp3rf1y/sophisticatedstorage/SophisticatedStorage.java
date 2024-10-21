@@ -1,10 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage;
 
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.fabricmc.api.ModInitializer;
+import net.p3pp3rf1y.sophisticatedcore.compat.CompatRegistry;
 import net.p3pp3rf1y.sophisticatedstorage.common.CommonEventHandler;
 import net.p3pp3rf1y.sophisticatedstorage.init.*;
-import fuzs.forgeconfigapiport.api.config.v3.ForgeConfigRegistry;
 import net.neoforged.fml.config.ModConfig;
 
 import org.slf4j.Logger;
@@ -21,19 +22,29 @@ public class SophisticatedStorage implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.SERVER, Config.SERVER_SPEC);
-		ForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
-		ForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.COMMON, Config.COMMON_SPEC);
+		NeoForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.SERVER, Config.SERVER_SPEC);
+		NeoForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
+		NeoForgeConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.COMMON, Config.COMMON_SPEC);
 		Config.SERVER.initListeners();
 		commonEventHandler.registerHandlers();
-		ModBlocks.register();
-		ModItems.register();
-		ModPackets.registerPackets();
+		ModCompat.register();
+		CompatRegistry.getRegistry(MOD_ID).initCompats();
+		ModBlocks.registerHandlers();
+		ModItems.registerHandlers();
+		ModPayloads.registerPackets();
+		SophisticatedStorage.setup();
 		ModParticles.registerParticles();
+
+		CompatRegistry.getRegistry(MOD_ID).setupCompats();
+	}
+
+	private static void setup() {
+		ModBlocks.registerDispenseBehavior();
+		ModBlocks.registerCauldronInteractions();
 	}
 
 	public static ResourceLocation getRL(String regName) {
-		return new ResourceLocation(getRegistryName(regName));
+		return ResourceLocation.parse(getRegistryName(regName));
 	}
 
 	public static String getRegistryName(String regName) {

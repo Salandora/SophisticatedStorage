@@ -1,3 +1,4 @@
+/*
 package net.p3pp3rf1y.sophisticatedstorage.compat.mkb;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -37,3 +38,4 @@ public class ModernKeyBindingCompat implements ICompat {
 		return !((IKeyBinding) SORT_KEYBIND).isActiveAndMatches(key) || !tryCallSort(screen);
 	}
 }
+*/

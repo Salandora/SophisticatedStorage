@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
@@ -16,7 +16,7 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	private Storage<ItemVariant> itemHandler;
 
 	public StorageOutputBlockEntity(BlockPos pos, BlockState state) {
-		super(ModBlocks.STORAGE_OUTPUT_BLOCK_ENTITY_TYPE, pos, state);
+		super(ModBlocks.STORAGE_OUTPUT_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Nullable
@@ -26,8 +26,8 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 			return null;
 		}
 		if (itemHandler == null) {
-			itemHandler = super.getExternalItemHandler(side);
-			if (itemHandler instanceof SlottedStackStorage simpleInserter) {
+			itemHandler = super.getExternalItemHandler(null);
+			if (itemHandler instanceof IItemHandlerSimpleInserter simpleInserter) {
 				//itemHandler = new OutputOnlyItemHandlerWrapper(simpleInserter);
 				itemHandler = FilteringStorage.extractOnlyOf(simpleInserter);
 			}

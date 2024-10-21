@@ -14,9 +14,6 @@
     },
     "environment": "*",
     "entrypoints": {
-        "preLaunch": [
-            "net.p3pp3rf1y.sophisticatedstorage.SophisticatedStoragePreLaunch"
-        ],
         "main": [
             "net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage"
         ],
@@ -45,6 +42,7 @@
     "mixins": [
         "sophisticatedstorage.mixins.json"
     ],
+    "accessWidener": "sophisticatedstorage.accesswidener",
     "depends": {
         "fabricloader": ">=${loader_version}",
         "fabric-api": ">=${fabric_version}",

@@ -11,8 +11,6 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Dimension;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TextureBlitData;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.UV;
-import net.p3pp3rf1y.sophisticatedcore.mixin.client.accessor.AbstractContainerScreenAccessor;
-import net.p3pp3rf1y.sophisticatedcore.mixin.common.accessor.SlotAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 
@@ -32,13 +30,13 @@ public class LimitedBarrelScreen extends StorageScreen {
 	}
 
 	@Override
-	protected void drawSlotBg(GuiGraphics guiGraphics, int x, int y) {
+	protected void drawSlotBg(GuiGraphics guiGraphics, int x, int y, int visibleSlotsCount) {
 		LimitedBarrelScreen.drawSlotBg(this, guiGraphics, x, y, getMenu().getNumberOfStorageInventorySlots());
 	}
 
 	public static void drawSlotBg(AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int x, int y, int slotsNumber) {
 		TextureBlitData backgroundTexture = getBackgroundTexture(slotsNumber);
-		GuiHelper.blit(guiGraphics, x + ((AbstractContainerScreenAccessor) screen).getXSize() / 2 - backgroundTexture.getWidth() / 2 - 1, y + 17, backgroundTexture);
+		GuiHelper.blit(guiGraphics, x + screen.getXSize() / 2 - backgroundTexture.getWidth() / 2 - 1, y + 17, backgroundTexture);
 	}
 
 	@Override
@@ -88,44 +86,44 @@ public class LimitedBarrelScreen extends StorageScreen {
 		int halfWidth = imageWidth / 2;
 		if (slotNumber == 1) {
 			Slot slot = menu.getSlot(0);
-			((SlotAccessor) slot).setX(halfWidth - 9);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS - 9);
+			slot.x = halfWidth - 9;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS - 9;
 		} else if (slotNumber == 2) {
 			Slot slot = menu.getSlot(0);
-			((SlotAccessor) slot).setX(halfWidth - 9);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS - 29);
+			slot.x = halfWidth - 9;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS - 29;
 
 			slot = menu.getSlot(1);
-			((SlotAccessor) slot).setX(halfWidth - 9);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS + 11);
+			slot.x = halfWidth - 9;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS + 11;
 		} else if (slotNumber == 3) {
 			Slot slot = menu.getSlot(0);
-			((SlotAccessor) slot).setX(halfWidth - 9);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS - 29);
+			slot.x = halfWidth - 9;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS - 29;
 
 			slot = menu.getSlot(1);
-			((SlotAccessor) slot).setX(halfWidth - 29);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS + 11);
+			slot.x = halfWidth - 29;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS + 11;
 
 			slot = menu.getSlot(2);
-			((SlotAccessor) slot).setX(halfWidth + 11);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS + 11);
+			slot.x = halfWidth + 11;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS + 11;
 		} else if (slotNumber == 4) {
 			Slot slot = menu.getSlot(0);
-			((SlotAccessor) slot).setX(halfWidth - 29);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS - 29);
+			slot.x = halfWidth - 29;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS - 29;
 
 			slot = menu.getSlot(1);
-			((SlotAccessor) slot).setX(halfWidth + 11);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS - 29);
+			slot.x = halfWidth + 11;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS - 29;
 
 			slot = menu.getSlot(2);
-			((SlotAccessor) slot).setX(halfWidth - 29);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS + 11);
+			slot.x = halfWidth - 29;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS + 11;
 
 			slot = menu.getSlot(3);
-			((SlotAccessor) slot).setX(halfWidth + 11);
-			((SlotAccessor) slot).setY(MIDDLE_OF_STORAGE_SLOTS + 11);
+			slot.x = halfWidth + 11;
+			slot.y = MIDDLE_OF_STORAGE_SLOTS + 11;
 		}
 	}
 

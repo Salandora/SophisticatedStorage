@@ -17,10 +17,9 @@ import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandle
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.FlatBarrelRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.ShulkerBoxFromChestRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.TierUpgradeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
@@ -40,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class EmiCompat implements EmiPlugin {
 	public static Event<WorkstationCallback> WORKSTATIONS = EventFactory.createArrayBacked(WorkstationCallback.class, (listeners) -> (consumer) -> {
@@ -97,11 +97,11 @@ public class EmiCompat implements EmiPlugin {
 			return tag;
 		});
 
-		for (BlockItem item : ModBlocks.ALL_BARREL_ITEMS) {
-			registry.setDefaultComparison(item, barrelNbtInterpreter);
+		for (Supplier<BlockItem> item : ModBlocks.ALL_BARREL_ITEMS) {
+			registry.setDefaultComparison(item.get(), barrelNbtInterpreter);
 		}
-		for (BlockItem item : ModBlocks.CHEST_ITEMS) {
-			registry.setDefaultComparison(item, woodStorageNbtInterpreter);
+		for (Supplier<BlockItem> item : ModBlocks.CHEST_ITEMS) {
+			registry.setDefaultComparison(item.get(), woodStorageNbtInterpreter);
 		}
 
 		Comparison shulkerBoxNbtInterpreter = Comparison.compareData(emiStack -> {
@@ -111,14 +111,14 @@ public class EmiCompat implements EmiPlugin {
 			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
 			return tag;
 		});
-		for (BlockItem item : ModBlocks.SHULKER_BOX_ITEMS) {
+		for (Supplier<BlockItem> item : ModBlocks.SHULKER_BOX_ITEMS) {
 			registry.setDefaultComparison(item, shulkerBoxNbtInterpreter);
 		}
 
-		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, new EmiGridMenuInfo<>());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE.get(), new EmiGridMenuInfo<>());
 
-		registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(ModItems.CRAFTING_UPGRADE));
-		registry.addWorkstation(VanillaEmiRecipeCategories.STONECUTTING, EmiStack.of(ModItems.STONECUTTER_UPGRADE));
+		registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(ModItems.CRAFTING_UPGRADE.get()));
+		registry.addWorkstation(VanillaEmiRecipeCategories.STONECUTTING, EmiStack.of(ModItems.STONECUTTER_UPGRADE.get()));
 
 		List<WorkstationEntry> entries = new ArrayList<>();
 		WORKSTATIONS.invoker().additionalWorkstations(entries::add);

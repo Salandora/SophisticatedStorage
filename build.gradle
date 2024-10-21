@@ -12,8 +12,7 @@ buildscript {
 
 plugins {
     id 'idea'
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.9"
-    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
     id 'maven-publish'
     id "net.darkhax.curseforgegradle" version "1.1.15"
     id "com.modrinth.minotaur" version "2.+"
@@ -25,6 +24,7 @@ idea {
     module {
         downloadJavadoc = true
         downloadSources = true
+        inheritOutputDirs = true
     }
 }
 
@@ -111,6 +111,8 @@ fabricApi {
 
 loom {
     runtimeOnlyLog4j = true
+
+    accessWidenerPath = file ("src/main/resources/${mod_id}.accesswidener")
 
     mods {
         "${mod_id}" {
@@ -214,7 +216,7 @@ dependencies {
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version")
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
 
-    modImplementation("maven.modrinth:sodium:mc${minecraft_version}-${sodium_version}")
+    modImplementation("maven.modrinth:sodium:${sodium_version}")
     modImplementation("maven.modrinth:indium:${indium_version}")
 
     implementation("com.electronwill.night-config:core:$project.night_config_version")
@@ -239,9 +241,9 @@ dependencies {
     /*modImplementation("committee.nova.mkb.fabric:mkb-${project.minecraft_version}:${project.mkb_mod_version}") {
         transitive = false
     }*/
-    modImplementation("maven.modrinth:modernkeybinding:${project.mkb_modrinth_mod_version}") {
+    /*modImplementation("maven.modrinth:modernkeybinding:${project.mkb_modrinth_mod_version}") {
         transitive = false
-    }
+    }*/
 
     modImplementation(include("me.luligabi:NoIndium:${project.noindium_version}"))
 
@@ -267,7 +269,7 @@ tasks.register('validateMixinNames', ValidateMixinNameTask) {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'
-    it.options.release = 17
+    it.options.release = 21
 }
 
 java {
@@ -276,8 +278,8 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
@@ -350,12 +352,6 @@ tasks.register('fixIntelliJResources', Copy) {
         into it.toPath()
     }
 }
-/*rootProject.idea.project.settings {
-    taskTriggers {
-        afterBuild tasks.getByName("fixIntelliJResources")
-        afterRebuild tasks.getByName("fixIntelliJResources")
-    }
-}*/
 
 static def mavenVersionToFabric(String version) {
     StringBuilder builder = new StringBuilder()

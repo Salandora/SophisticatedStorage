@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
@@ -19,7 +20,7 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	private Storage<ItemVariant> itemHandler;
 
 	public StorageInputBlockEntity(BlockPos pos, BlockState state) {
-		super(ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE, pos, state);
+		super(ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Nullable
@@ -30,8 +31,8 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		if (itemHandler == null) {
-			itemHandler = super.getExternalItemHandler(side);
-			if (itemHandler instanceof SlottedStackStorage simpleInserter) {
+			itemHandler = super.getExternalItemHandler(null);
+			if (itemHandler instanceof IItemHandlerSimpleInserter simpleInserter) {
 				itemHandler = new SingleSlotInputItemHandlerWrapper(simpleInserter);
 			}
 		}
@@ -46,9 +47,9 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	}
 
 	private static class SingleSlotInputItemHandlerWrapper implements SlottedStackStorage {
-		private final SlottedStackStorage itemHandler;
+		private final IItemHandlerSimpleInserter itemHandler;
 
-		public SingleSlotInputItemHandlerWrapper(SlottedStackStorage itemHandler) {
+		public SingleSlotInputItemHandlerWrapper(IItemHandlerSimpleInserter itemHandler) {
 			this.itemHandler = itemHandler;
 		}
 

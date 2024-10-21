@@ -1,11 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SortBy;
@@ -180,31 +181,31 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		if (numberOfUpgradeSlots > -1) {
 			tag.putInt("numberOfUpgradeSlots", numberOfUpgradeSlots);
 		}
-		if (mainColor > -1) {
+		if (mainColor != -1) {
 			tag.putInt(MAIN_COLOR_TAG, mainColor);
 		}
-		if (accentColor > -1) {
+		if (accentColor != -1) {
 			tag.putInt(ACCENT_COLOR_TAG, accentColor);
 		}
 		return tag;
 	}
 
-	public void load(CompoundTag tag) {
+	public void load(HolderLookup.Provider registries, CompoundTag tag) {
 		loadContents(tag);
-		loadData(tag);
+		loadData(registries, tag);
 
 		initInventoryHandler();
 		getUpgradeHandler().refreshUpgradeWrappers();
-		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlotCount()) {
+		if (SophisticatedCore.isLogicalServerThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlotCount()) {
 			getUpgradeHandler().setRenderUpgradeItems();
 		}
 	}
 
-	private void loadData(CompoundTag tag) {
+	private void loadData(HolderLookup.Provider registries, CompoundTag tag) {
 		settingsNbt = tag.getCompound("settings");
 		settingsHandler.reloadFrom(settingsNbt);
 		renderInfoNbt = tag.getCompound("renderInfo");
-		renderInfo.deserializeFrom(renderInfoNbt);
+		renderInfo.deserializeFrom(registries, renderInfoNbt);
 		contentsUuid = NBTHelper.getTagValue(tag, UUID_TAG, CompoundTag::get).map(NbtUtils::loadUUID).orElse(null);
 		openTabId = NBTHelper.getInt(tag, OPEN_TAB_ID_TAG).orElse(-1);
 		sortBy = NBTHelper.getString(tag, "sortBy").map(SortBy::fromName).orElse(SortBy.NAME);
@@ -313,7 +314,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	public boolean hasMainColor() {
-		return mainColor > -1;
+		return mainColor != -1;
 	}
 
 	public void setMainColor(int mainColor) {
@@ -326,7 +327,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	public boolean hasAccentColor() {
-		return accentColor > -1;
+		return accentColor != -1;
 	}
 
 	public void setAccentColor(int accentColor) {

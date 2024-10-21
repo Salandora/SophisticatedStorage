@@ -1,0 +1,20 @@
+accessWidener v2 named
+
+accessible field net/minecraft/client/multiplayer/MultiPlayerGameMode destroyDelay I
+
+accessible field net/minecraft/client/renderer/block/model/BakedQuad direction Lnet/minecraft/core/Direction;
+mutable field net/minecraft/client/renderer/block/model/BakedQuad direction Lnet/minecraft/core/Direction;
+accessible field net/minecraft/client/renderer/block/model/BakedQuad tintIndex I
+mutable field net/minecraft/client/renderer/block/model/BakedQuad tintIndex I
+accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
+accessible method net/minecraft/client/renderer/LevelRenderer renderShape (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/phys/shapes/VoxelShape;DDDFFFF)V
+
+accessible field net/minecraft/world/item/crafting/ShapelessRecipe result Lnet/minecraft/world/item/ItemStack;
+
+accessible field net/minecraft/world/level/block/entity/BarrelBlockEntity openersCounter Lnet/minecraft/world/level/block/entity/ContainerOpenersCounter;
+accessible field net/minecraft/world/level/block/entity/ChestBlockEntity openersCounter Lnet/minecraft/world/level/block/entity/ContainerOpenersCounter;
+accessible field net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity openCount I
+
+accessible method net/minecraft/world/level/block/state/BlockBehaviour attack (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)V
+
+accessible field net/minecraft/world/level/block/state/properties/WoodType TYPES Ljava/util/Map;

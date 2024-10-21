@@ -1,0 +1,42 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedbackpacks:chipped/botanist_workbench_upgrade"
+    },
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "sophisticatedbackpacks"
+      ]
+    },
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "chipped"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "tag": "c:leathers"
+    },
+    "T": {
+      "tag": "c:strings"
+    },
+    "U": {
+      "item": "sophisticatedstorage:chipped/botanist_workbench_upgrade"
+    }
+  },
+  "pattern": [
+    "TUT",
+    " L ",
+    "T T"
+  ],
+  "result": {
+    "count": 1,
+    "id": "sophisticatedbackpacks:chipped/botanist_workbench_upgrade"
+  }
+}

@@ -33,6 +33,7 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.AssertionFailureBuilder.assertionFailure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class CompressionInventoryPartTest {
@@ -58,7 +59,7 @@ public class CompressionInventoryPartTest {
 		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.IRON_INGOT)).thenReturn(new RecipeHelper.UncompactingResult(Items.IRON_NUGGET, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 
 		ss = Mockito.mockStatic(SophisticatedStorage.class);
-		ss.when(() -> SophisticatedStorage.getRL(anyString())).thenAnswer(i -> new ResourceLocation(i.getArgument(0)));
+		ss.when(() -> SophisticatedStorage.getRL(anyString())).thenAnswer(i -> ResourceLocation.parse(i.getArgument(0)));
 	}
 
 	@BeforeEach
@@ -76,10 +77,11 @@ public class CompressionInventoryPartTest {
 		InventoryHandler inventoryHandler = Mockito.mock(InventoryHandler.class);
 		when(inventoryHandler.getBaseStackLimit(any(ItemVariant.class))).thenAnswer(i -> {
 			ItemVariant resource = i.getArgument(0);
-			int limit = MathHelper.intMaxCappedMultiply(resource.getItem().getMaxStackSize(), (baseSlotLimit / 64));
+			int maxStackSize = resource.isBlank() ? 64 : resource.toStack().getMaxStackSize();
+			int limit = MathHelper.intMaxCappedMultiply(maxStackSize, (baseSlotLimit / 64));
 			int remainder = baseSlotLimit % 64;
 			if (remainder > 0) {
-				limit = MathHelper.intMaxCappedAddition(limit, remainder * resource.getItem().getMaxStackSize() / 64);
+				limit = MathHelper.intMaxCappedAddition(limit, remainder * maxStackSize / 64);
 			}
 			return limit;
 		});
@@ -108,7 +110,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("compactsStacksOnInit")
 	void compactsStacksOnInit(Map<Integer, ItemStack> slotStacksInput, Map<Integer, ItemStack> slotStacksModified, int baseSlotLimit) {
 		InventoryHandler invHandler = getFilledInventoryHandler(slotStacksInput, baseSlotLimit);
 		int minSlot = Collections.min(slotStacksInput.keySet());
@@ -179,7 +181,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("calculatedStacksCorrectOnInit")
 	void calculatedStacksCorrectOnInit(Map<Integer, ItemStack> slotStacksInput, Map<Integer, ItemStack> calculatedStacks, int baseSlotLimit) {
 		InventoryHandler invHandler = getFilledInventoryHandler(slotStacksInput, baseSlotLimit);
 		int minSlot = Collections.min(slotStacksInput.keySet());
@@ -242,7 +244,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("extractItemUpdatesStacks")
 	void extractItemUpdatesStacks(Map<Integer, ItemStack> internalStacksBefore, int baseSlotLimit, int extractSlot, int extractAmount, ItemStack extractResult, Map<Integer, ItemStack> internalStacksUpdated, Map<Integer, ItemStack> calculatedStacksAfter) {
 		InventoryHandler invHandler = getFilledInventoryHandler(internalStacksBefore, baseSlotLimit);
 		int minSlot = Collections.min(internalStacksBefore.keySet());
@@ -367,7 +369,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("simulatedExtractItemDoesNotUpdateStacks")
 	void simulatedExtractItemDoesNotUpdateStacks(Map<Integer, ItemStack> internalStacksBefore, Map<Integer, ItemStack> calculatedStacksBefore, int baseSlotLimit, int extractSlot, int extractAmount, ItemStack extractResult) {
 		InventoryHandler invHandler = getFilledInventoryHandler(internalStacksBefore, baseSlotLimit);
 		int minSlot = Collections.min(internalStacksBefore.keySet());
@@ -745,7 +747,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("insertingAdditionalUncompressibleItemsProperlyCalculatesCount")
 	void insertingAdditionalUncompressibleItemsProperlyCalculatesCount(InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams params) {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;
@@ -843,7 +845,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("initializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacks")
 	void initializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacks(InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams params) {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;

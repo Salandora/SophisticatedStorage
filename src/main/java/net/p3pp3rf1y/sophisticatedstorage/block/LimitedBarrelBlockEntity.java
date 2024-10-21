@@ -1,6 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -9,13 +13,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeWrapper;
-import net.p3pp3rf1y.sophisticatedcore.util.*;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.RandHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import java.util.*;
@@ -40,7 +44,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean showFillLevels = false;
 
 	public LimitedBarrelBlockEntity(BlockPos pos, BlockState state) {
-		super(pos, state, ModBlocks.LIMITED_BARREL_BLOCK_ENTITY_TYPE);
+		super(pos, state, ModBlocks.LIMITED_BARREL_BLOCK_ENTITY_TYPE.get());
 		registerUpgradeDefaults();
 		registerClientNotificationOnCountChange();
 	}
@@ -184,9 +188,9 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean depositFromAllOfPlayersInventory(Player player, int slot, InventoryHandler invHandler, ItemStack stackInSlot, MemorySettingsCategory memorySettings) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		Predicate<ItemStack> memoryItemMatches = itemStack -> memorySettings.isSlotSelected(slot) && memorySettings.matchesFilter(slot, itemStack);
-		// TODO:
+		// TODO: Usable?
 		/*CapabilityHelper.runOnItemHandler(player, playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
-			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemHandlerHelper.canItemStacksStack(stackInSlot, playerStack)))) {
+			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameComponents(stackInSlot, playerStack)))) {
 
 				ItemStack result = invHandler.insertItemOnlyToSlot(slot, playerStack, true);
 				if (result.getCount() < playerStack.getCount()) {
@@ -198,10 +202,11 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 				}
 			}
 		}));*/
+
 		PlayerInventoryStorage playerInventory = PlayerInventoryStorage.of(player);
 		InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
 			ItemVariant resource = ItemVariant.of(playerStack);
-			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameTags(stackInSlot, playerStack)))) {
+			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameComponents(stackInSlot, playerStack)))) {
 				try (Transaction ctx = Transaction.openOuter()) {
 					long inserted;
 					try (Transaction simulate = Transaction.openNested(ctx)) {
@@ -228,7 +233,18 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 			return false;
 		}
 
-		ItemVariant resource = ItemVariant.of(stackInSlot);
+		int countToTake = player.isShiftKeyDown() ? Math.min(stackInSlot.getMaxStackSize(), stackInSlot.getCount()) : 1;
+		ItemStack stackTaken = inventoryHandler.extractItem(slot, countToTake, false);
+
+		if (player.getInventory().add(stackTaken)) {
+			//noinspection ConstantConditions
+			getLevel().playSound(null, getBlockPos(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, (RandHelper.getRandomMinusOneToOne(getLevel().random) * .7f + 1) * 2);
+		} else {
+			player.drop(stackTaken, false);
+		}
+
+		// TODO: check
+		/*ItemVariant resource = ItemVariant.of(stackInSlot);
 		int countToTake = player.isShiftKeyDown() ? Math.min(stackInSlot.getMaxStackSize(), stackInSlot.getCount()) : 1;
 		long extracted;
 		try (Transaction ctx = Transaction.openOuter()) {
@@ -237,12 +253,12 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 		}
 
 		ItemStack extractedStack = resource.toStack((int) extracted);
- 		if (player.getInventory().add(extractedStack)) {
+		if (player.getInventory().add(extractedStack)) {
 			//noinspection ConstantConditions
 			getLevel().playSound(null, getBlockPos(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, (RandHelper.getRandomMinusOneToOne(getLevel().random) * .7f + 1) * 2);
 		} else if (!extractedStack.isEmpty()) {
 			player.drop(extractedStack, false);
-		}
+		}*/
 		return true;
 	}
 
@@ -252,8 +268,8 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		CompoundTag updateTag = super.getUpdateTag();
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		CompoundTag updateTag = super.getUpdateTag(registries);
 		List<Integer> sc = new ArrayList<>();
 		ListTag sfl = new ListTag();
 		InventoryHelper.iterate(getStorageWrapper().getInventoryHandler(), (slot, stack) -> {
@@ -266,8 +282,8 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	}
 
 	@Override
-	public void loadSynchronizedData(CompoundTag tag) {
-		super.loadSynchronizedData(tag);
+	public void loadSynchronizedData(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadSynchronizedData(tag, registries);
 		if (tag.contains(SLOT_COUNTS_TAG)) {
 			int[] countsArray = tag.getIntArray(SLOT_COUNTS_TAG);
 			if (slotCounts.size() != countsArray.length) {

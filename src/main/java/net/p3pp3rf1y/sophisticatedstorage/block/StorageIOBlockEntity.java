@@ -1,13 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -22,7 +21,9 @@ import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 
 public class StorageIOBlockEntity extends BlockEntity implements IControllerBoundable, ILinkable {
 	@Nullable
@@ -35,13 +36,10 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 
 	protected StorageIOBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-
-		ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> onChunkUnloaded());
-		ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> onChunkUnloaded());
 	}
 
 	public StorageIOBlockEntity(BlockPos pos, BlockState state) {
-		this(ModBlocks.STORAGE_IO_BLOCK_ENTITY_TYPE, pos, state);
+		this(ModBlocks.STORAGE_IO_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Override
@@ -140,8 +138,8 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
 		saveControllerPos(tag);
 		if (isLinkedToController) {
 			tag.putBoolean("isLinkedToController", isLinkedToController);
@@ -149,8 +147,8 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		loadControllerPos(tag);
 		isLinkedToController = NBTHelper.getBoolean(tag, "isLinkedToController").orElse(false);
 	}

@@ -52,20 +52,20 @@ public abstract class StorageRenderer<T extends StorageBlockEntity> implements B
 			}
 
 			boolean holdsStorageTool = holdsItem(player, this::isStorageTool);
-			holdsStorageToolSetToToggleUpgrades = holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL)
+			holdsStorageToolSetToToggleUpgrades = holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL.get())
 					.map(item -> StorageToolItem.getMode(item) == StorageToolItem.Mode.UPGRADES_DISPLAY).orElse(false);
 
 			holdsItemThatShowsUpgrades = holdsStorageTool || holdsItem(player, this::isUpgrade);
 			holdsItemThatShowsFillLevels = holdsStorageTool || holdsItem(player, StorageTierUpgradeItem.class::isInstance) || holdsItem(player, item -> isStorageItem(item) && item instanceof StackUpgradeItem);
-			holdsItemThatShowsHiddenTiers = (holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL)
+			holdsItemThatShowsHiddenTiers = (holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL.get())
 					.map(item -> StorageToolItem.getMode(item) == StorageToolItem.Mode.TIER_DISPLAY).orElse(false))
 					|| holdsItem(player, StorageTierUpgradeItem.class::isInstance);
-			holdsToolInToggleLockOrLockDisplay = holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL)
+			holdsToolInToggleLockOrLockDisplay = holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL.get())
 					.map(item -> {
 						StorageToolItem.Mode mode = StorageToolItem.getMode(item);
 						return mode == StorageToolItem.Mode.LOCK_DISPLAY || mode == StorageToolItem.Mode.LOCK;
 					}).orElse(false);
-			holdsToolInToggleFillLevelDisplay = holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL)
+			holdsToolInToggleFillLevelDisplay = holdsStorageTool && InventoryHelper.getItemFromEitherHand(player, ModItems.STORAGE_TOOL.get())
 					.map(item -> StorageToolItem.getMode(item) == StorageToolItem.Mode.FILL_LEVEL_DISPLAY).orElse(false);
 		}
 	}
@@ -91,7 +91,7 @@ public abstract class StorageRenderer<T extends StorageBlockEntity> implements B
 	}
 
 	private boolean isStorageTool(Item item) {
-		return item == ModItems.STORAGE_TOOL;
+		return item == ModItems.STORAGE_TOOL.get();
 	}
 
 	private boolean isUpgrade(Item item) {

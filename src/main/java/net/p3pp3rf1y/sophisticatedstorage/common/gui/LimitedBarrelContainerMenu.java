@@ -11,7 +11,7 @@ import static net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks.LIMITED_BARREL_C
 
 public class LimitedBarrelContainerMenu extends StorageContainerMenu{
 	public LimitedBarrelContainerMenu(int containerId, Player player, BlockPos pos) {
-		super(LIMITED_BARREL_CONTAINER_TYPE, containerId, player, pos);
+		super(LIMITED_BARREL_CONTAINER_TYPE.get(), containerId, player, pos);
 	}
 
 	public static LimitedBarrelContainerMenu fromBuffer(int windowId, Inventory playerInventory, FriendlyByteBuf buffer) {

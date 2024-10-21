@@ -1,28 +1,28 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.init;
 
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MinecraftAccessor;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ModBlockColors {
 	private ModBlockColors() {}
 
 	public static void registerBlockColorHandlers() {
-		ColorProviderRegistry.BLOCK.register(ModBlockColors::getBarrelTintColor, ModBlocks.ALL_BARRELS);
-		ColorProviderRegistry.BLOCK.register(ModBlockColors::getChestShulkerBoxColor, ArrayUtils.addAll(ModBlocks.CHESTS, ModBlocks.SHULKER_BOXES));
+		ColorProviderRegistry.BLOCK.register(ModBlockColors::getBarrelTintColor, ModBlocks.ALL_BARRELS.stream().map(Supplier::get).toArray(BarrelBlock[]::new));
+		ColorProviderRegistry.BLOCK.register(ModBlockColors::getChestShulkerBoxColor, ModBlocks.CHESTS.stream().map(Supplier::get).toArray(ChestBlock[]::new));
+		ColorProviderRegistry.BLOCK.register(ModBlockColors::getChestShulkerBoxColor, ModBlocks.SHULKER_BOXES.stream().map(Supplier::get).toArray(ShulkerBoxBlock[]::new));
 	}
 
 	private static int getBarrelTintColor(BlockState state, @Nullable BlockAndTintGetter blockDisplayReader, @Nullable BlockPos pos, int tintIndex) {

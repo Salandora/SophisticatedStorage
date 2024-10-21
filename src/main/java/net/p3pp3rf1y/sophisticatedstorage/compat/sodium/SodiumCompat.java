@@ -1,3 +1,4 @@
+/*
 package net.p3pp3rf1y.sophisticatedstorage.compat.sodium;
 
 import net.fabricmc.api.EnvType;
@@ -12,3 +13,4 @@ public class SodiumCompat implements ICompat {
 		}
 	}
 }
+*/

@@ -73,9 +73,9 @@ public class LimitedBarrelDynamicModel extends BarrelDynamicModelBase<LimitedBar
 		protected void rotateDisplayItemFrontOffset(BlockState state, Direction dir, Vector3f frontOffset) {
 			VerticalFacing verticalFacing = state.getValue(LimitedBarrelBlock.VERTICAL_FACING);
 			if (verticalFacing != VerticalFacing.NO) {
-				frontOffset.rotate(getNorthBasedRotation(verticalFacing.getDirection()));
+				getNorthBasedRotation(verticalFacing.getDirection()).transform(frontOffset);
 			}
-			frontOffset.rotate(getNorthBasedRotation(state.getValue(LimitedBarrelBlock.HORIZONTAL_FACING)));
+			getNorthBasedRotation(state.getValue(LimitedBarrelBlock.HORIZONTAL_FACING)).transform(frontOffset);
 		}
 
 		@Override

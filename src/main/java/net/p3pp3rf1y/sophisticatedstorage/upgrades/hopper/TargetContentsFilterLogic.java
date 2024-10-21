@@ -3,14 +3,16 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterAttributes;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 
 import java.util.HashSet;
@@ -28,8 +30,8 @@ public class TargetContentsFilterLogic extends ContentsFilterLogic {
 		}
 	});
 
-	public TargetContentsFilterLogic(ItemStack upgrade, Consumer<ItemStack> saveHandler, int filterSlotCount, Supplier<InventoryHandler> getInventoryHandler, MemorySettingsCategory memorySettings, String parentTagKey) {
-		super(upgrade, saveHandler, filterSlotCount, getInventoryHandler, memorySettings, parentTagKey);
+	public TargetContentsFilterLogic(ItemStack upgrade, Consumer<ItemStack> saveHandler, int filterSlotCount, Supplier<InventoryHandler> getInventoryHandler, MemorySettingsCategory memorySettings, DeferredHolder<DataComponentType<?>, DataComponentType<FilterAttributes>> filterAttributesComponent) {
+		super(upgrade, saveHandler, filterSlotCount, getInventoryHandler, memorySettings, filterAttributesComponent);
 	}
 
 	public void setInventory(Storage<ItemVariant> inventory) {

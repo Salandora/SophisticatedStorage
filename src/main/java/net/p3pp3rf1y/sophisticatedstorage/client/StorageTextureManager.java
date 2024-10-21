@@ -106,7 +106,7 @@ public class StorageTextureManager extends SimpleJsonResourceReloadListener impl
 		StorageTextureDefinition parentDefinition = null;
 
 		if (jsonContents.has(PARENT_TAG) && jsonContents.get(PARENT_TAG).isJsonPrimitive()) {
-			ResourceLocation parent = new ResourceLocation(jsonContents.get(PARENT_TAG).getAsString());
+			ResourceLocation parent = ResourceLocation.parse(jsonContents.get(PARENT_TAG).getAsString());
 			JsonElement parentJson = fileContents.get(parent);
 			parentDefinition = loadDefinition(storageTextureDefinitions, parent, parentJson, fileContents).orElse(null);
 			if (parentDefinition != null) {
@@ -183,7 +183,7 @@ public class StorageTextureManager extends SimpleJsonResourceReloadListener impl
 				jsonTextures.keySet().forEach(name ->
 						jsonTextures.get(name).getAsJsonObject().entrySet().forEach(entry -> {
 							if (entry.getValue().isJsonPrimitive()) {
-								textures.computeIfAbsent(name, k -> new HashMap<>()).put(entry.getKey(), new ResourceLocation(entry.getValue().getAsString()));
+								textures.computeIfAbsent(name, k -> new HashMap<>()).put(entry.getKey(), ResourceLocation.parse(entry.getValue().getAsString()));
 							}
 						})
 				);

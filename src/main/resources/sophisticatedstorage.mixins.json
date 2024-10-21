@@ -4,17 +4,8 @@
     "minVersion": "0.8",
     "package": "net.p3pp3rf1y.sophisticatedstorage.mixin",
     "compatibilityLevel": "JAVA_17",
-    "mixins": [
-        "common.accessor.BarrelBlockEntityAccessor",
-        "common.accessor.ChestBlockEntityAccessor",
-        "common.accessor.ShulkerBoxBlockEntityAccessor"
-    ],
     "client": [
-        "client.accessor.BakedQuadAccessor",
-        "client.accessor.BlockModelAccessor",
-        "client.accessor.LevelRendererAccessor",
         "client.accessor.MinecraftAccessor",
-        "client.accessor.MultiPlayerGameModeAccessor",
         "client.accessor.SimpleBakedModelBuilderAccessor"
     ],
     "injectors": {

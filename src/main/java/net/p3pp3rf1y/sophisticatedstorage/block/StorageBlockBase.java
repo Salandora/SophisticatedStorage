@@ -1,6 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.mojang.math.Axis;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,8 +22,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.api.IUpgradeRenderer;
 import net.p3pp3rf1y.sophisticatedcore.client.render.UpgradeRenderRegistry;
@@ -39,9 +39,7 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -74,9 +72,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		if (Minecraft.getInstance().isPaused()) {
 			return;
 		}
-
-		Map<UpgradeRenderDataType<?>, IUpgradeRenderData> upgradeRenderData = new HashMap<>(renderInfo.getUpgradeRenderData());
-		upgradeRenderData.forEach((type, data) -> UpgradeRenderRegistry.getUpgradeRenderer(type).ifPresent(renderer -> {
+		renderInfo.getUpgradeRenderData().forEach((type, data) -> UpgradeRenderRegistry.getUpgradeRenderer(type).ifPresent(renderer -> {
 			if (storageBlockState.getBlock() instanceof StorageBlockBase storageBlock) {
 				storageBlock.renderUpgrade(renderer, level, rand, pos, facing, type, data, storageBlockState, storageBlock);
 			}
@@ -98,7 +94,6 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		type.cast(data).ifPresent(renderData -> renderer.render(level, rand, vector -> storageBlock.getMiddleFacePoint(state, pos, facing, vector), (T) renderData));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
 		super.entityInside(state, level, pos, entity);
@@ -109,10 +104,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 
 	protected void tryToPickup(Level level, ItemEntity itemEntity, IStorageWrapper w) {
 		ItemStack remainingStack = itemEntity.getItem().copy();
-		try (Transaction ctx = Transaction.openOuter()) {
-			remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(level, w.getUpgradeHandler(), remainingStack, ctx);
-			ctx.commit();
-		}
+		remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(level, w.getUpgradeHandler(), remainingStack, null);
 		if (remainingStack.getCount() < itemEntity.getItem().getCount()) {
 			itemEntity.setItem(remainingStack);
 		}
@@ -153,7 +145,6 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		return WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(be -> InventoryHelper.getAnalogOutputSignal(be.getStorageWrapper().getInventoryForInputOutput())).orElse(0);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (!state.is(newState.getBlock())) {
@@ -219,9 +210,8 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
 		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(be -> be.onNeighborChange(neighborPos));
 	}
 
@@ -242,7 +232,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 				&& RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
 			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
 			ItemVariant resource = ItemVariant.of(itemInHand);
-			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).isSuccessful()
+			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).successful()
 					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != 0) {
 				try (Transaction ctx = Transaction.openOuter()) {
 					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);

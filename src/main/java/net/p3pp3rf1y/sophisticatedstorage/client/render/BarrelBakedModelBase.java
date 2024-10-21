@@ -4,12 +4,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Axis;
 import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -34,9 +32,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
-import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
@@ -49,7 +45,7 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.BakedQuadAccessor;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -172,6 +168,11 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return hash;
 	}
 
+	/*@Override
+	public ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
+		return ChunkRenderTypeSet.of(RenderType.cutout(), RenderType.translucent());
+	}*/
+
 	@Override
 	public boolean isVanillaAdapter() {
 		return false;
@@ -186,11 +187,12 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		modelData = null;
-		if (this.barrelItemOverrides != null) {
+		// TODO: Still needed?
+		/*if (this.barrelItemOverrides != null) {
 			// need this here because of REI's fast entry rendering feature
 			// it is doing batched rendering and this collides with how item overrides are implemented here
 			this.barrelItemOverrides.resolve(this, stack, null, null, 0);
-		}
+		}*/
 		BakedModel.super.emitItemQuads(stack, randomSupplier, context);
 	}
 
@@ -273,15 +275,15 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return ret;
 	}
 
-	public List<BakedQuad> getTierQuads(BlockState state, RandomSource rand, String woodName, @Nullable RenderType renderType) {
+	public List<BakedQuad> getTierQuads(BlockState state, RandomSource rand, String woodName, RenderType renderType) {
 		return getPartQuads(state, rand, woodName, BarrelModelPart.TIER, renderType);
 	}
 
-	public List<BakedQuad> getLockQuads(BlockState state, RandomSource rand, String woodName, @Nullable RenderType renderType) {
+	public List<BakedQuad> getLockQuads(BlockState state, RandomSource rand, String woodName, RenderType renderType) {
 		return getPartQuads(state, rand, woodName, BarrelModelPart.LOCKED, renderType);
 	}
 
-	private List<BakedQuad> getPartQuads(BlockState state, RandomSource rand, String woodName, BarrelModelPart part, @Nullable RenderType renderType) {
+	private List<BakedQuad> getPartQuads(BlockState state, RandomSource rand, String woodName, BarrelModelPart part, RenderType renderType) {
 		List<BakedQuad> ret = new ArrayList<>();
 
 		Map<BarrelModelPart, BakedModel> modelParts = getWoodModelParts(woodName, false);
@@ -370,7 +372,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return baseModelPartDefinition.modelLocation().map(modelLocation -> {
 			BlockModel baseModel = new CompositeElementsModel(modelLocation, materials);
 			baseModel.resolveParents(baker::getModel); //need to call resolveParents here to get parent models loaded
-			return baseModel.bake(baker, baseModel, spriteGetter, bakingData.modelState(), bakingData.modelLocation(), false);
+			return baseModel.bake(baker, baseModel, spriteGetter, bakingData.modelState(), false);
 		}).orElse(Minecraft.getInstance().getModelManager().getMissingModel());
 	}
 
@@ -449,7 +451,8 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 	private int getDisplayItemHash(RenderInfo.DisplayItem displayItem) {
 		int hash = displayItem.getRotation();
-		hash = hash * 31 + ItemStackKey.getHashCode(displayItem.getItem());
+		ItemStack stack = displayItem.getItem();
+		hash = hash * 31 + ItemStack.hashItemAndComponents(stack);
 		hash = hash * 31 + displayItem.getSlotIndex();
 		return hash;
 	}
@@ -509,7 +512,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 			@Nullable List<RenderInfo.DisplayItem> displayItems, Minecraft minecraft) {
 		List<Integer> inaccessibleSlots = data.getInaccessibleSlots();
 		if (displayItems != null && inaccessibleSlots != null) {
-			ItemStack inaccessibleSlotStack = new ItemStack(ModItems.INACCESSIBLE_SLOT);
+			ItemStack inaccessibleSlotStack = new ItemStack(ModItems.INACCESSIBLE_SLOT.get());
 			BakedModel model = minecraft.getItemRenderer().getModel(inaccessibleSlotStack, null, minecraft.player, 0);
 			for (int inaccessibleSlot : inaccessibleSlots) {
 				if (!model.isCustomRenderer()) {
@@ -522,7 +525,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		}
 	}
 
-	@SuppressWarnings({"java:S107"})
+	@SuppressWarnings({"deprecation", "java:S107"})
 	private void addRenderedItemSide(BlockState state, RandomSource rand, List<BakedQuad> ret, ItemStack displayItem, BakedModel model, int rotation,
 			@Nullable Direction dir, int displayItemIndex, int displayItemCount) {
 		List<BakedQuad> quads = model.getQuads(null, dir, rand);
@@ -564,7 +567,11 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 			return Transformation.identity();
 		}
 
-		return new Transformation(transform.translation, QuaternionHelper.quatFromXYZDegree(transform.rotation), transform.scale, null);
+		return new Transformation(transform.translation, quatFromXYZ(transform.rotation, true), transform.scale, null);
+	}
+
+	public Quaternionf quatFromXYZ(Vector3f xyz, boolean degrees) {
+		return QuaternionHelper.quatFromXYZDegree(xyz);
 	}
 
 	protected abstract List<BakedQuad> rotateDisplayItemQuads(List<BakedQuad> quads, BlockState state);
@@ -572,14 +579,14 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	private void updateTintIndexes(List<BakedQuad> quads, int displayItemIndex) {
 		int offset = (displayItemIndex + 1) * 10;
 		quads.forEach(quad -> {
-			if (((BakedQuadAccessor) quad).getTintIndex() >= 0) {
-				((BakedQuadAccessor) quad).setTintIndex(((BakedQuadAccessor) quad).getTintIndex() + offset);
+			if (quad.tintIndex >= 0) {
+				quad.tintIndex = quad.tintIndex + offset;
 			}
 		});
 	}
 
 	private void recalculateDirections(List<BakedQuad> quads) {
-		quads.forEach(quad -> ((BakedQuadAccessor) quad).setDirection(FaceBakery.calculateFacing(quad.getVertices())));
+		quads.forEach(quad -> quad.direction = FaceBakery.calculateFacing(quad.getVertices()));
 	}
 
 	private RenderContext.QuadTransform getDirectionMove(ItemStack displayItem, BakedModel model, BlockState state, Direction direction, int displayItemIndex, int displayItemCount, float itemScale) {
@@ -603,7 +610,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 	@SuppressWarnings("java:S1172") //state used in override
 	protected int calculateDirectionMoveHash(BlockState state, ItemStack displayItem, int displayItemIndex, int displayItemCount, boolean isFlatTop) {
-		int hashCode = ItemStackKey.getHashCode(displayItem);
+		int hashCode = ItemStack.hashItemAndComponents(displayItem);
 		hashCode = hashCode * 31 + displayItemIndex;
 		hashCode = hashCode * 31 + displayItemCount;
 		hashCode = hashCode * 31 + (isFlatTop ? 1 : 0);
@@ -680,59 +687,104 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public TextureAtlasSprite getParticleIcon() {
 		return getWoodModelParts(null, false).getOrDefault(BarrelModelPart.BASE, Minecraft.getInstance().getModelManager().getMissingModel()).getParticleIcon();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public ItemTransforms getTransforms() {
 		return ITEM_TRANSFORMS;
 	}
 
 	@Override
-	public TextureAtlasSprite getParticleIcon(BlockState state, BlockAndTintGetter blockView, BlockPos pos) {
-		Object attachment = blockView.getBlockEntityRenderData(pos);
-		if (attachment instanceof BarrelBlockEntity.ModelData data) {
-			if (data.hasMainColor() && data.hasMainColor()) {
-				BakedModel model = getWoodModelParts(null, false).get(BarrelModelPart.TINTABLE_MAIN);
-				if (model instanceof CustomParticleIcon dataModel) {
-					return dataModel.getParticleIcon(state, blockView, pos);
-				}
-				return model.getParticleIcon();
-			}
+	public TextureAtlasSprite getParticleIcon(Object attachment) {
+		if (!(attachment instanceof BarrelBlockEntity.ModelData data)) {
+			return getParticleIcon();
+		}
 
-			if (data.getMaterials() != null) {
-				Map<BarrelMaterial, ResourceLocation> materials = data.getMaterials();
-				if (materials != null && !materials.isEmpty()) {
-					for (BarrelMaterial barrelMaterial : PARTICLE_ICON_MATERIAL_PRIORITY) {
-						if (materials.containsKey(barrelMaterial)) {
-							BlockState blockState = getDefaultBlockState(materials.get(barrelMaterial));
-							return Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState).getParticleIcon();
-						}
+		if (data.hasMainColor() && data.hasMainColor()) {
+			BakedModel model = getWoodModelParts(null, false).get(BarrelModelPart.TINTABLE_MAIN);
+			if (model instanceof CustomParticleIcon dataModel) {
+				return dataModel.getParticleIcon(attachment);
+			}
+			return model.getParticleIcon();
+		}
+
+		if (data.getMaterials() != null) {
+			Map<BarrelMaterial, ResourceLocation> materials = data.getMaterials();
+			if (materials != null && !materials.isEmpty()) {
+				for (BarrelMaterial barrelMaterial : PARTICLE_ICON_MATERIAL_PRIORITY) {
+					if (materials.containsKey(barrelMaterial)) {
+						BlockState blockState = getDefaultBlockState(materials.get(barrelMaterial));
+						return Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState).getParticleIcon();
 					}
 				}
 			}
+		}
 
-			if (data.woodName() != null) {
-				String name = data.woodName();
-				if (!woodModelParts.containsKey(name)) {
-					return getParticleIcon();
-				}
-				BakedModel model = getWoodModelParts(name, false).get(BarrelModelPart.BASE);
-				if (model instanceof CustomParticleIcon dataModel) {
-					return dataModel.getParticleIcon(state, blockView, pos);
-				}
-				return model.getParticleIcon();
+		if (data.woodName() != null) {
+			String name = data.woodName();
+			if (!woodModelParts.containsKey(name)) {
+				return getParticleIcon();
 			}
+			BakedModel model = getWoodModelParts(name, false).get(BarrelModelPart.BASE);
+			if (model instanceof CustomParticleIcon dataModel) {
+				return dataModel.getParticleIcon(attachment);
+			}
+			return model.getParticleIcon();
 		}
 		return getParticleIcon();
 	}
+
+	/*@Nonnull
+	@Override
+	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData) {
+		return WorldHelper.getBlockEntity(world, pos, BarrelBlockEntity.class)
+				.map(be -> {
+
+					ModelData.Builder builder = ModelData.builder();
+					boolean hasMainColor = be.getStorageWrapper().hasMainColor();
+					builder.with(HAS_MAIN_COLOR, hasMainColor);
+					boolean hasAccentColor = be.getStorageWrapper().hasAccentColor();
+					builder.with(HAS_ACCENT_COLOR, hasAccentColor);
+					if (!be.hasFullyDynamicRenderer()) {
+						builder.with(DISPLAY_ITEMS, be.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getDisplayItems());
+						builder.with(INACCESSIBLE_SLOTS, be.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getInaccessibleSlots());
+					}
+					builder.with(IS_PACKED, be.isPacked());
+					builder.with(SHOWS_LOCK, be.isLocked() && be.shouldShowLock());
+					builder.with(SHOWS_TIER, be.shouldShowTier());
+					Optional<WoodType> woodType = be.getWoodType();
+					if (woodType.isPresent() || !(hasMainColor && hasAccentColor)) {
+						builder.with(WOOD_NAME, woodType.orElse(WoodType.ACACIA).name());
+					}
+
+					Map<BarrelMaterial, ResourceLocation> materials = be.getMaterials();
+					if (!materials.isEmpty()) {
+						builder.with(MATERIALS, materials);
+					}
+					return builder.build();
+				}).orElse(ModelData.EMPTY);
+	}*/
 
 	@Override
 	public ItemOverrides getOverrides() {
 		return barrelItemOverrides;
 	}
+
+	/*@Override
+	public BakedModel applyTransform(ItemDisplayContext transformType, PoseStack poseStack, boolean applyLeftHandTransform) {
+		if (transformType == ItemDisplayContext.NONE) {
+			return this;
+		}
+
+		ITEM_TRANSFORMS.getTransform(transformType).apply(applyLeftHandTransform, poseStack);
+
+		return this;
+	}*/
 
 	private static class BarrelItemOverrides extends ItemOverrides {
 		private final BarrelBakedModelBase barrelBakedModel;
@@ -813,6 +865,18 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 				setProperties();
 				return super.getQuads(state, side, rand);
 			}
+
+			/*@Override
+			public BakedModel applyTransform(ItemDisplayContext cameraTransformType, PoseStack poseStack, boolean applyLeftHandTransform) {
+				super.applyTransform(cameraTransformType, poseStack, applyLeftHandTransform);
+
+				return this;
+			}
+
+			@Override
+			public List<BakedModel> getRenderPasses(ItemStack itemStack, boolean fabulous) {
+				return List.of(this); //this will only work as long as the barrel model has only 1 render pass
+			}*/
 
 			private void setProperties() {
 				barrelBakedModel.barrelHasMainColor = hasMainColor;
