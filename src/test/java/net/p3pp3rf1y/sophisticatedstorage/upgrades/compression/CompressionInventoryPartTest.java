@@ -75,9 +75,9 @@ public class CompressionInventoryPartTest {
 
 	private InventoryHandler getFilledInventoryHandler(Map<Integer, ItemStack> slotStacks, int baseSlotLimit) {
 		InventoryHandler inventoryHandler = Mockito.mock(InventoryHandler.class);
-		when(inventoryHandler.getBaseStackLimit(any(ItemVariant.class))).thenAnswer(i -> {
-			ItemVariant resource = i.getArgument(0);
-			int maxStackSize = resource.isBlank() ? 64 : resource.toStack().getMaxStackSize();
+		when(inventoryHandler.getBaseStackLimit(any(ItemStack.class))).thenAnswer(i -> {
+			ItemStack stack = i.getArgument(0);
+			int maxStackSize = stack.isEmpty() ? 64 : stack.getMaxStackSize();
 			int limit = MathHelper.intMaxCappedMultiply(maxStackSize, (baseSlotLimit / 64));
 			int remainder = baseSlotLimit % 64;
 			if (remainder > 0) {
@@ -714,7 +714,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
-		params.expectedLimits().forEach((slot, stackLimit) -> assertEquals(stackLimit.getRight(), part.getStackLimit(slot, ItemVariant.of(stackLimit.getLeft())), "Stack limit doesn't match"));
+		params.expectedLimits().forEach((slot, stackLimit) -> assertEquals(stackLimit.getRight(), part.getStackLimit(slot, stackLimit.getLeft()), "Stack limit doesn't match"));
 	}
 
 	private record StackLimitsAreSetCorrectlyOnInitParams(Map<Integer, ItemStack> stacks, int baseLimit,

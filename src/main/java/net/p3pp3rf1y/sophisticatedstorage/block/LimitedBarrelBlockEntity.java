@@ -235,7 +235,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 		ListTag sfl = new ListTag();
 		InventoryHelper.iterate(getStorageWrapper().getInventoryHandler(), (slot, stack) -> {
 			sc.add(slot, stack.getCount());
-			sfl.add(slot, FloatTag.valueOf(stack.getCount() / (float) getStorageWrapper().getInventoryHandler().getStackLimit(slot, ItemVariant.of(stack))));
+			sfl.add(slot, FloatTag.valueOf(stack.getCount() / (float) getStorageWrapper().getInventoryHandler().getStackLimit(slot, stack)));
 		});
 		updateTag.putIntArray(SLOT_COUNTS_TAG, sc);
 		updateTag.put(SLOT_FILL_LEVELS_TAG, sfl);

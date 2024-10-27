@@ -128,7 +128,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 				if (slot != slotRange.firstSlot()) {
 					lastMultiplier = intMaxCappedMultiply(lastMultiplier, definitions.get(slot).prevSlotMultiplier);
 				}
-				totalLimit = intMaxCappedAddition(totalLimit, intMaxCappedMultiply(lastMultiplier, parent.getBaseStackLimit(ItemVariant.of(definitions.get(slot).item))));
+				totalLimit = intMaxCappedAddition(totalLimit, intMaxCappedMultiply(lastMultiplier, parent.getBaseStackLimit(new ItemStack(definitions.get(slot).item))));
 
 				definitions.get(slot).setSlotLimit(totalLimit);
 			}
@@ -153,7 +153,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 			ItemStack calculatedStack = new ItemStack(slotDefinition.item(), totalCalculated);
 
-			int internalLimit = parent.getBaseStackLimit(ItemVariant.of(slotDefinition.item()));
+			int internalLimit = parent.getBaseStackLimit(calculatedStack);
 			int maxStackSize = calculatedStack.getMaxStackSize();
 			if (Integer.MAX_VALUE - totalCalculated < maxStackSize) {
 				calculatedStack.setCount(Integer.MAX_VALUE - (prevFull ? Math.min(maxStackSize, internalLimit - internalCount) : maxStackSize));
@@ -175,7 +175,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			}
 			int prevSlot = slot - 1;
 			ItemStack prevStack = parent.getSlotStack(prevSlot);
-			int stackLimit = parent.getBaseStackLimit(ItemVariant.of(prevStack));
+			int stackLimit = parent.getBaseStackLimit(prevStack);
 			int prevStackCount = toUpdate.containsKey(prevSlot) ? toUpdate.get(prevSlot) : prevStack.getCount();
 			int availableSpace = stackLimit - prevStackCount;
 			int countToInsert = Math.min(availableSpace, slotStack.getCount() / multiplier);
@@ -275,9 +275,9 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	}
 
 	@Override
-	public int getStackLimit(int slot, ItemVariant resource) {
+	public int getStackLimit(int slot, ItemStack stack) {
 		if (!slotDefinitions.containsKey(slot)) {
-			return parent.getBaseStackLimit(resource);
+			return parent.getBaseStackLimit(stack);
 		}
 
 		SlotDefinition slotDefinition = slotDefinitions.get(slot);
@@ -333,6 +333,37 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 		return 0;
 	}
+
+	// TODO:
+	/*private ItemStack extractItem(int slot, int amount, boolean simulate, ToIntFunction<ItemStack> getLimit) {
+		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
+			return ItemStack.EMPTY;
+		}
+		int toExtract = Math.min(calculatedStacks.get(slot).getCount(), amount);
+
+		if (toExtract > 0) {
+			SlotDefinition slotDefinition = slotDefinitions.get(slot);
+			ItemStack slotStack = parent.getSlotStack(slot);
+			toExtract = Math.min(toExtract, getLimit.applyAsInt(slotStack));
+			ItemStack result = slotDefinition.isCompressible() ? new ItemStack(slotDefinition.item(), toExtract) : slotStack.copyWithCount(toExtract);
+
+			if (!simulate) {
+				if (slotDefinition.isCompressible()) {
+					extractFromCalculated(slot, toExtract);
+					extractFromInternal(slot, toExtract);
+				} else {
+					slotStack.shrink(toExtract);
+					parent.setSlotStack(slot, slotStack);
+					calculatedStacks.put(slot, slotStack.copy());
+				}
+				removeDefinitionsIfEmpty(slot);
+			}
+
+			return result;
+		}
+
+		return ItemStack.EMPTY;
+	}*/
 
 	private void removeDefinitionsIfEmpty(int slotTriggeringChange) {
 		for (int slot = slotRange.firstSlot(); slot < slotRange.firstSlot() + slotRange.numberOfSlots(); slot++) {
@@ -444,7 +475,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		boolean hasPrevious = prevSlotDefinition != null && prevSlotDefinition.isAccessible();
 		if (countCalculated > 0 && Integer.MAX_VALUE - countCalculated < calculatedStack.getMaxStackSize() && hasPrevious) {
 			boolean prevSlotFull = getSlotLimit(prevSlot) == calculatedStacks.get(prevSlot).getCount();
-			int buffer = prevSlotFull ? getStackLimit(slotCalculated, ItemVariant.of(calculatedStack)) - countCalculated : calculatedStack.getMaxStackSize();
+			int buffer = prevSlotFull ? getStackLimit(slotCalculated, calculatedStack) - countCalculated : calculatedStack.getMaxStackSize();
 			toSet = Integer.MAX_VALUE - buffer;
 		}
 		return toSet;
@@ -534,7 +565,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	}*/
 
 	private long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx) {
-		if (canNotBeInserted(slot, resource)) {
+		ItemStack stack = resource.toStack((int) maxAmount);
+		if (canNotBeInserted(slot, stack)) {
 			return 0;
 		}
 
@@ -547,7 +579,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		int limit = getStackLimit(definitions.get(slot));
 
 		int currentCalculatedCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
-		long inserted = Math.min(Math.max(parent.getBaseStackLimit(resource) - parent.getSlotStack(slot).getCount(), limit - currentCalculatedCount), maxAmount);
+		long inserted = Math.min(Math.max(parent.getBaseStackLimit(stack) - parent.getSlotStack(slot).getCount(), limit - currentCalculatedCount), maxAmount);
 
 		if (inserted == 0) {
 			return 0;
@@ -584,8 +616,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		return inserted;
 	}
 
-	private boolean canNotBeInserted(int slot, ItemVariant resource) {
-		if (resource.isBlank()) {
+	private boolean canNotBeInserted(int slot, ItemStack stack) {
+		if (stack.isEmpty()) {
 			return true;
 		}
 
@@ -594,7 +626,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 
 		SlotDefinition slotDefinition = slotDefinitions.get(slot);
-		return !slotDefinition.isAccessible() || slotDefinition.item() != resource.getItem();
+		return !slotDefinition.isAccessible() || slotDefinition.item() != stack.getItem();
 	}
 
 	private void insertIntoInternalAndCalculated(int slotToStartFrom, long amountToInsert) {
@@ -615,7 +647,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		while (slot <= slotToStartFrom) {
 			calculatedAddition *= getPrevSlotMultiplier(slot);
 			ItemStack slotStack = parent.getSlotStack(slot);
-			int toSet = (int) Math.min(amountToSet / totalMultiplier, parent.getBaseStackLimit(ItemVariant.of(slotStack)));
+			int toSet = (int) Math.min(amountToSet / totalMultiplier, parent.getBaseStackLimit(slotStack));
 			calculatedAddition += (toSet - slotStack.getCount());
 			calculatedAdditions.put(slot, (int) Math.min(calculatedAddition, Integer.MAX_VALUE));
 			if (toSet > 0) {
@@ -669,9 +701,9 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 
 		ItemStack previousInternalStack = parent.getSlotStack(previousSlot);
-		boolean isPreviousFull = previousInternalStack.getCount() >= parent.getBaseStackLimit(ItemVariant.of(previousInternalStack));
+		boolean isPreviousFull = previousInternalStack.getCount() >= parent.getBaseStackLimit(previousInternalStack);
 
-		int internalLimit = parent.getBaseStackLimit(ItemVariant.of(currentCalculated));
+		int internalLimit = parent.getBaseStackLimit(currentCalculated);
 		int internalCount = parent.getSlotStack(slot).getCount();
 
 		int maxStackSize = previousInternalStack.getMaxStackSize();
@@ -704,18 +736,13 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	}
 
 	@Override
-	public boolean isItemValid(int slot, ItemVariant resource, int count) {
+	public boolean isItemValid(int slot, ItemStack stack) {
 		if (!slotDefinitions.containsKey(slot)) {
 			return true;
 		}
 
 		SlotDefinition slotDefinition = slotDefinitions.get(slot);
-		return slotDefinition.isAccessible() && slotDefinition.item() == resource.getItem();
-	}
-
-	@Override
-	public ItemVariant getVariantInSlot(int slot, IntFunction<ItemVariant> getVariantInSlotSuper) {
-		return slotDefinitions.containsKey(slot) && slotDefinitions.get(slot).isAccessible() && calculatedStacks.containsKey(slot) ? ItemVariant.of(calculatedStacks.get(slot)) : ItemVariant.blank();
+		return slotDefinition.isAccessible() && slotDefinition.item() == stack.getItem();
 	}
 
 	@Override
