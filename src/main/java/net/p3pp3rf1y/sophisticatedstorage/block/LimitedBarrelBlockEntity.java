@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -16,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeWrapper;
+import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RandHelper;
@@ -188,8 +188,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean depositFromAllOfPlayersInventory(Player player, int slot, InventoryHandler invHandler, ItemStack stackInSlot, MemorySettingsCategory memorySettings) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		Predicate<ItemStack> memoryItemMatches = itemStack -> memorySettings.isSlotSelected(slot) && memorySettings.matchesFilter(slot, itemStack);
-		// TODO: Usable?
-		/*CapabilityHelper.runOnItemHandler(player, playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
+		CapabilityHelper.runOnItemHandler(player, playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
 			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameComponents(stackInSlot, playerStack)))) {
 
 				ItemStack result = invHandler.insertItemOnlyToSlot(slot, playerStack, true);
@@ -201,28 +200,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 					}
 				}
 			}
-		}));*/
-
-		PlayerInventoryStorage playerInventory = PlayerInventoryStorage.of(player);
-		InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
-			ItemVariant resource = ItemVariant.of(playerStack);
-			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameComponents(stackInSlot, playerStack)))) {
-				try (Transaction ctx = Transaction.openOuter()) {
-					long inserted;
-					try (Transaction simulate = Transaction.openNested(ctx)) {
-						inserted = invHandler.insertItemOnlyToSlot(slot, resource, playerStack.getCount(), simulate);
-					}
-					if (inserted > 0) {
-						long extracted = playerInventory.getSlot(playerSlot).extract(resource, inserted, ctx);
-						if (extracted > 0) {
-							invHandler.insertItemOnlyToSlot(slot, resource, extracted, ctx);
-							success.set(true);
-							ctx.commit();
-						}
-					}
-				}
-			}
-		});
+		}));
 		return success.get();
 	}
 
@@ -242,23 +220,6 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 		} else {
 			player.drop(stackTaken, false);
 		}
-
-		// TODO: check
-		/*ItemVariant resource = ItemVariant.of(stackInSlot);
-		int countToTake = player.isShiftKeyDown() ? Math.min(stackInSlot.getMaxStackSize(), stackInSlot.getCount()) : 1;
-		long extracted;
-		try (Transaction ctx = Transaction.openOuter()) {
-			extracted = inventoryHandler.extractSlot(slot, resource, countToTake, ctx);
-			ctx.commit();
-		}
-
-		ItemStack extractedStack = resource.toStack((int) extracted);
-		if (player.getInventory().add(extractedStack)) {
-			//noinspection ConstantConditions
-			getLevel().playSound(null, getBlockPos(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, (RandHelper.getRandomMinusOneToOne(getLevel().random) * .7f + 1) * 2);
-		} else if (!extractedStack.isEmpty()) {
-			player.drop(extractedStack, false);
-		}*/
 		return true;
 	}
 
