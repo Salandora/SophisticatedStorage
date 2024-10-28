@@ -43,12 +43,10 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 			CapabilityHelper.runOnCapability(player, Capabilities.ItemHandler.ENTITY, null,
 					playerInventory -> InventoryHelper.iterate(playerInventory, (slot, stack) -> {
 						if (canDepositStack(stack)) {
-							try(Transaction ctx = Transaction.openOuter()) {
-								ItemVariant resource = ItemVariant.of(stack);
-								long inserted = insert(resource, stack.getCount(), ctx, false);
-								if (inserted > 0 && playerInventory.extract(resource, inserted, ctx) == inserted) {
-									ctx.commit();
-								}
+							ItemStack resultStack = insertItem(stack, true, false);
+							int countToExtract = stack.getCount() - resultStack.getCount();
+							if (countToExtract > 0 && playerInventory.extractItem(slot, countToExtract, true).getCount() == countToExtract) {
+								insertItem(playerInventory.extractItem(slot, countToExtract, false), false, false);
 							}
 						}
 					}));
@@ -57,11 +55,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 
 		ItemStack itemInHand = player.getItemInHand(hand);
 		if (!itemInHand.isEmpty() && canDepositStack(itemInHand)) {
-			try (Transaction ctx = Transaction.openOuter()) {
-				long inserted = insert(ItemVariant.of(itemInHand), itemInHand.getCount(), ctx, false);
-				player.setItemInHand(hand, itemInHand.copyWithCount(itemInHand.getCount() - (int) inserted));
-				ctx.commit();
-			}
+			player.setItemInHand(hand, insertItem(itemInHand, false, false));
 		}
 	}
 

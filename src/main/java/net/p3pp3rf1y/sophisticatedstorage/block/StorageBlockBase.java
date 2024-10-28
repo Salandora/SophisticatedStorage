@@ -231,13 +231,9 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem
 				&& RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
 			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
-			ItemVariant resource = ItemVariant.of(itemInHand);
 			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).successful()
-					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != 0) {
-				try (Transaction ctx = Transaction.openOuter()) {
-					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);
-					ctx.commit();
-				}
+					&& InventoryHelper.insertIntoInventory(itemInHand, upgradeHandler, true).getCount() != itemInHand.getCount()) {
+				InventoryHelper.insertIntoInventory(itemInHand.copyWithCount(1), upgradeHandler, false);
 				itemInHand.shrink(1);
 				if (itemInHand.isEmpty()) {
 					player.setItemInHand(hand, ItemStack.EMPTY);

@@ -120,8 +120,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 				upgradeCachesInvalidatedHandler.run();
 			}) {
 				@Override
-				public boolean isItemValid(int slot, ItemVariant resource, int count) {
-					return super.isItemValid(slot, resource, count) && (resource.isBlank() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(resource.getItem()).getNamespace()) || resource.toStack(count).is(ModItems.STORAGE_UPGRADE_TAG));
+				public boolean isItemValid(int slot, ItemStack stack) {
+					return super.isItemValid(slot, stack) && (stack.isEmpty() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace()) || stack.is(ModItems.STORAGE_UPGRADE_TAG));
 				}
 
 				@Override
@@ -248,8 +248,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private void initInventoryHandler() {
 		inventoryHandler = new InventoryHandler(getNumberOfInventorySlots(), this, getContentsNbt(), getSaveHandler.get(), StackUpgradeItem.getInventorySlotLimit(this), Config.SERVER.stackUpgrade) {
 			@Override
-			protected boolean isAllowed(ItemVariant resource) {
-				return isAllowedInStorage(resource.toStack());
+			protected boolean isAllowed(ItemStack stack) {
+				return isAllowedInStorage(stack);
 			}
 		};
 		inventoryHandler.addListener(getSettingsHandler().getTypeCategory(ItemDisplaySettingsCategory.class)::itemChanged);
