@@ -25,17 +25,20 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+
+import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
+import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.WOOD_NAME;
 
 public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";
@@ -94,18 +97,24 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 			return model.getParticleIcon();
 		}
 
-		@Override
-		public TextureAtlasSprite getParticleIcon(BlockState state, BlockAndTintGetter blockView, BlockPos pos) {
-			Object attachment = blockView.getBlockEntityRenderData(pos);
-			if (attachment instanceof WoodStorageBlockEntity.ModelData data) {
-				ResourceLocation texture = TINTABLE_BREAK_TEXTURE;
-				if (Boolean.FALSE.equals(data.hasMainColor()) && data.woodName() != null && WOOD_BREAK_TEXTURES.containsKey(data.woodName())) {
-					texture = WOOD_BREAK_TEXTURES.get(data.woodName());
-				}
-				return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
-			}
+		@Nonnull
+		public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
+			return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class)
+					.map(be -> {
+						ModelData.Builder builder = ModelData.builder();
+						builder.with(HAS_MAIN_COLOR, be.getStorageWrapper().getMainColor() > -1);
+						be.getWoodType().ifPresent(n -> builder.with(WOOD_NAME, n.name()));
+						return builder.build();
+					}).orElse(ModelData.EMPTY);
+		}
 
-			return getParticleIcon();
+		@Override
+		public TextureAtlasSprite getParticleIcon(ModelData data) {
+			ResourceLocation texture = TINTABLE_BREAK_TEXTURE;
+			if (Boolean.FALSE.equals(data.get(HAS_MAIN_COLOR)) && data.has(WOOD_NAME) && WOOD_BREAK_TEXTURES.containsKey(data.get(WOOD_NAME))) {
+				texture = WOOD_BREAK_TEXTURES.get(data.get(WOOD_NAME));
+			}
+			return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
 		}
 
 		@Override

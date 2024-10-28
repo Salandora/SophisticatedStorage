@@ -20,7 +20,6 @@ import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import java.util.List;
-import javax.annotation.Nullable;
 
 public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	public static final String STORAGE_TYPE = "shulker_box";
@@ -150,16 +149,5 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 		OPENING,
 		OPENED,
 		CLOSING
-	}
-
-	@Override
-	public @Nullable Object getRenderAttachmentData() {
-		return new ModelData(this);
-	}
-
-	public record ModelData(Boolean hasMainColor) {
-		public ModelData(ShulkerBoxBlockEntity tile) {
-			this(tile.getStorageWrapper().hasMainColor());
-		}
 	}
 }
