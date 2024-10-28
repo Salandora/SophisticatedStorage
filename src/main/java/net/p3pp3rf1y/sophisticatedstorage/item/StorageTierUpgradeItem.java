@@ -68,6 +68,10 @@ public class StorageTierUpgradeItem extends ItemBase {
 		this.hasTooltip = hasTooltip;
 	}
 
+	public TierUpgrade getTier() {
+		return tier;
+	}
+
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
 		if (hasTooltip) {

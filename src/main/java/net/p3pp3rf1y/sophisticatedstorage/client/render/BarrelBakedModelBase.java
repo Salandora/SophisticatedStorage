@@ -729,6 +729,39 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return getParticleIcon();
 	}
 
+	// TODO: Fix thsi
+	@Nonnull
+	@Override
+	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData) {
+		return WorldHelper.getBlockEntity(world, pos, BarrelBlockEntity.class)
+				.map(BarrelBakedModelBase::getModelDataFromBlockEntity).orElse(ModelData.EMPTY);
+	}
+
+	public static ModelData getModelDataFromBlockEntity(BarrelBlockEntity be) {
+		ModelData.Builder builder = ModelData.builder();
+		boolean hasMainColor = be.getStorageWrapper().hasMainColor();
+		builder.with(HAS_MAIN_COLOR, hasMainColor);
+		boolean hasAccentColor = be.getStorageWrapper().hasAccentColor();
+		builder.with(HAS_ACCENT_COLOR, hasAccentColor);
+		if (!be.hasFullyDynamicRenderer()) {
+			builder.with(DISPLAY_ITEMS, be.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getDisplayItems());
+			builder.with(INACCESSIBLE_SLOTS, be.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getInaccessibleSlots());
+		}
+		builder.with(IS_PACKED, be.isPacked());
+		builder.with(SHOWS_LOCK, be.isLocked() && be.shouldShowLock());
+		builder.with(SHOWS_TIER, be.shouldShowTier());
+		Optional<WoodType> woodType = be.getWoodType();
+		if (woodType.isPresent() || !(hasMainColor && hasAccentColor)) {
+			builder.with(WOOD_NAME, woodType.orElse(WoodType.ACACIA).name());
+		}
+
+		Map<BarrelMaterial, ResourceLocation> materials = be.getMaterials();
+		if (!materials.isEmpty()) {
+			builder.with(MATERIALS, materials);
+		}
+		return builder.build();
+	}
+
 	@Override
 	public ItemOverrides getOverrides() {
 		return barrelItemOverrides;
