@@ -36,6 +36,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
 
 import javax.annotation.Nonnull;
@@ -43,6 +44,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
 
 public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay {
 	public static final String STORAGE_WRAPPER_TAG = "storageWrapper";
@@ -736,5 +739,12 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
 			itemHandlerGetter.get().setStackInSlot(slot, stack);
 		}
+	}
+
+	@Override
+	public @Nullable Object getRenderData() {
+		ModelData.Builder builder = ModelData.builder();
+		builder.with(HAS_MAIN_COLOR, this.getStorageWrapper().getMainColor() != -1);
+		return builder.build();
 	}
 }

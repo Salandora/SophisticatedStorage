@@ -16,11 +16,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	public static final String STORAGE_TYPE = "shulker_box";
@@ -150,16 +152,5 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 		OPENING,
 		OPENED,
 		CLOSING
-	}
-
-	@Override
-	public @Nullable Object getRenderData() {
-		return new ModelData(this);
-	}
-
-	public record ModelData(Boolean hasMainColor) {
-		public ModelData(ShulkerBoxBlockEntity tile) {
-			this(tile.getStorageWrapper().hasMainColor());
-		}
 	}
 }
