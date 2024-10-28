@@ -180,7 +180,9 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		}
 	}
 
+	@Override
 	public void onChunkUnloaded() {
+		super.onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

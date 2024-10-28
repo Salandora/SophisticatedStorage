@@ -15,11 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeWrapper;
-import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.RandHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.*;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import java.util.*;
@@ -171,16 +167,14 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 			return depositFromAllOfPlayersInventory(player, slot, invHandler, stackInSlot, memorySettings);
 		}
 
-		try (Transaction ctx = Transaction.openOuter()) {
-			long inserted = invHandler.insertItemOnlyToSlot(slot, ItemVariant.of(stackInHand), stackInHand.getCount(), ctx);
-			if (inserted > 0) {
-				if (isLocked()) {
-					memorySettings.selectSlot(slot);
-				}
-				player.setItemInHand(hand, stackInHand.copyWithCount(stackInHand.getCount() - (int) inserted));
-				ctx.commit();
-				return true;
+		ItemStack result = invHandler.insertItemOnlyToSlot(slot, stackInHand, true);
+		if (result.getCount() != stackInHand.getCount()) {
+			result = invHandler.insertItemOnlyToSlot(slot, stackInHand, false);
+			if (isLocked()) {
+				memorySettings.selectSlot(slot);
 			}
+			player.setItemInHand(hand, result);
+			return true;
 		}
 		return false;
 	}

@@ -298,7 +298,9 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		}
 	}
 
+	@Override
 	public void onChunkUnloaded() {
+		super.onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 
@@ -632,6 +634,15 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 			return itemHandlerGetter.get().getStackInSlot(slot);
 		}
 
+		@Nonnull
+		@Override
+		public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+			if (matchesContents(stack)) {
+				return itemHandlerGetter.get().insertItem(slot, stack, simulate);
+			}
+			return stack;
+		}
+
 		@Override
 		public SingleSlotStorage<ItemVariant> getSlot(int slot) {
 			return itemHandlerGetter.get().getSlot(slot);
@@ -643,6 +654,12 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 				return itemHandlerGetter.get().insertSlot(slot, resource, maxAmount, ctx);
 			}
 			return 0;
+		}
+
+		@Nonnull
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			return itemHandlerGetter.get().extractItem(slot, amount, simulate);
 		}
 
 		@Override
@@ -667,6 +684,14 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 
 		private boolean matchesContents(ItemStack stack) {
 			return slotTrackerGetter.get().getItems().contains(stack.getItem()) || memorySettingsGetter.get().matchesFilter(stack);
+		}
+
+		@Override
+		public ItemStack insertItem(ItemStack stack, boolean simulate) {
+			if (matchesContents(stack)) {
+				return itemHandlerGetter.get().insertItem(stack, simulate);
+			}
+			return stack;
 		}
 
 		@Override

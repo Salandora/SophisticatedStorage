@@ -42,25 +42,16 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		itemHandler = null;
 	}
 
-	/*private static class OutputOnlyItemHandlerWrapper implements SlottedStackStorage {
-		private final SlottedStackStorage itemHandler;
+	/*private static class OutputOnlyItemHandlerWrapper implements IItemHandler {
+		private final IItemHandlerSimpleInserter itemHandler;
 
-		public OutputOnlyItemHandlerWrapper(SlottedStackStorage itemHandler) {
+		public OutputOnlyItemHandlerWrapper(IItemHandlerSimpleInserter itemHandler) {
 			this.itemHandler = itemHandler;
 		}
 
 		@Override
-		public int getSlotCount() {
-			return itemHandler.getSlotCount();
-		}
-
-		@Override
-		public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-			return new SingleSlotOutputSlotWrapper(itemHandler.getSlot(slot));
-		}
-
-		@Override
-		public void setStackInSlot(int slot, ItemStack stack) {
+		public int getSlots() {
+			return itemHandler.getSlots();
 		}
 
 		@Override
@@ -69,23 +60,13 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public long insert(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return 0;
+		public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+			return stack;
 		}
 
 		@Override
-		public long insertSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return 0;
-		}
-
-		@Override
-		public long extract(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return itemHandler.extract(resource, maxAmount, ctx);
-		}
-
-		@Override
-		public long extractSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return itemHandler.extractSlot(slot, resource, maxAmount, ctx);
+		public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+			return itemHandler.extractItem(slot, amount, simulate);
 		}
 
 		@Override
@@ -94,45 +75,8 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
+		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 			return false;
-		}
-	}
-
-	private static class SingleSlotOutputSlotWrapper implements SingleSlotStorage<ItemVariant> {
-		private final SingleSlotStorage<ItemVariant> backingSlot;
-		public SingleSlotOutputSlotWrapper(SingleSlotStorage<ItemVariant> backingSlot) {
-			this.backingSlot = backingSlot;
-		}
-
-		@Override
-		public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-			return 0;
-		}
-
-		@Override
-		public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-			return backingSlot.extract(resource, maxAmount, transaction);
-		}
-
-		@Override
-		public boolean isResourceBlank() {
-			return backingSlot.isResourceBlank();
-		}
-
-		@Override
-		public ItemVariant getResource() {
-			return backingSlot.getResource();
-		}
-
-		@Override
-		public long getAmount() {
-			return backingSlot.getAmount();
-		}
-
-		@Override
-		public long getCapacity() {
-			return backingSlot.getSlotCount();
 		}
 	}*/
 }
