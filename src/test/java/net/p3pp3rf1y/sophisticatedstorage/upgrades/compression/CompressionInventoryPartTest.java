@@ -251,12 +251,8 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(internalStacksBefore, invHandler, minSlot);
 
-		ItemVariant variant = part.getVariantInSlot(extractSlot, s -> ItemVariant.blank());
-		ItemStack result;
-		try (Transaction ctx = Transaction.openOuter()) {
-			result = variant.toStack((int) part.extractItem(extractSlot, variant, extractAmount, ctx));
-			ctx.commit();
-		}
+		ItemVariant variant = ItemVariant.of(part.getStackInSlot(extractSlot, s -> ItemStack.EMPTY));
+		ItemStack result = variant.toStack((int) part.extractItem(extractSlot, variant, extractAmount, null));
 
 		assertStackEquals(extractResult, result, "Extract result doesn't match");
 		assertCalculatedStacks(calculatedStacksAfter, minSlot, part);
@@ -376,7 +372,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(internalStacksBefore, invHandler, minSlot);
 
-		ItemVariant variant = part.getVariantInSlot(extractSlot, s -> ItemVariant.blank());
+		ItemVariant variant = ItemVariant.of(part.getStackInSlot(extractSlot, s -> ItemStack.EMPTY));
 		ItemStack result;
 		try (Transaction ctx = Transaction.openOuter()) {
 			result = variant.toStack((int) part.extractItem(extractSlot, variant, extractAmount, ctx));
@@ -684,7 +680,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
-		ItemVariant resource = part.getVariantInSlot(1, s -> ItemVariant.blank());
+		ItemVariant resource = ItemVariant.of(part.getStackInSlot(1, s -> ItemStack.EMPTY));
 		ItemStack extracted;
 		try (Transaction ctx = Transaction.openOuter()) {
 			extracted = resource.toStack((int) part.extractItem(1, resource, 1, ctx));
@@ -699,7 +695,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
-		ItemVariant resource = part.getVariantInSlot(1, s -> ItemVariant.blank());
+		ItemVariant resource = ItemVariant.of(part.getStackInSlot(1, s -> ItemStack.EMPTY));
 		ItemStack extracted = resource.toStack((int) part.extractItem(1, null, 1, null));
 
 		assertStackEquals(new ItemStack(Items.COBBLESTONE, 1), extracted, "Extracted item doesn't match");

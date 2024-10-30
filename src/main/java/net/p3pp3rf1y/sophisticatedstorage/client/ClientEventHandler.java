@@ -193,6 +193,7 @@ public class ClientEventHandler {
 					Minecraft.getInstance().gameMode.destroyDelay = 5;
 				}
 			}
+			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}

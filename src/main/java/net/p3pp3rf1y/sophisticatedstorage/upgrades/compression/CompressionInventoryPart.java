@@ -723,8 +723,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack, BiConsumer<Integer, ItemStack> setStackInSlotSuper) {
-		// We want this to always run, but  we might come from a closing transaction, so we can not open a new one hence why
-		// by passing null we later check if there is a transaction and either attach to it or run directly
+		/// We want this to always run, but we might come from a closing transaction, so we can not open a new one hence why
+		/// by passing null we later check if there is a transaction and either attach to it or run directly see {@link #onSuccessOrRun(TransactionContext, Runnable)}
 		int currentCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
 		if (currentCount < stack.getCount()) {
 			// TODO: insertItem(slot, stack.copyWithCount(stack.getCount() - currentCount), false);
