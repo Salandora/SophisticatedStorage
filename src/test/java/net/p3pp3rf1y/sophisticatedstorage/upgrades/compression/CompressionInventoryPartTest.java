@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -415,8 +413,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(params.internalStacksBefore, invHandler, minSlot);
 
-		ItemVariant variant = ItemVariant.of(params.stack);
-		ItemStack result = variant.toStack(params.stack.getCount() - (int) part.insertItem(params.insertSlot, variant, params.stack.getCount(), null, (slot, resource, amount, context) -> 0L));
+		ItemStack result = part.insertItem(params.insertSlot, params.stack, false, (slot, itemStack, simulate) -> ItemStack.EMPTY);
 
 		assertStackEquals(params.insertResult, result, "Insert result doesn't match");
 		assertCalculatedStacks(params.calculatedStacksAfter, minSlot, part);
@@ -554,9 +551,9 @@ public class CompressionInventoryPartTest {
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> getMemorySettings(invHandler, Map.of()));
 		part.extractItem(0, 63, false);
 
-		long inserted = part.insertItem(1, ItemVariant.of(Items.GOLD_NUGGET), 10, null, (s, res, amount, nested) -> 10L);
+		ItemStack insertResult = part.insertItem(1, new ItemStack(Items.GOLD_NUGGET, 10), false, (s, st, sim) -> ItemStack.EMPTY);
 
-		assertEquals(10L, inserted);
+		assertTrue(insertResult.isEmpty());
 	}
 
 	@Test
@@ -568,7 +565,7 @@ public class CompressionInventoryPartTest {
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> memorySettings);
 		part.extractItem(0, 32, false);
 
-		assertEquals(0L, part.insertItem(1, ItemVariant.of(Items.GOLD_BLOCK), 32, null, (s, res, amount, nested) -> 0L), "Insert result does not equal");
+		assertStackEquals(new ItemStack(Items.GOLD_BLOCK, 32), part.insertItem(1, new ItemStack(Items.GOLD_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
 	}
 
 	@Test
@@ -579,13 +576,8 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> memorySettings);
 
-		long inserted;
-		try (Transaction simulate = Transaction.openOuter()) {
-			inserted = part.insertItem(1, ItemVariant.of(Items.GOLD_BLOCK), 32, simulate, (s, res, amount, nested) -> 0L);
-		}
-
-		assertEquals(0L, inserted, "Insert result does not equal");
-		assertEquals(32L, part.insertItem(1, ItemVariant.of(Items.IRON_BLOCK), 32, null, (s, res, amount, nested) -> 32L), "Insert result does not equal");
+		assertStackEquals(new ItemStack(Items.GOLD_BLOCK, 32), part.insertItem(1, new ItemStack(Items.GOLD_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
+		assertStackEquals(ItemStack.EMPTY, part.insertItem(1, new ItemStack(Items.IRON_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
 	}
 
 	@ParameterizedTest
@@ -649,7 +641,7 @@ public class CompressionInventoryPartTest {
 
 		ItemStack damagedItem = new ItemStack(Items.NETHERITE_AXE);
 		damagedItem.setDamageValue(10);
-		part.insertItem(1, ItemVariant.of(damagedItem), damagedItem.getCount(), null, (s, res, amount, nested) -> (long) damagedItem.getCount());
+		part.insertItem(1, damagedItem, false, (s, st, sim) -> ItemStack.EMPTY);
 
 		assertStackEquals(damagedItem, part.getStackInSlot(1, s -> ItemStack.EMPTY), "Damaged item doesn't match");
 	}
@@ -670,7 +662,7 @@ public class CompressionInventoryPartTest {
 		ItemStack damagedItem = new ItemStack(Items.NETHERITE_AXE);
 		damagedItem.setDamageValue(10);
 
-		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, damagedItem.copy(), 2, ItemStack.EMPTY), 64);
+		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, damagedItem, 2, ItemStack.EMPTY), 64);
 		int minSlot = 0;
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
@@ -739,8 +731,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
-		ItemStack stack = params.insertedStack.getRight();
-		part.insertItem(params.insertedStack.getLeft(), ItemVariant.of(stack), stack.getCount(), null, (slot, resource, amount, nested) -> 0L);
+		part.insertItem(params.insertedStack.getLeft(), params.insertedStack.getRight(), false, (slot, itemStack, simulate) -> ItemStack.EMPTY);
 
 		assertCalculatedStacks(params.expectedStacksSet(), 0, part);
 		assertInternalStacks(params.expectedStacksSet(), invHandler);

@@ -1,11 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
-import com.mojang.datafixers.util.Function4;
 import com.mojang.datafixers.util.Pair;
-import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
@@ -457,18 +452,11 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	}
 
 	@Override
-	public long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx, Function4<Integer, ItemVariant, Long, TransactionContext, Long> insertSuper) {
-		return insertItem(slot, resource, maxAmount, ctx);
-	}
-
-	// TODO:
-	/*@Override
 	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate, TriFunction<Integer, ItemStack, Boolean, ItemStack> insertSuper) {
 		return insertItem(slot, stack, simulate);
-	}*/
+	}
 
-	// TODO:
-	/*private ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+	private ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 		if (canNotBeInserted(slot, stack)) {
 			return stack;
 		}
@@ -524,58 +512,6 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 
 		return result;
-	}*/
-
-	private long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx) {
-		ItemStack stack = resource.toStack((int) maxAmount);
-		if (canNotBeInserted(slot, stack)) {
-			return 0;
-		}
-
-		Map<Integer, SlotDefinition> definitions = slotDefinitions;
-
-		if (definitions.isEmpty()) {
-			definitions = getSlotDefinitions(resource.getItem(), slot, Map.of());
-		}
-
-		int limit = getStackLimit(definitions.get(slot));
-
-		int currentCalculatedCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
-		long inserted = Math.min(Math.max(parent.getBaseStackLimit(stack) - parent.getSlotStack(slot).getCount(), limit - currentCalculatedCount), maxAmount);
-
-		if (inserted == 0) {
-			return 0;
-		}
-
-		Map<Integer, SlotDefinition> finalDefinitions = definitions;
-		onSuccessOrRun(ctx, () -> {
-			if (!slotDefinitions.containsKey(slot)) {
-				setSlotDefinitions(finalDefinitions, false);
-				compactInternalSlots();
-				updateCalculatedStacks();
-			}
-
-			if (slotDefinitions.get(slot).isCompressible()) {
-				insertIntoInternalAndCalculated(slot, inserted);
-			} else if (inserted > 0) {
-				calculatedStacks.compute(slot, (s, st) -> {
-					if (st == null || st.isEmpty()) {
-						return resource.toStack((int) inserted);
-					}
-					st.grow((int) inserted);
-					return st;
-				});
-				ItemStack slotStack = parent.getSlotStack(slot);
-				if (slotStack.isEmpty()) {
-					parent.setSlotStack(slot, resource.toStack((int) inserted));
-				} else {
-					slotStack.grow((int) inserted);
-					parent.setSlotStack(slot, slotStack);
-				}
-			}
-		});
-
-		return inserted;
 	}
 
 	private boolean canNotBeInserted(int slot, ItemStack stack) {
@@ -673,27 +609,13 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		currentCalculated.setCount(Integer.MAX_VALUE - spaceBeforeMaxInt);
 	}
 
-	public static void onSuccessOrRun(@Nullable TransactionContext ctx, Runnable r) {
-		if (ctx != null) {
-			TransactionCallback.onSuccess(ctx, r);
-		} else if (Transaction.getLifecycle() == Transaction.Lifecycle.OPEN) {
-			TransactionCallback.onSuccess(Transaction.getCurrentUnsafe(), r);
-		} else {
-			r.run();
-		}
-	}
-
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack, BiConsumer<Integer, ItemStack> setStackInSlotSuper) {
-		/// We want this to always run, but we might come from a closing transaction, so we can not open a new one hence why
-		/// by passing null we later check if there is a transaction and either attach to it or run directly see {@link #onSuccessOrRun(TransactionContext, Runnable)}
 		int currentCount = calculatedStacks.containsKey(slot) ? calculatedStacks.get(slot).getCount() : 0;
 		if (currentCount < stack.getCount()) {
-			// TODO: insertItem(slot, stack.copyWithCount(stack.getCount() - currentCount), false);
-			insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, null);
+			insertItem(slot, stack.copyWithCount(stack.getCount() - currentCount), false);
 		} else if (currentCount > stack.getCount()) {
 			extractItem(slot, currentCount - stack.getCount(), false, s -> Integer.MAX_VALUE);
-			// TODO: Remove extractItem(slot, currentCount - stack.getCount(), null, s -> Integer.MAX_VALUE);
 		}
 	}
 

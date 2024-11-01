@@ -38,6 +38,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -690,7 +691,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		}
 
 		@Override
-		public ItemStack insertItem(ItemStack stack, boolean simulate) {
+		public @NotNull ItemStack insertItem(ItemStack stack, boolean simulate) {
 			if (matchesContents(stack)) {
 				return itemHandlerGetter.get().insertItem(stack, simulate);
 			}
