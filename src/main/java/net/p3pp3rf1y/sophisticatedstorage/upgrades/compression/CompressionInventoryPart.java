@@ -18,6 +18,7 @@ import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import org.apache.commons.lang3.function.TriFunction;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -228,7 +229,6 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		return Optional.empty();
 	}
 
-
 	private void addPreviousItems(Map<Integer, SlotDefinition> slotDefinitions, int firstFilledSlot, Item firstFilledItem) {
 		Item currentItem = firstFilledItem;
 		for (int slot = firstFilledSlot + 1; slot < slotRange.firstSlot() + slotRange.numberOfSlots(); slot++) {
@@ -292,50 +292,12 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		return slotDefinition.slotLimit();
 	}
 
-	// TODO:
-	/*@Override
-	public ItemStack extractItem(int slot, long amount, boolean simulate) {
-		return extractItem(slot, amount, simulate, s -> s.isEmpty() ? 64 : s.getMaxStackSize());
-	}*/
-
 	@Override
-	public long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx) {
-		return extractItem(slot, amount, ctx, s -> resource.isBlank() ? 64 : resource.toStack().getMaxStackSize());
+	public ItemStack extractItem(int slot, int amount, boolean simulate) {
+		return extractItem(slot, amount, simulate, s -> s.isEmpty() ? 64 : s.getMaxStackSize());
 	}
 
-	private long extractItem(int slot, long amount, @Nullable TransactionContext ctx, ToIntFunction<ItemStack> getLimit) {
-		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
-			return 0;
-		}
-		int toExtract = Math.min(calculatedStacks.get(slot).getCount(), (int) amount);
-
-		if (toExtract > 0) {
-			SlotDefinition slotDefinition = slotDefinitions.get(slot);
-			ItemStack slotStack = parent.getSlotStack(slot);
-			toExtract = Math.min(toExtract, getLimit.applyAsInt(slotStack));
-			//ItemStack result = slotDefinition.isCompressible() ? new ItemStack(slotDefinition.item(), toExtract) : slotStack.copyWithCount(toExtract);
-
-			int finalToExtract = toExtract;
-			onSuccessOrRun(ctx, () -> {
-				if (slotDefinition.isCompressible()) {
-					extractFromCalculated(slot, finalToExtract);
-					extractFromInternal(slot, finalToExtract);
-				} else {
-					slotStack.shrink(finalToExtract);
-					parent.setSlotStack(slot, slotStack);
-					calculatedStacks.put(slot, slotStack.copy());
-				}
-				removeDefinitionsIfEmpty(slot);
-			});
-
-			return toExtract;
-		}
-
-		return 0;
-	}
-
-	// TODO:
-	/*private ItemStack extractItem(int slot, int amount, boolean simulate, ToIntFunction<ItemStack> getLimit) {
+	private ItemStack extractItem(int slot, int amount, boolean simulate, ToIntFunction<ItemStack> getLimit) {
 		if (!slotDefinitions.containsKey(slot) || !slotDefinitions.get(slot).isAccessible()) {
 			return ItemStack.EMPTY;
 		}
@@ -363,7 +325,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 
 		return ItemStack.EMPTY;
-	}*/
+	}
 
 	private void removeDefinitionsIfEmpty(int slotTriggeringChange) {
 		for (int slot = slotRange.firstSlot(); slot < slotRange.firstSlot() + slotRange.numberOfSlots(); slot++) {
@@ -494,16 +456,16 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 	}
 
+	@Override
+	public long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx, Function4<Integer, ItemVariant, Long, TransactionContext, Long> insertSuper) {
+		return insertItem(slot, resource, maxAmount, ctx);
+	}
+
 	// TODO:
 	/*@Override
 	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate, TriFunction<Integer, ItemStack, Boolean, ItemStack> insertSuper) {
 		return insertItem(slot, stack, simulate);
 	}*/
-
-	@Override
-	public long insertItem(int slot, ItemVariant resource, long maxAmount, @Nullable TransactionContext ctx, Function4<Integer, ItemVariant, Long, TransactionContext, Long> insertSuper) {
-		return insertItem(slot, resource, maxAmount, ctx);
-	}
 
 	// TODO:
 	/*private ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
@@ -730,8 +692,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			// TODO: insertItem(slot, stack.copyWithCount(stack.getCount() - currentCount), false);
 			insertItem(slot, ItemVariant.of(stack), stack.getCount() - currentCount, null);
 		} else if (currentCount > stack.getCount()) {
-			// TODO: extractItem(slot, currentCount - stack.getCount(), false, s -> Integer.MAX_VALUE);
-			extractItem(slot, currentCount - stack.getCount(), null, s -> Integer.MAX_VALUE);
+			extractItem(slot, currentCount - stack.getCount(), false, s -> Integer.MAX_VALUE);
+			// TODO: Remove extractItem(slot, currentCount - stack.getCount(), null, s -> Integer.MAX_VALUE);
 		}
 	}
 
