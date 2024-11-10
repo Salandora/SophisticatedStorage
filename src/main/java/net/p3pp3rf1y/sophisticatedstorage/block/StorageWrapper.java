@@ -35,11 +35,13 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class StorageWrapper implements IStorageWrapper {
-	private static final String MAIN_COLOR_TAG = "mainColor";
-	private static final String ACCENT_COLOR_TAG = "accentColor";
+	public static final String MAIN_COLOR_TAG = "mainColor";
+	public static final String ACCENT_COLOR_TAG = "accentColor";
 	private static final String UUID_TAG = "uuid";
 	private static final String OPEN_TAB_ID_TAG = "openTabId";
 	public static final String CONTENTS_TAG = "contents";
+	public static final String NUMBER_OF_INVENTORY_SLOTS_TAG = "numberOfInventorySlots";
+	public static final String NUMBER_OF_UPGRADE_SLOTS_TAG = "numberOfUpgradeSlots";
 	private final Supplier<Runnable> getSaveHandler;
 
 	@Nullable
@@ -176,10 +178,10 @@ public abstract class StorageWrapper implements IStorageWrapper {
 			tag.putInt("columnsTaken", columnsTaken);
 		}
 		if (numberOfInventorySlots > 0) {
-			tag.putInt("numberOfInventorySlots", numberOfInventorySlots);
+			tag.putInt(NUMBER_OF_INVENTORY_SLOTS_TAG, numberOfInventorySlots);
 		}
 		if (numberOfUpgradeSlots > -1) {
-			tag.putInt("numberOfUpgradeSlots", numberOfUpgradeSlots);
+			tag.putInt(NUMBER_OF_UPGRADE_SLOTS_TAG, numberOfUpgradeSlots);
 		}
 		if (mainColor != -1) {
 			tag.putInt(MAIN_COLOR_TAG, mainColor);
@@ -216,8 +218,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	protected void loadSlotNumbers(CompoundTag tag) {
-		numberOfInventorySlots = NBTHelper.getInt(tag, "numberOfInventorySlots").orElse(0);
-		numberOfUpgradeSlots = NBTHelper.getInt(tag, "numberOfUpgradeSlots").orElse(-1);
+		numberOfInventorySlots = NBTHelper.getInt(tag, NUMBER_OF_INVENTORY_SLOTS_TAG).orElse(0);
+		numberOfUpgradeSlots = NBTHelper.getInt(tag, NUMBER_OF_UPGRADE_SLOTS_TAG).orElse(-1);
 	}
 
 	private void loadContents(CompoundTag tag) {

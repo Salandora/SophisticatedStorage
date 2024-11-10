@@ -13,13 +13,16 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterAttributes;
+import net.p3pp3rf1y.sophisticatedcore.util.CodecHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ModDataComponents {
@@ -54,19 +57,9 @@ public class ModDataComponents {
     public static final Supplier<DataComponentType<Integer>> FIRST_INVENTORY_SLOT = DATA_COMPONENT_TYPES.register("first_inventory_slot",
             () -> new DataComponentType.Builder<Integer>().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT).build());
 
-    private static final Codec<Set<Direction>> DIRECTION_SET_CODEC = setCodec(Direction.CODEC);
-    public static <V> Codec<Set<V>> setCodec(Codec<V> elementCodec) {
-        return setOf(elementCodec);
-    }
+    private static final Codec<Set<Direction>> DIRECTION_SET_CODEC = CodecHelper.setOf(Direction.CODEC);
 
-    public static <V> Codec<Set<V>> setOf(Codec<V> elementCodec) {
-        return setFromList(elementCodec.listOf());
-    }
-
-    public static <V> Codec<Set<V>> setFromList(Codec<List<V>> listCodec) {
-        return listCodec.xmap(HashSet::new, ArrayList::new);
-    }
-    private static final StreamCodec<FriendlyByteBuf, Set<Direction>> DIRECTION_SET_STREAM_CODEC = new StreamCodec<>() {
+	private static final StreamCodec<FriendlyByteBuf, Set<Direction>> DIRECTION_SET_STREAM_CODEC = new StreamCodec<>() {
 		@Override
 		public Set<Direction> decode(FriendlyByteBuf buf) {
 			return buf.readCollection(HashSet::new, b -> b.readEnum(Direction.class));
@@ -83,12 +76,6 @@ public class ModDataComponents {
 
     public static final Supplier<DataComponentType<Set<Direction>>> PUSH_DIRECTIONS = DATA_COMPONENT_TYPES.register("push_directions",
             () -> new DataComponentType.Builder<Set<Direction>>().persistent(DIRECTION_SET_CODEC).networkSynchronized(DIRECTION_SET_STREAM_CODEC).build());
-
-	public static final Supplier<DataComponentType<Boolean>> DIRECTIONS_INTIALIZED = DATA_COMPONENT_TYPES.register("directions_initialized",
-			() -> new DataComponentType.Builder<Boolean>().persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL).build());
-
-	public static final Supplier<DataComponentType<FilterAttributes>> INPUT_FILTER_ATTRIBUTES = DATA_COMPONENT_TYPES.register("input_filter_attributes",
-			() -> new DataComponentType.Builder<FilterAttributes>().persistent(FilterAttributes.CODEC).networkSynchronized(FilterAttributes.STREAM_CODEC).build());
 
 	public static final DeferredHolder<DataComponentType<?>, DataComponentType<FilterAttributes>> OUTPUT_FILTER_ATTRIBUTES = DATA_COMPONENT_TYPES.register("output_filter_attributes",
 			() -> new DataComponentType.Builder<FilterAttributes>().persistent(FilterAttributes.CODEC).networkSynchronized(FilterAttributes.STREAM_CODEC).build());

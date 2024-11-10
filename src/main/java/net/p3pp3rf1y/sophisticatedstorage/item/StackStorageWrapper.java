@@ -20,10 +20,7 @@ public class StackStorageWrapper extends StorageWrapper {
 	private ItemStack storageStack;
 
 	public StackStorageWrapper(ItemStack storageStack) {
-		super(() -> () -> {
-		}, () -> {
-		}, () -> {
-		});
+		super(() -> () -> {}, () -> {}, () -> {});
 		setStorageStack(storageStack);
 	}
 
@@ -50,6 +47,10 @@ public class StackStorageWrapper extends StorageWrapper {
 		return Optional.ofNullable(contentsUuid);
 	}
 
+	public boolean hasContents() {
+		return StorageBlockItem.getEntityWrapperTagFromStack(storageStack).isPresent() || contentsUuid != null;
+	}
+
 	@Override
 	public void setContentsUuid(@Nullable UUID contentsUuid) {
 		super.setContentsUuid(contentsUuid);
@@ -69,10 +70,12 @@ public class StackStorageWrapper extends StorageWrapper {
 
 	@Override
 	protected CompoundTag getContentsNbt() {
-		if (contentsUuid == null) {
-			contentsUuid = getNewUuid();
-		}
-		return ItemContentsStorage.get().getOrCreateStorageContents(contentsUuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG).getCompound(CONTENTS_TAG);
+		return StorageBlockItem.getEntityWrapperTagFromStack(storageStack).map(wrapperTag -> wrapperTag.getCompound(CONTENTS_TAG)).orElseGet(() -> {
+			if (contentsUuid == null) {
+				contentsUuid = getNewUuid();
+			}
+			return ItemContentsStorage.get().getOrCreateStorageContents(contentsUuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG).getCompound(CONTENTS_TAG);
+		});
 	}
 
 	@Override
@@ -87,8 +90,13 @@ public class StackStorageWrapper extends StorageWrapper {
 
 	@Override
 	protected void loadSlotNumbers(CompoundTag tag) {
-		numberOfInventorySlots = storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
-		numberOfUpgradeSlots = storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+		StorageBlockItem.getEntityWrapperTagFromStack(storageStack).ifPresentOrElse(wrapperTag -> {
+			numberOfInventorySlots = wrapperTag.getInt(StorageWrapper.NUMBER_OF_INVENTORY_SLOTS_TAG);
+			numberOfUpgradeSlots = wrapperTag.getInt(StorageWrapper.NUMBER_OF_UPGRADE_SLOTS_TAG);
+		}, () -> {
+			numberOfInventorySlots = storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
+			numberOfUpgradeSlots = storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+		});
 	}
 
 	@Override

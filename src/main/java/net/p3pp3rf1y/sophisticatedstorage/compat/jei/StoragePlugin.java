@@ -11,7 +11,9 @@ import mezz.jei.api.registration.*;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.CraftingContainerRecipeTransferHandlerBase;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.SettingsGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.StorageGhostIngredientHandler;
@@ -22,6 +24,7 @@ import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.BarrelSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.ShulkerBoxSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.WoodStorageSubtypeInterpreter;
+import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromVanillaShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 
@@ -126,6 +129,7 @@ public class StoragePlugin implements IModPlugin {
 		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
 		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
 		registration.addRecipes(RecipeTypes.CRAFTING, ShulkerBoxFromChestRecipesMaker.getRecipes());
+		registration.addRecipes(RecipeTypes.CRAFTING, ClientRecipeHelper.transformAllRecipesOfType(RecipeType.CRAFTING, ShulkerBoxFromVanillaShapelessRecipe.class, ClientRecipeHelper::copyShapelessRecipe));
 		registration.addRecipes(RecipeTypes.CRAFTING, FlatBarrelRecipesMaker.getRecipes());
 	}
 

@@ -5,7 +5,7 @@
       "itemRegistryName": "sophisticatedstorage:shulker_box"
     }
   ],
-  "type": "minecraft:crafting_shapeless",
+  "type": "sophisticatedstorage:shulker_box_from_vanilla_shapeless",
   "category": "misc",
   "ingredients": [
     {
