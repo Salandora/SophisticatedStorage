@@ -9,8 +9,8 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuadTransformers;
 
 import javax.annotation.Nullable;
@@ -35,7 +35,7 @@ public class BarrelDynamicModel extends BarrelDynamicModelBase<BarrelDynamicMode
 		}
 
 		@Override
-		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data, @Nullable RenderType renderType) {
+		protected int getInWorldBlockHash(BlockState state, ModelData data, @Nullable RenderType renderType) {
 			int hash = super.getInWorldBlockHash(state, data, renderType);
 			hash = hash * 31 + (Boolean.TRUE.equals(state.getValue(BarrelBlock.OPEN)) ? 1 : 0);
 			hash = hash * 31 + state.getValue(BarrelBlock.FACING).get3DDataValue();

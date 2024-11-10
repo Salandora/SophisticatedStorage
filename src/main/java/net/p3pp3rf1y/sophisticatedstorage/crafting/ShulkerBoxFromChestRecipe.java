@@ -1,15 +1,15 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
-import net.p3pp3rf1y.sophisticatedcore.mixin.common.accessor.ShapedRecipeAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlock;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
@@ -21,13 +21,13 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 	private final ShapedRecipe compose;
 
 	public ShulkerBoxFromChestRecipe(ShapedRecipe compose) {
-		super(compose.getGroup(), compose.category(), ((ShapedRecipeAccessor) compose).getPattern(), ((ShapedRecipeAccessor) compose).getResult());
+		super(compose.getGroup(), compose.category(), compose.pattern, compose.result);
 		this.compose = compose;
 	}
 
 	@Override
-	public boolean matches(CraftingContainer inv, Level level) {
-		return super.matches(inv, level) && getChest(inv).map(c -> !WoodStorageBlockItem.isPacked(c)).orElse(false);
+	public boolean matches(CraftingInput input, Level level) {
+		return super.matches(input, level) && getChest(input).map(c -> !WoodStorageBlockItem.isPacked(c)).orElse(false);
 	}
 
 	@Override
@@ -35,8 +35,8 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 		return true;
 	}
 
-	private Optional<ItemStack> getChest(CraftingContainer inv) {
-		for (int slot = 0; slot < inv.getContainerSize(); slot++) {
+	private Optional<ItemStack> getChest(CraftingInput inv) {
+		for (int slot = 0; slot < inv.size(); slot++) {
 			ItemStack slotStack = inv.getItem(slot);
 			if (slotStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ChestBlock) {
 				return Optional.of(slotStack);
@@ -46,11 +46,11 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 	}
 
 	@Override
-	public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
-		ItemStack shulker = super.assemble(inv, registryAccess);
-		getChest(inv).ifPresent(chest -> {
-			if (chest.hasCustomHoverName()) {
-				shulker.setHoverName(chest.getHoverName());
+	public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+		ItemStack shulker = super.assemble(input, registries);
+		getChest(input).ifPresent(chest -> {
+			if (chest.has(DataComponents.CUSTOM_NAME)) {
+				shulker.set(DataComponents.CUSTOM_NAME, chest.getHoverName());
 			}
 			if (shulker.getItem() instanceof StorageBlockItem storageBlockItem) {
 				StorageBlockItem.getMainColorFromStack(chest).ifPresent(mc -> storageBlockItem.setMainColor(shulker, mc));
@@ -67,7 +67,7 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ModBlocks.SHULKER_BOX_FROM_CHEST_RECIPE_SERIALIZER;
+		return ModBlocks.SHULKER_BOX_FROM_CHEST_RECIPE_SERIALIZER.get();
 	}
 
 	public static class Serializer extends RecipeWrapperSerializer<ShapedRecipe, ShulkerBoxFromChestRecipe> {

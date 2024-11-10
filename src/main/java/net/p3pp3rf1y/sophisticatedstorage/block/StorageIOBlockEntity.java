@@ -1,17 +1,18 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllerBoundable;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
@@ -28,6 +29,8 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	@Nullable
 	private BlockPos controllerPos = null;
 	private boolean isLinkedToController = false;
+	private boolean chunkBeingUnloaded = false;
+
 	@Nullable
 	private BlockApiCache<Storage<ItemVariant>, @org.jetbrains.annotations.Nullable Direction> controllerItemHandlerCache;
 
@@ -36,7 +39,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	public StorageIOBlockEntity(BlockPos pos, BlockState state) {
-		this(ModBlocks.STORAGE_IO_BLOCK_ENTITY_TYPE, pos, state);
+		this(ModBlocks.STORAGE_IO_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Override
@@ -135,8 +138,8 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
 		saveControllerPos(tag);
 		if (isLinkedToController) {
 			tag.putBoolean("isLinkedToController", isLinkedToController);
@@ -144,8 +147,8 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		loadControllerPos(tag);
 		isLinkedToController = NBTHelper.getBoolean(tag, "isLinkedToController").orElse(false);
 	}
@@ -175,5 +178,20 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		} else {
 			return WorldHelper.getBlockEntity(getLevel(), getControllerPos().get(), ControllerBlockEntity.class).map(c -> c.getExternalItemHandler(side)).orElse(null);
 		}
+	}
+
+	@Override
+	public void onChunkUnloaded() {
+		super.onChunkUnloaded();
+		chunkBeingUnloaded = true;
+	}
+
+	@Override
+	public void setRemoved() {
+		if (!chunkBeingUnloaded && level != null) {
+			unlinkFromController();
+		}
+
+		super.setRemoved();
 	}
 }

@@ -1,13 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.emi;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -17,10 +14,6 @@ import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandle
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
@@ -28,18 +21,16 @@ import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
-import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.Comparison;
-import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class EmiCompat implements EmiPlugin {
 	public static Event<WorkstationCallback> WORKSTATIONS = EventFactory.createArrayBacked(WorkstationCallback.class, (listeners) -> (consumer) -> {
@@ -72,12 +63,6 @@ public class EmiCompat implements EmiPlugin {
         registry.addDragDropHandler(StorageScreen.class, new EmiStorageGhostDragDropHandler<>());
         registry.addDragDropHandler(SettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
 
-        registerCraftingRecipes(registry, DyeRecipesMaker.getRecipes());
-		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
-		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
-		registerCraftingRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes());
-		registerCraftingRecipes(registry, FlatBarrelRecipesMaker.getRecipes());
-
 		Comparison woodStorageNbtInterpreter = Comparison.compareData(emiStack -> {
 			CompoundTag tag = new CompoundTag();
 			ItemStack stack = emiStack.getItemStack();
@@ -97,11 +82,11 @@ public class EmiCompat implements EmiPlugin {
 			return tag;
 		});
 
-		for (BlockItem item : ModBlocks.ALL_BARREL_ITEMS) {
-			registry.setDefaultComparison(item, barrelNbtInterpreter);
+		for (Supplier<BlockItem> item : ModBlocks.ALL_BARREL_ITEMS) {
+			registry.setDefaultComparison(item.get(), barrelNbtInterpreter);
 		}
-		for (BlockItem item : ModBlocks.CHEST_ITEMS) {
-			registry.setDefaultComparison(item, woodStorageNbtInterpreter);
+		for (Supplier<BlockItem> item : ModBlocks.CHEST_ITEMS) {
+			registry.setDefaultComparison(item.get(), woodStorageNbtInterpreter);
 		}
 
 		Comparison shulkerBoxNbtInterpreter = Comparison.compareData(emiStack -> {
@@ -111,30 +96,19 @@ public class EmiCompat implements EmiPlugin {
 			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
 			return tag;
 		});
-		for (BlockItem item : ModBlocks.SHULKER_BOX_ITEMS) {
+		for (Supplier<BlockItem> item : ModBlocks.SHULKER_BOX_ITEMS) {
 			registry.setDefaultComparison(item, shulkerBoxNbtInterpreter);
 		}
 
-		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, new EmiGridMenuInfo<>());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE.get(), new EmiGridMenuInfo<>());
 
-		registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(ModItems.CRAFTING_UPGRADE));
-		registry.addWorkstation(VanillaEmiRecipeCategories.STONECUTTING, EmiStack.of(ModItems.STONECUTTER_UPGRADE));
+		registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(ModItems.CRAFTING_UPGRADE.get()));
+		registry.addWorkstation(VanillaEmiRecipeCategories.STONECUTTING, EmiStack.of(ModItems.STONECUTTER_UPGRADE.get()));
 
 		List<WorkstationEntry> entries = new ArrayList<>();
 		WORKSTATIONS.invoker().additionalWorkstations(entries::add);
 		for (WorkstationEntry entry : entries) {
 			registry.addWorkstation(new EmiRecipeCategory(entry.id, EmiStack.of(entry.icon)), EmiStack.of(entry.workstation));
 		}
-    }
-
-    private static void registerCraftingRecipes(EmiRegistry registry, Collection<RecipeHolder<CraftingRecipe>> recipes) {
-		Minecraft mc = Minecraft.getInstance();
-        recipes.forEach(r -> registry.addRecipe(
-            new EmiCraftingRecipe(
-                r.value().getIngredients().stream().map(EmiIngredient::of).toList(),
-                EmiStack.of(r.value().getResultItem(mc.level.registryAccess())),
-                r.id())
-            )
-        );
     }
 }

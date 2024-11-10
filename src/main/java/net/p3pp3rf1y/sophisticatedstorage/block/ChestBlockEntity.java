@@ -1,7 +1,9 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
@@ -14,7 +16,6 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.DisplaySide;
 import net.p3pp3rf1y.sophisticatedcore.settings.ISettingsCategory;
@@ -68,7 +69,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		public void incrementOpeners(Player player, Level level, BlockPos pos, BlockState state) {
 			super.incrementOpeners(player, level, pos, state);
 			if (isMainChest()) {
-				runOnTheOtherPart(level, pos, state, (blockEntity, neighborPos) -> blockEntity.openersCounter.incrementOpeners(player, level, neighborPos, state));
+				runOnTheOtherPart(level, pos, state, (blockEntity, neighborPos) -> blockEntity.openersCounter.incrementOpeners(player, level, neighborPos, level.getBlockState(neighborPos)));
 			}
 		}
 
@@ -76,7 +77,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		public void decrementOpeners(Player player, Level level, BlockPos pos, BlockState state) {
 			super.decrementOpeners(player, level, pos, state);
 			if (isMainChest()) {
-				runOnTheOtherPart(level, pos, state, (blockEntity, neighborPos) -> blockEntity.openersCounter.decrementOpeners(player, level, neighborPos, state));
+				runOnTheOtherPart(level, pos, state, (blockEntity, neighborPos) -> blockEntity.openersCounter.decrementOpeners(player, level, neighborPos, level.getBlockState(neighborPos)));
 			}
 		}
 	};
@@ -197,7 +198,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	private void moveMyStacksFromMain() {
-		level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(mainBE -> {
+		level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).ifPresent(mainBE -> {
 			StorageWrapper mainStorageWrapper = mainBE.getStorageWrapper();
 			InventoryHandler mainInventoryHandler = mainStorageWrapper.getInventoryHandler();
 			int firstIndex = mainInventoryHandler.getSlotCount() / 2;
@@ -232,7 +233,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	public ChestBlockEntity(BlockPos pos, BlockState state) {
-		super(pos, state, ModBlocks.CHEST_BLOCK_ENTITY_TYPE);
+		super(pos, state, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get());
 	}
 
 	public static void lidAnimateTick(ChestBlockEntity chestBlockEntity) {
@@ -298,7 +299,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		}
 		Direction facing = state.getValue(ChestBlock.FACING);
 		BlockPos neighborPos = chestType == ChestType.RIGHT ? pos.relative(facing.getCounterClockWise()) : pos.relative(facing.getClockWise());
-		level.getBlockEntity(neighborPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE)
+		level.getBlockEntity(neighborPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get())
 				.ifPresent(chestBlockEntity -> execute.accept(chestBlockEntity, neighborPos));
 	}
 
@@ -314,7 +315,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		}
 
 		if (doubleMainPos != null) {
-			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getExternalItemHandler(side)).orElse(null);
+			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).map(be -> be.getExternalItemHandler(side)).orElse(null);
 		}
 
 		return super.getExternalItemHandler(side);
@@ -325,8 +326,8 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	@Override
-	public void loadSynchronizedData(CompoundTag tag) {
-		super.loadSynchronizedData(tag);
+	public void loadSynchronizedData(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadSynchronizedData(tag, registries);
 		doubleMainPos = NBTHelper.getLong(tag, DOUBLE_CHEST_MAIN_POS_TAG).map(BlockPos::of).orElse(null);
 	}
 
@@ -356,7 +357,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 	public StorageWrapper getMainStorageWrapper() {
 		if (doubleMainPos != null) {
-			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(StorageBlockEntity::getStorageWrapper).orElseGet(this::getStorageWrapper);
+			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).map(StorageBlockEntity::getStorageWrapper).orElseGet(this::getStorageWrapper);
 		}
 		return getStorageWrapper();
 	}
@@ -399,8 +400,8 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		if (!isBeingUpgraded() && getBlockState().getValue(ChestBlock.TYPE) == ChestType.SINGLE) {
 			if (getBlockState().getBlock() instanceof ChestBlock chestBlock
 					&& getStorageWrapper().getInventoryHandler().getSlotCount() > chestBlock.getNumberOfInventorySlots()) {

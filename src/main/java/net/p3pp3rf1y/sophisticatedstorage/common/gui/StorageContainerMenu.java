@@ -10,11 +10,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.ISyncedContainer;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.SophisticatedMenuProvider;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
 import net.p3pp3rf1y.sophisticatedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeHandler;
-import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NoopStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
@@ -28,7 +28,7 @@ public class StorageContainerMenu extends StorageContainerMenuBase<IStorageWrapp
 	private final StorageBlockEntity storageBlockEntity;
 
 	public StorageContainerMenu(int containerId, Player player, BlockPos pos) {
-		this(ModBlocks.STORAGE_CONTAINER_TYPE, containerId, player, pos);
+		this(ModBlocks.STORAGE_CONTAINER_TYPE.get(), containerId, player, pos);
 	}
 
 	public StorageContainerMenu(MenuType<?> menuType, int containerId, Player player, BlockPos pos) {
@@ -79,8 +79,8 @@ public class StorageContainerMenu extends StorageContainerMenuBase<IStorageWrapp
 			sendToServer(data -> data.putString(ACTION_TAG, "openSettings"));
 			return;
 		}
-		getBlockPosition().ifPresent(pos -> player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> instantiateSettingsContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
-				Component.translatable(StorageTranslationHelper.INSTANCE.translGui("settings.title")))));
+		getBlockPosition().ifPresent(pos -> player.openMenu(new SophisticatedMenuProvider((w, p, pl) -> instantiateSettingsContainerMenu(w, pl, pos),
+				Component.translatable(StorageTranslationHelper.INSTANCE.translGui("settings.title")), false), storageBlockEntity.getBlockPos()));
 	}
 
 	protected StorageSettingsContainerMenu instantiateSettingsContainerMenu(int windowId, Player player, BlockPos pos) {

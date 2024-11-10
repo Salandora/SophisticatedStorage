@@ -1,27 +1,35 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
-import net.minecraft.nbt.StringTag;
+import com.mojang.serialization.Codec;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class BarrelBlockItem extends WoodStorageBlockItem {
-	private static final String FLAT_TOP_TAG = "flatTop";
-	private static final String MATERIALS_TAG = "materials";
-
 	public BarrelBlockItem(Block block) {
 		this(block, new Properties());
 	}
+
 	public BarrelBlockItem(Block block, Properties properties) {
 		super(block, properties);
 	}
+
+	public static final Codec<Map<BarrelMaterial, ResourceLocation>> MATERIALS_CODEC =
+			Codec.simpleMap(BarrelMaterial.CODEC, ResourceLocation.CODEC, StringRepresentable.keys(BarrelMaterial.values())).codec();
+
+	public static final StreamCodec<FriendlyByteBuf, Map<BarrelMaterial, ResourceLocation>> MATERIALS_STREAM_CODEC =
+			StreamCodec.of((buf, map) -> buf.writeMap(map, BarrelMaterial.STREAM_CODEC, ResourceLocation.STREAM_CODEC),
+					buf -> buf.readMap(BarrelMaterial.STREAM_CODEC, ResourceLocation.STREAM_CODEC));
 
 	public static void toggleFlatTop(ItemStack stack) {
 		boolean flatTop = isFlatTop(stack);
@@ -30,26 +38,26 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 
 	public static void setFlatTop(ItemStack stack, boolean flatTop) {
 		if (flatTop) {
-			NBTHelper.setBoolean(stack, FLAT_TOP_TAG, true);
+			stack.set(ModDataComponents.FLAT_TOP, true);
 		} else {
-			NBTHelper.removeTag(stack, FLAT_TOP_TAG);
+			stack.remove(ModDataComponents.FLAT_TOP);
 		}
 	}
 
 	public static boolean isFlatTop(ItemStack stack) {
-		return NBTHelper.getBoolean(stack, FLAT_TOP_TAG).orElse(false);
+		return stack.getOrDefault(ModDataComponents.FLAT_TOP, false);
 	}
 
 	public static void setMaterials(ItemStack barrel, Map<BarrelMaterial, ResourceLocation> materials) {
-		NBTHelper.putMap(barrel.getOrCreateTag(), MATERIALS_TAG, materials, BarrelMaterial::getSerializedName, resourceLocation -> StringTag.valueOf(resourceLocation.toString()));
+		barrel.set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getMaterials(ItemStack barrel) {
-		return NBTHelper.getMap(barrel, MATERIALS_TAG, BarrelMaterial::fromName, (bm, tag) -> Optional.of(new ResourceLocation(tag.getAsString()))).orElse(Map.of());
+		return new HashMap<>(barrel.getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of()));
 	}
 
 	public static void removeMaterials(ItemStack stack) {
-		NBTHelper.removeTag(stack, MATERIALS_TAG);
+		stack.remove(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	@Override

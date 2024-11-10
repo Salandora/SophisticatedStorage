@@ -6,10 +6,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.client.render.ClientStorageContentsTooltipBase;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
-import net.p3pp3rf1y.sophisticatedstorage.network.RequestStorageContentsPacket;
+import net.p3pp3rf1y.sophisticatedstorage.network.RequestStorageContentsPayload;
 
 import java.util.UUID;
 
@@ -25,7 +25,8 @@ public class ClientStorageContentsTooltip extends ClientStorageContentsTooltipBa
 
 	@Override
 	public void renderImage(Font font, int leftX, int topY, GuiGraphics guiGraphics) {
-		renderTooltip(StackStorageWrapper.fromData(storageItem), font, leftX, topY, guiGraphics);
+		//noinspection DataFlowIssue - level definitely exists here
+		renderTooltip(StackStorageWrapper.fromStack(Minecraft.getInstance().level.registryAccess(), storageItem), font, leftX, topY, guiGraphics);
 	}
 
 	public ClientStorageContentsTooltip(StorageContentsTooltip tooltip) {
@@ -34,6 +35,6 @@ public class ClientStorageContentsTooltip extends ClientStorageContentsTooltipBa
 
 	@Override
 	protected void sendInventorySyncRequest(UUID uuid) {
-		PacketHelper.sendToServer(new RequestStorageContentsPacket(uuid));
+		PacketDistributor.sendToServer(new RequestStorageContentsPayload(uuid));
 	}
 }

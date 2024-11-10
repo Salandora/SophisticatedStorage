@@ -1,28 +1,29 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static net.p3pp3rf1y.sophisticatedstorage.util.model.ModelProperties.*;
 
 public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	private static final String MATERIALS_TAG = "materials";
@@ -73,7 +74,7 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	public BarrelBlockEntity(BlockPos pos, BlockState state) {
-		this(pos, state, ModBlocks.BARREL_BLOCK_ENTITY_TYPE);
+		this(pos, state, ModBlocks.BARREL_BLOCK_ENTITY_TYPE.get());
 	}
 
 	void updateOpenBlockState(BlockState state, boolean open) {
@@ -112,9 +113,9 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	@Override
-	public void loadSynchronizedData(CompoundTag tag) {
-		super.loadSynchronizedData(tag);
-		materials = NBTHelper.getMap(tag, MATERIALS_TAG, BarrelMaterial::fromName, (bm, t) -> Optional.of(new ResourceLocation(t.getAsString()))).orElse(Map.of());
+	public void loadSynchronizedData(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadSynchronizedData(tag, registries);
+		materials = NBTHelper.getMap(tag, MATERIALS_TAG, BarrelMaterial::fromName, (bm, t) -> Optional.of(ResourceLocation.parse(t.getAsString()))).orElse(Map.of());
 	}
 
 	public void setMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
@@ -127,97 +128,28 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	@Override
-	public @Nullable Object getRenderAttachmentData() {
-		return new ModelData(this);
-	}
-
-	public static class ModelData {
-		public static ModelData EMPTY = new ModelData(null);
-		private final Boolean hasMainColor;
-		private final Boolean hasAccentColor;
-		private String woodName;
-		private final Boolean isPacked;
-		private final Boolean showsLock;
-		private final Boolean showsTier;
-		private List<RenderInfo.DisplayItem> displayItems;
-		private List<Integer> inaccessibleSlots;
-		private final Map<BarrelMaterial, ResourceLocation> materials;
-
-		public ModelData(@Nullable BarrelBlockEntity tile) {
-			if (tile != null) {
-				StorageWrapper wrapper = tile.getStorageWrapper();
-				this.hasMainColor = wrapper.hasMainColor();
-				this.hasAccentColor = wrapper.hasAccentColor();
-
-				Optional<WoodType> woodType = tile.getWoodType();
-				if (woodType.isPresent() || !(hasMainColor && hasAccentColor)) {
-					this.woodName = woodType.orElse(WoodType.ACACIA).name();
-				}
-
-				if (!tile.hasFullyDynamicRenderer()) {
-					this.displayItems = wrapper.getRenderInfo().getItemDisplayRenderInfo().getDisplayItems();
-					this.inaccessibleSlots = wrapper.getRenderInfo().getItemDisplayRenderInfo().getInaccessibleSlots();
-				}
-
-				this.isPacked = tile.isPacked();
-				this.showsLock = tile.isLocked() && tile.shouldShowLock();
-				this.showsTier = tile.shouldShowTier();
-				this.materials = tile.getMaterials();
-			} else {
-				this.hasMainColor = false;
-				this.hasAccentColor = false;
-
-				this.woodName = null;
-
-				this.displayItems = null;
-				this.inaccessibleSlots = null;
-
-				this.isPacked = false;
-				this.showsLock = false;
-				this.showsTier = false;
-				this.materials = null;
-			}
+	public @Nullable Object getRenderData() {
+		ModelData.Builder builder = ModelData.builder();
+		boolean hasMainColor = this.getStorageWrapper().hasMainColor();
+		builder.with(HAS_MAIN_COLOR, hasMainColor);
+		boolean hasAccentColor = this.getStorageWrapper().hasAccentColor();
+		builder.with(HAS_ACCENT_COLOR, hasAccentColor);
+		if (!this.hasFullyDynamicRenderer()) {
+			builder.with(DISPLAY_ITEMS, this.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getDisplayItems());
+			builder.with(INACCESSIBLE_SLOTS, this.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getInaccessibleSlots());
+		}
+		builder.with(IS_PACKED, this.isPacked());
+		builder.with(SHOWS_LOCK, this.isLocked() && this.shouldShowLock());
+		builder.with(SHOWS_TIER, this.shouldShowTier());
+		Optional<WoodType> woodType = this.getWoodType();
+		if (woodType.isPresent() || !(hasMainColor && hasAccentColor)) {
+			builder.with(WOOD_NAME, woodType.orElse(WoodType.ACACIA).name());
 		}
 
-		// Getters for fields (you can generate these automatically in most IDEs)
-		public Boolean hasMainColor() {
-			return hasMainColor;
+		Map<BarrelMaterial, ResourceLocation> materials = this.getMaterials();
+		if (!materials.isEmpty()) {
+			builder.with(MATERIALS, materials);
 		}
-
-		public Boolean hasAccentColor() {
-			return hasAccentColor;
-		}
-
-		@Nullable
-		public String woodName() {
-			return woodName;
-		}
-
-		public Boolean isPacked() {
-			return isPacked;
-		}
-
-		public Boolean showsLock() {
-			return showsLock;
-		}
-
-		public Boolean showsTier() {
-			return showsTier;
-		}
-
-		@Nullable
-		public List<RenderInfo.DisplayItem> getDisplayItems() {
-			return displayItems;
-		}
-
-		@Nullable
-		public List<Integer> getInaccessibleSlots() {
-			return inaccessibleSlots;
-		}
-
-		@Nullable
-		public Map<BarrelMaterial, ResourceLocation> getMaterials() {
-			return materials;
-		}
+		return builder.build();
 	}
 }

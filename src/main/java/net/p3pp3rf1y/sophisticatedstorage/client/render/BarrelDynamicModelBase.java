@@ -7,17 +7,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.BlockModelAccessor;
 import org.joml.Quaternionf;
 
 import javax.annotation.Nullable;
@@ -56,14 +56,14 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 	}
 
 	@Override
-	public BakedModel bake(BlockModel context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
-		Map<String, Map<BarrelModelPart, BakedModel>> woodModelParts = bakeWoodModelParts(baker, spriteGetter, modelState, modelLocation, woodModelPartDefinitions);
-		Map<String, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData>> woodDynamicBakingData = getDynamicBakingData(modelState, modelLocation);
+	public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides) {
+		Map<String, Map<BarrelModelPart, BakedModel>> woodModelParts = bakeWoodModelParts(baker, spriteGetter, modelTransform, woodModelPartDefinitions);
+		Map<String, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData>> woodDynamicBakingData = getDynamicBakingData(modelTransform);
 
 		copyAndResolveTextures(woodModelPartDefinitions, woodPartitionedModelPartDefinitions);
 
-		Map<String, Map<BarrelModelPart, BakedModel>> woodPartitionedModelParts = bakeWoodModelParts(baker, spriteGetter, modelState, modelLocation, woodPartitionedModelPartDefinitions);
-		BakedModel flatTopModel = getFlatTopModelName().map(modelName -> baker.getModel(modelName).bake(baker, spriteGetter, modelState, modelLocation)).orElse(null);
+		Map<String, Map<BarrelModelPart, BakedModel>> woodPartitionedModelParts = bakeWoodModelParts(baker, spriteGetter, modelTransform, woodPartitionedModelPartDefinitions);
+		BakedModel flatTopModel = getFlatTopModelName().map(modelName -> baker.getModel(modelName).bake(baker, spriteGetter, modelTransform)).orElse(null);
 
 		return instantiateBakedModel(baker, spriteGetter, woodModelParts, flatTopModel, woodDynamicBakingData, woodPartitionedModelParts);
 	}
@@ -122,7 +122,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 	}
 
 	private Map<String, Map<BarrelModelPart, BakedModel>> bakeWoodModelParts(ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter,
-																			 ModelState modelTransform, ResourceLocation modelLocation, Map<String, Map<BarrelModelPart, BarrelModelPartDefinition>> definitions) {
+																			 ModelState modelTransform, Map<String, Map<BarrelModelPart, BarrelModelPartDefinition>> definitions) {
 		Map<String, Map<BarrelModelPart, UnbakedModel>> woodModels = createUnbakedWoodModelParts(definitions);
 
 		ImmutableMap.Builder<String, Map<BarrelModelPart, BakedModel>> builder = ImmutableMap.builder();
@@ -131,7 +131,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 			partModels.forEach((part, model) -> {
 				model.resolveParents(baker::getModel);
 				int hash = getBakedModelHash(model, modelTransform, part);
-				BakedModel bakedModel = BAKED_PART_MODELS.computeIfAbsent(hash, h -> model.bake(baker, spriteGetter, modelTransform, modelLocation));
+				BakedModel bakedModel = BAKED_PART_MODELS.computeIfAbsent(hash, h -> model.bake(baker, spriteGetter, modelTransform));
 				if (bakedModel != null) {
 					partBuilder.put(part, bakedModel);
 				}
@@ -142,12 +142,12 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		return builder.build();
 	}
 
-	private Map<String, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData>> getDynamicBakingData(ModelState modelTransform, ResourceLocation modelLocation) {
+	private Map<String, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData>> getDynamicBakingData(ModelState modelTransform) {
 		Map<String, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData>> woodDynamicBakingData = new HashMap<>();
 		woodModelPartDefinitions.forEach((woodName, partDefinitions) -> {
 			Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData> dynamicPartBakingData = new EnumMap<>(DynamicBarrelBakingData.DynamicPart.class);
 			dynamicPartModels.forEach((dynamicPart, dynamicPartModel) ->
-					dynamicPartBakingData.put(dynamicPart, new DynamicBarrelBakingData(new BarrelModelPartDefinition(dynamicPartModel, partDefinitions.get(BarrelModelPart.BASE).textures()), modelTransform, modelLocation)));
+					dynamicPartBakingData.put(dynamicPart, new DynamicBarrelBakingData(new BarrelModelPartDefinition(dynamicPartModel, partDefinitions.get(BarrelModelPart.BASE).textures()), modelTransform)));
 			woodDynamicBakingData.put(woodName, dynamicPartBakingData);
 		});
 		return woodDynamicBakingData;
@@ -171,7 +171,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		}
 
 		if (model instanceof BlockModel blockModel) {
-			for (Either<Material, String> material : ((BlockModelAccessor) blockModel).getTextureMap().values()) {
+			for (Either<Material, String> material : blockModel.textureMap.values()) {
 				Optional<Material> mat = material.left();
 				if (mat.isPresent()) {
 					hash = 31 * hash + mat.get().hashCode();
@@ -180,7 +180,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		}
 
 		if (model instanceof CompositeElementsModel compositeElementsModel) {
-			for (Map.Entry<String, Either<Material, String>> entry : ((BlockModelAccessor) compositeElementsModel).getTextureMap().entrySet()) {
+			for (Map.Entry<String, Either<Material, String>> entry : compositeElementsModel.textureMap.entrySet()) {
 				hash = 31 * hash + entry.getKey().hashCode();
 				hash = 31 * hash + entry.getValue().hashCode();
 			}
@@ -203,7 +203,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 																  Map<String, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData>> woodDynamicBakingData, Map<String, Map<BarrelModelPart, BakedModel>> woodPartitionedModelParts);
 
 	@Override
-	public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel context) {
+	public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext context) {
 		visitAndUpdateParents(modelGetter);
 
 		updatePartDefinitionsFromParents();
@@ -286,7 +286,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 			return false;
 		}
 
-		if (!(parentBlockModel.getCustomGeometry() instanceof BarrelDynamicModelBase<?> parentModel)) {
+		if (!(parentBlockModel.port_lib$getCustomData().getCustomGeometry() instanceof BarrelDynamicModelBase<?> parentModel)) {
 			SophisticatedStorage.LOGGER.warn("Parent '{}' doesn't hold a barrel model of 'BarrelDynamicModelBase' while loading '{}'", parentBlockModel, currentModel);
 			return false;
 		}
@@ -307,7 +307,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		public T read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
 			ResourceLocation parentLocation = null;
 			if (modelContents.has("parent")) {
-				parentLocation = new ResourceLocation(modelContents.get("parent").getAsString());
+				parentLocation = ResourceLocation.parse(modelContents.get("parent").getAsString());
 			}
 
 			Map<BarrelModelPart, BarrelModelPartDefinition> modelParts = readModelParts(modelContents, "model_parts");
@@ -333,7 +333,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		private static ResourceLocation readFlatTopModel(JsonObject modelContents) {
 			ResourceLocation flatTopModelName = null;
 			if (modelContents.has("flat_top_model")) {
-				flatTopModelName = new ResourceLocation(modelContents.get("flat_top_model").getAsString());
+				flatTopModelName = ResourceLocation.parse(modelContents.get("flat_top_model").getAsString());
 			}
 			return flatTopModelName;
 		}
@@ -371,7 +371,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 				JsonObject dynamicPartsJson = modelContents.getAsJsonObject("dynamic_part_models");
 				for (Map.Entry<String, JsonElement> entry : dynamicPartsJson.entrySet()) {
 					DynamicBarrelBakingData.DynamicPart.getByNameOptional(entry.getKey()).ifPresent(part ->
-							dynamicPartModels.put(part, new ResourceLocation(entry.getValue().getAsString())));
+							dynamicPartModels.put(part, ResourceLocation.parse(entry.getValue().getAsString())));
 				}
 			}
 			return dynamicPartModels;
@@ -443,7 +443,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		public static BarrelModelPartDefinition deserialize(JsonObject json) {
 			ResourceLocation modelLocation = null;
 			if (json.has("model")) {
-				modelLocation = new ResourceLocation(json.get("model").getAsString());
+				modelLocation = ResourceLocation.parse(json.get("model").getAsString());
 			}
 			Map<String, Material> textures = new HashMap<>();
 			if (json.has("textures")) {
@@ -453,7 +453,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 					if (textureName.startsWith("#")) {
 						textureName = REFERENCE_PREFIX + textureName.substring(1);
 					}
-					textures.put(entry.getKey(), new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(textureName)));
+					textures.put(entry.getKey(), new Material(InventoryMenu.BLOCK_ATLAS, ResourceLocation.parse(textureName)));
 				}
 			}
 			return new BarrelModelPartDefinition(modelLocation, textures);

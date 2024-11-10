@@ -79,7 +79,7 @@ public class DynamicRenderTracker implements IDynamicRenderTracker {
 			return false;
 		}
 		for (int i = 0; i < lastRenderedItems.size(); i++) {
-			if (!ItemStack.isSameItemSameTags(lastRenderedItems.get(i), displayItems.get(i).getItem())) {
+			if (!ItemStack.isSameItemSameComponents(lastRenderedItems.get(i), displayItems.get(i).getItem())) {
 				return false;
 			}
 		}

@@ -1,12 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
@@ -24,20 +24,18 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
 	private boolean chunkBeingUnloaded = false;
 
 	public StorageLinkBlockEntity(BlockPos pos, BlockState state) {
-		super(ModBlocks.STORAGE_LINK_BLOCK_ENTITY_TYPE, pos, state);
-
-		ServerChunkEvents.CHUNK_UNLOAD.register((level, levelChunk) -> this.onChunkUnloaded());
+		super(ModBlocks.STORAGE_LINK_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
 		saveControllerPos(tag);
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
 		loadControllerPos(tag);
 	}
 
@@ -103,7 +101,9 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
 		return getControllerPos().isPresent();
 	}
 
+	@Override
 	public void onChunkUnloaded() {
+		super.onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

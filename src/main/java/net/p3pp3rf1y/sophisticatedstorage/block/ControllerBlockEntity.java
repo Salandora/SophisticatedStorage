@@ -1,17 +1,17 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
+import net.p3pp3rf1y.sophisticatedcore.util.Capabilities;
 import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
@@ -29,7 +29,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 	private SlottedStackStorage cachedFailedInsertItemHandler;
 
 	public ControllerBlockEntity(BlockPos pos, BlockState state) {
-		super(ModBlocks.CONTROLLER_BLOCK_ENTITY_TYPE, pos, state);
+		super(ModBlocks.CONTROLLER_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	public void depositPlayerItems(Player player, InteractionHand hand) {
@@ -40,15 +40,13 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 		boolean doubleClick = gameTime - lastDepositTime < 10;
 		lastDepositTime = gameTime;
 		if (doubleClick) {
-			CapabilityHelper.runOnCapability(player, CapabilityHelper.ENTITY, null,
+			CapabilityHelper.runOnCapability(player, Capabilities.ItemHandler.ENTITY, null,
 					playerInventory -> InventoryHelper.iterate(playerInventory, (slot, stack) -> {
 						if (canDepositStack(stack)) {
-							try(Transaction ctx = Transaction.openOuter()) {
-								ItemVariant resource = ItemVariant.of(stack);
-								long inserted = insert(resource, stack.getCount(), ctx, false);
-								if (inserted > 0 && playerInventory.extract(resource, inserted, ctx) == inserted) {
-									ctx.commit();
-								}
+							ItemStack resultStack = insertItem(stack, true, false);
+							int countToExtract = stack.getCount() - resultStack.getCount();
+							if (countToExtract > 0 && playerInventory.extractItem(slot, countToExtract, true).getCount() == countToExtract) {
+								insertItem(playerInventory.extractItem(slot, countToExtract, false), false, false);
 							}
 						}
 					}));
@@ -57,11 +55,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 
 		ItemStack itemInHand = player.getItemInHand(hand);
 		if (!itemInHand.isEmpty() && canDepositStack(itemInHand)) {
-			try (Transaction ctx = Transaction.openOuter()) {
-				long inserted = insert(ItemVariant.of(itemInHand), itemInHand.getCount(), ctx, false);
-				player.setItemInHand(hand, itemInHand.copyWithCount(itemInHand.getCount() - (int) inserted));
-				ctx.commit();
-			}
+			player.setItemInHand(hand, insertItem(itemInHand, false, false));
 		}
 	}
 

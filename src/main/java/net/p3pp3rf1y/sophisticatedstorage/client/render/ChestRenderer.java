@@ -239,8 +239,11 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 			poseStack.pushPose();
 			poseStack.translate(-0.005D, -0.005D, -0.005D);
 			poseStack.scale(1.01f, 1.01f, 1.01f);
-			lidPart.render(poseStack, translucentConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 0.5F);
-			bottomPart.render(poseStack, translucentConsumer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 0.5F);
+
+			int color = 0x7F_FFFFFF;
+
+			lidPart.render(poseStack, translucentConsumer, packedLight, packedOverlay, color);
+			bottomPart.render(poseStack, translucentConsumer, packedLight, packedOverlay, color);
 			poseStack.popPose();
 		}
 
@@ -251,19 +254,33 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 
 		private void renderBottomAndLid(PoseStack poseStack, float lidAngle, int packedLight, int packedOverlay, VertexConsumer consumer) {
 			lidPart.xRot = -(lidAngle * ((float) Math.PI / 2F));
+			if (lidAngle > 0) {
+				poseStack.pushPose();
+				poseStack.translate(-0.0005F, -0.001F, -0.0005F);
+				poseStack.scale(1.001F, 1.001F, 1.001F);
+			}
 			lidPart.render(poseStack, consumer, packedLight, packedOverlay);
+			if (lidAngle > 0) {
+				poseStack.popPose();
+			}
 			bottomPart.render(poseStack, consumer, packedLight, packedOverlay);
 		}
 
 		private void renderBottomAndLidWithTint(PoseStack poseStack, MultiBufferSource bufferSource, float lidAngle, int packedLight, int packedOverlay, int tint, StorageTextureManager.ChestMaterial chestMaterial) {
-			float tintRed = (tint >> 16 & 255) / 255.0F;
-			float tingGreen = (tint >> 8 & 255) / 255.0F;
-			float tintBlue = (tint & 255) / 255.0F;
-
 			VertexConsumer consumer = chestMaterials.get(chestMaterial).buffer(bufferSource, RenderType::entityCutout);
 			lidPart.xRot = -(lidAngle * ((float) Math.PI / 2F));
-			lidPart.render(poseStack, consumer, packedLight, packedOverlay, tintRed, tingGreen, tintBlue, 1);
-			bottomPart.render(poseStack, consumer, packedLight, packedOverlay, tintRed, tingGreen, tintBlue, 1);
+			int color = 0xFF_000000 | tint;
+
+			if (lidAngle > 0) {
+				poseStack.pushPose();
+				poseStack.translate(-0.0005F, -0.001F, -0.0005F);
+				poseStack.scale(1.001F, 1.001F, 1.001F);
+			}
+			lidPart.render(poseStack, consumer, packedLight, packedOverlay, color);
+			if (lidAngle > 0) {
+				poseStack.popPose();
+			}
+			bottomPart.render(poseStack, consumer, packedLight, packedOverlay, color);
 		}
 
 		private void renderChestLock(PoseStack poseStack, MultiBufferSource bufferSource, float lidAngle, int packedLight, int packedOverlay) {
@@ -273,15 +290,15 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 		}
 
 		private Material getTierMaterial(Block block) {
-			if (block == ModBlocks.COPPER_CHEST) {
+			if (block == ModBlocks.COPPER_CHEST.get()) {
 				return chestMaterials.get(StorageTextureManager.ChestMaterial.COPPER_TIER);
-			} else if (block == ModBlocks.IRON_CHEST) {
+			} else if (block == ModBlocks.IRON_CHEST.get()) {
 				return chestMaterials.get(StorageTextureManager.ChestMaterial.IRON_TIER);
-			} else if (block == ModBlocks.GOLD_CHEST) {
+			} else if (block == ModBlocks.GOLD_CHEST.get()) {
 				return chestMaterials.get(StorageTextureManager.ChestMaterial.GOLD_TIER);
-			} else if (block == ModBlocks.DIAMOND_CHEST) {
+			} else if (block == ModBlocks.DIAMOND_CHEST.get()) {
 				return chestMaterials.get(StorageTextureManager.ChestMaterial.DIAMOND_TIER);
-			} else if (block == ModBlocks.NETHERITE_CHEST) {
+			} else if (block == ModBlocks.NETHERITE_CHEST.get()) {
 				return chestMaterials.get(StorageTextureManager.ChestMaterial.NETHERITE_TIER);
 			}
 			return chestMaterials.get(StorageTextureManager.ChestMaterial.WOOD_TIER);

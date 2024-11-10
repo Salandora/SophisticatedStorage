@@ -16,11 +16,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	public static final String STORAGE_TYPE = "shulker_box";
@@ -56,7 +58,7 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	};
 
 	public ShulkerBoxBlockEntity(BlockPos pos, BlockState state) {
-		super(pos, state, ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE);
+		super(pos, state, ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE.get());
 	}
 
 	public static void tick(Level level, BlockPos pos, BlockState state, ShulkerBoxBlockEntity blockEntity) {
@@ -104,13 +106,13 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 	}
 
 	public AABB getBoundingBox(BlockState state) {
-		return Shulker.getProgressAabb(state.getValue(ShulkerBoxBlock.FACING), 0.5F * getProgress(1.0F));
+		return Shulker.getProgressAabb(1.0F, state.getValue(ShulkerBoxBlock.FACING), 0.5F * getProgress(1.0F));
 	}
 
 	private void moveCollidedEntities(Level level, BlockPos pos, BlockState state) {
 		if (state.getBlock() instanceof ShulkerBoxBlock) {
 			Direction direction = state.getValue(ShulkerBoxBlock.FACING);
-			AABB aabb = Shulker.getProgressDeltaAabb(direction, progressOld, progress).move(pos);
+			AABB aabb = Shulker.getProgressDeltaAabb(1.0F, direction, progressOld, progress).move(pos);
 			List<Entity> list = level.getEntities(null, aabb);
 			if (!list.isEmpty()) {
 				for (Entity entity : list) {
@@ -150,16 +152,5 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 		OPENING,
 		OPENED,
 		CLOSING
-	}
-
-	@Override
-	public @Nullable Object getRenderAttachmentData() {
-		return new ModelData(this);
-	}
-
-	public record ModelData(Boolean hasMainColor) {
-		public ModelData(ShulkerBoxBlockEntity tile) {
-			this(tile.getStorageWrapper().hasMainColor());
-		}
 	}
 }

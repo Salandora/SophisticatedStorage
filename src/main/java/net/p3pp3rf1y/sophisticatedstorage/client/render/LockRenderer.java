@@ -14,7 +14,8 @@ import org.joml.Vector3f;
 import java.util.function.BooleanSupplier;
 
 public class LockRenderer {
-	private LockRenderer() {}
+	private LockRenderer() {
+	}
 
 	public static final Material LOCK_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, SophisticatedStorage.getRL("block/lock"));
 

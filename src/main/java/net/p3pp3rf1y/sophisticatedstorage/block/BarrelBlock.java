@@ -10,6 +10,8 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -28,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -37,7 +40,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticleData;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
@@ -69,7 +71,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	@Override
 	public void addCreativeTabItems(Consumer<ItemStack> itemConsumer) {
 		super.addCreativeTabItems(itemConsumer);
-		if (this != ModBlocks.BARREL) {
+		if (this != ModBlocks.BARREL.get()) {
 			return;
 		}
 
@@ -111,37 +113,38 @@ public class BarrelBlock extends WoodStorageBlockBase {
 		return BarrelBlockClientExtensions.addDestroyEffects(this, state, level, pos, manager);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+	public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).map(b -> {
 			if (b.isPacked()) {
-				return InteractionResult.PASS;
+				return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 			}
 			if (level.isClientSide || hand == InteractionHand.OFF_HAND) {
-				return InteractionResult.SUCCESS;
+				return ItemInteractionResult.SUCCESS;
 			}
 
-			ItemStack stackInHand = player.getItemInHand(hand);
-			if (tryItemInteraction(player, hand, b, stackInHand, getFacing(state), hitResult)) {
-				return InteractionResult.SUCCESS;
+			if (tryItemInteraction(player, hand, b, stack, getFacing(state), hitResult)) {
+				return ItemInteractionResult.SUCCESS;
 			}
-
-			player.awardStat(Stats.OPEN_BARREL);
-			player.openMenu(
-					MenuProviderHelper.createMenuProvider(
-							(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
-							buffer -> buffer.writeBlockPos(pos),
-							WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())
-					)
-			);
-			PiglinAi.angerNearbyPiglins(player, true);
-			return InteractionResult.CONSUME;
-		}).orElse(InteractionResult.PASS);
+			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		}).orElse(ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
 	}
 
 	@Override
-	public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+		player.awardStat(Stats.OPEN_BARREL);
+		player.openMenu(
+				new SimpleMenuProvider(
+						(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
+						WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())
+				), pos
+		);
+		PiglinAi.angerNearbyPiglins(player, true);
+		return InteractionResult.CONSUME;
+	}
+
+	@Override
+	public void setPlacedBy(Level level, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(level, pos, state, placer, stack);
 		WorldHelper.getBlockEntity(level, pos, BarrelBlockEntity.class).ifPresent(barrel -> {
 			Map<BarrelMaterial, ResourceLocation> materials = BarrelBlockItem.getMaterials(stack);
@@ -155,16 +158,14 @@ public class BarrelBlock extends WoodStorageBlockBase {
 		return new StorageContainerMenu(w, pl, pos);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
 		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(StorageBlockEntity::recheckOpen);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public BlockState rotate(BlockState state, Rotation rotation) {
-		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+	public BlockState rotate(BlockState state, Rotation direction) {
+		return state.setValue(FACING, direction.rotate(state.getValue(FACING)));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -179,10 +180,10 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-		ItemStack cloneItemStack = super.getCloneItemStack(level, pos, state);
+	public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+		ItemStack cloneItemStack = super.getCloneItemStack(world, pos, state);
 		BarrelBlockItem.setFlatTop(cloneItemStack, state.getValue(FLAT_TOP));
-		WorldHelper.getBlockEntity(level, pos, BarrelBlockEntity.class).ifPresent(barrelBlockEntity -> {
+		WorldHelper.getBlockEntity(world, pos, BarrelBlockEntity.class).ifPresent(barrelBlockEntity -> {
 			Map<BarrelMaterial, ResourceLocation> materials = barrelBlockEntity.getMaterials();
 			if (!materials.isEmpty()) {
 				BarrelBlockItem.setMaterials(cloneItemStack, materials);
@@ -234,7 +235,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 
 	@Override
 	protected BlockEntityType<? extends StorageBlockEntity> getBlockEntityType() {
-		return ModBlocks.BARREL_BLOCK_ENTITY_TYPE;
+		return ModBlocks.BARREL_BLOCK_ENTITY_TYPE.get();
 	}
 
 	@Override
@@ -250,5 +251,10 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	@Override
 	public boolean useShapeForLightOcclusion(BlockState state) {
 		return true;
+	}
+
+	@Override
+	protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
+		return false;
 	}
 }

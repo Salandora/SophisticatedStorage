@@ -6,10 +6,10 @@ import net.p3pp3rf1y.sophisticatedcore.compat.rei.SettingsGhostIngredientHandler
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.StorageGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.DyeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.FlatBarrelRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.ShulkerBoxFromChestRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.TierUpgradeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
@@ -49,8 +49,8 @@ public class REIClientCompat implements REIClientPlugin {
 
 	@Override
 	public void registerCategories(CategoryRegistry registry) {
-		registry.addWorkstations(BuiltinPlugin.CRAFTING, EntryStacks.of(ModItems.CRAFTING_UPGRADE));
-		registry.addWorkstations(BuiltinPlugin.STONE_CUTTING, EntryStacks.of(ModItems.STONECUTTER_UPGRADE));
+		registry.addWorkstations(BuiltinPlugin.CRAFTING, EntryStacks.of(ModItems.CRAFTING_UPGRADE.get()));
+		registry.addWorkstations(BuiltinPlugin.STONE_CUTTING, EntryStacks.of(ModItems.STONECUTTER_UPGRADE.get()));
 		additionalCategories.accept(registry);
 	}
 

@@ -1,8 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.init;
 
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.minecraft.world.item.BlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
+
+import java.util.function.Supplier;
 
 public class ModItemColors {
 	private ModItemColors() {}
@@ -18,6 +21,6 @@ public class ModItemColors {
 						return StorageBlockItem.getAccentColorFromStack(stack).orElse(-1);
 					}
 				},
-				ModBlocks.ALL_BARREL_ITEMS);
+				ModBlocks.ALL_BARREL_ITEMS.stream().map(Supplier::get).toArray(BlockItem[]::new));
 	}
 }

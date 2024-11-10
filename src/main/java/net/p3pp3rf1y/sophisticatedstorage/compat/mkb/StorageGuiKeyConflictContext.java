@@ -1,3 +1,4 @@
+/*
 package net.p3pp3rf1y.sophisticatedstorage.compat.mkb;
 
 import net.minecraft.client.Minecraft;
@@ -19,3 +20,4 @@ public class StorageGuiKeyConflictContext implements IKeyConflictContext {
 		return this == other;
 	}
 }
+*/

@@ -1,0 +1,26 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:shulker_box"
+    }
+  ],
+  "type": "sophisticatedstorage:shulker_box_from_vanilla_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:yellow_shulker_box"
+    },
+    {
+      "item": "minecraft:redstone_torch"
+    }
+  ],
+  "result": {
+    "components": {
+      "sophisticatedcore:accent_color": -75715,
+      "sophisticatedcore:main_color": -75715
+    },
+    "count": 1,
+    "id": "sophisticatedstorage:shulker_box"
+  }
+}

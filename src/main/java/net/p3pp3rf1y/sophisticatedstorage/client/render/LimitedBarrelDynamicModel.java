@@ -10,7 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuadTransformers;
@@ -44,7 +44,7 @@ public class LimitedBarrelDynamicModel extends BarrelDynamicModelBase<LimitedBar
 		}
 
 		@Override
-		protected int getInWorldBlockHash(BlockState state, BarrelBlockEntity.ModelData data, @Nullable RenderType renderType) {
+		protected int getInWorldBlockHash(BlockState state, ModelData data, @Nullable RenderType renderType) {
 			int hash = super.getInWorldBlockHash(state, data, renderType);
 			hash = hash * 31 + state.getValue(LimitedBarrelBlock.HORIZONTAL_FACING).get2DDataValue();
 			hash = hash * 31 + state.getValue(LimitedBarrelBlock.VERTICAL_FACING).getIndex();
@@ -73,9 +73,9 @@ public class LimitedBarrelDynamicModel extends BarrelDynamicModelBase<LimitedBar
 		protected void rotateDisplayItemFrontOffset(BlockState state, Direction dir, Vector3f frontOffset) {
 			VerticalFacing verticalFacing = state.getValue(LimitedBarrelBlock.VERTICAL_FACING);
 			if (verticalFacing != VerticalFacing.NO) {
-				frontOffset.rotate(getNorthBasedRotation(verticalFacing.getDirection()));
+				getNorthBasedRotation(verticalFacing.getDirection()).transform(frontOffset);
 			}
-			frontOffset.rotate(getNorthBasedRotation(state.getValue(LimitedBarrelBlock.HORIZONTAL_FACING)));
+			getNorthBasedRotation(state.getValue(LimitedBarrelBlock.HORIZONTAL_FACING)).transform(frontOffset);
 		}
 
 		@Override

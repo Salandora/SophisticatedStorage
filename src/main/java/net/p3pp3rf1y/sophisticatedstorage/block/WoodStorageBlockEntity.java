@@ -1,21 +1,26 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
+
+import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
+import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.WOOD_NAME;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	private static final String PACKED_TAG = "packed";
@@ -38,14 +43,14 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	}
 
 	public CompoundTag getStorageContentsTag() {
-		CompoundTag contents = saveWithoutMetadata();
+		CompoundTag contents = saveWithoutMetadata(level.registryAccess());
 		contents.putBoolean(PACKED_TAG, false);
 		return contents;
 	}
 
 	@Override
-	public void loadSynchronizedData(CompoundTag tag) {
-		super.loadSynchronizedData(tag);
+	public void loadSynchronizedData(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadSynchronizedData(tag, registries);
 		woodType = NBTHelper.getString(tag, "woodType").flatMap(woodTypeName -> WoodType.values().filter(wt -> wt.name().equals(woodTypeName)).findFirst())
 				.orElse(getStorageWrapper().hasMainColor() && getStorageWrapper().hasAccentColor() ? null : WoodType.ACACIA);
 		packed = tag.getBoolean(PACKED_TAG);
@@ -111,13 +116,15 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	}
 
 	@Override
-	public @Nullable Object getRenderAttachmentData() {
-		return new ModelData(this);
+	protected boolean canRefreshUpgrades() {
+		return super.canRefreshUpgrades() && !packed;
 	}
 
-	public record ModelData(Boolean hasMainColor, @Nullable String woodName) {
-		public ModelData(WoodStorageBlockEntity tile) {
-			this(tile.getStorageWrapper().hasMainColor(), tile.getWoodType().map(WoodType::name).orElse(null));
-		}
+	@Override
+	public @Nullable Object getRenderData() {
+		ModelData.Builder builder = ModelData.builder();
+		builder.with(HAS_MAIN_COLOR, this.getStorageWrapper().getMainColor() > -1);
+		this.getWoodType().ifPresent(n -> builder.with(WOOD_NAME, n.name()));
+		return builder.build();
 	}
 }

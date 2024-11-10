@@ -30,7 +30,6 @@ public class CustomTintTerrainParticle extends TerrainParticle {
 		bCol *= (color & 255) / 255.0F;
 	}
 
-	@Environment(EnvType.CLIENT)
 	public static class Factory implements ParticleProvider<CustomTintTerrainParticleData> {
 		@Nullable
 		@Override

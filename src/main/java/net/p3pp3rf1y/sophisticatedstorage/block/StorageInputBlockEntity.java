@@ -1,25 +1,26 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
+import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	@Nullable
 	private Storage<ItemVariant> itemHandler;
 
 	public StorageInputBlockEntity(BlockPos pos, BlockState state) {
-		super(ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE, pos, state);
+		super(ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Nullable
@@ -30,8 +31,8 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		if (itemHandler == null) {
-			itemHandler = super.getExternalItemHandler(side);
-			if (itemHandler instanceof SlottedStackStorage simpleInserter) {
+			itemHandler = super.getExternalItemHandler(null);
+			if (itemHandler instanceof IItemHandlerSimpleInserter simpleInserter) {
 				itemHandler = new SingleSlotInputItemHandlerWrapper(simpleInserter);
 			}
 		}
@@ -46,9 +47,9 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	}
 
 	private static class SingleSlotInputItemHandlerWrapper implements SlottedStackStorage {
-		private final SlottedStackStorage itemHandler;
+		private final IItemHandlerSimpleInserter itemHandler;
 
-		public SingleSlotInputItemHandlerWrapper(SlottedStackStorage itemHandler) {
+		public SingleSlotInputItemHandlerWrapper(IItemHandlerSimpleInserter itemHandler) {
 			this.itemHandler = itemHandler;
 		}
 
@@ -94,7 +95,7 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 
 		@Override
 		public int getSlotLimit(int slot) {
-			return 64;
+			return 99;
 		}
 
 		@Override

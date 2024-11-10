@@ -1,14 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -16,42 +7,50 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
+import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
-import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.BlockSide;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrapper, HopperUpgradeItem>
 		implements ITickableUpgrade, INeighborChangeListenerUpgrade {
 
-	private Set<Direction> pullDirections = new LinkedHashSet<>();
-	private Set<Direction> pushDirections = new LinkedHashSet<>();
-	private boolean directionsInitialized = false;
-	private final Map<Direction, BlockApiCache<Storage<ItemVariant>, Direction>> handlerCache = new EnumMap<>(Direction.class);
+	private final Set<Direction> pullDirections = new LinkedHashSet<>();
+	private final Set<Direction> pushDirections = new LinkedHashSet<>();
+	private final Map<Direction, ItemHandlerHolder> handlerCache = new EnumMap<>(Direction.class);
 
 	private final ContentsFilterLogic inputFilterLogic;
-	private final ContentsFilterLogic outputFilterLogic;
+	private final TargetContentsFilterLogic outputFilterLogic;
 	private long coolDownTime = 0;
 
 	protected HopperUpgradeWrapper(IStorageWrapper storageWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {
 		super(storageWrapper, upgrade, upgradeSaveHandler);
 		inputFilterLogic = new ContentsFilterLogic(upgrade, upgradeSaveHandler, upgradeItem.getInputFilterSlotCount(), storageWrapper::getInventoryHandler,
-				storageWrapper.getSettingsHandler().getTypeCategory(MemorySettingsCategory.class), "inputFilter");
-		outputFilterLogic = new ContentsFilterLogic(upgrade, upgradeSaveHandler, upgradeItem.getOutputFilterSlotCount(), storageWrapper::getInventoryHandler,
-				storageWrapper.getSettingsHandler().getTypeCategory(MemorySettingsCategory.class), "outputFilter");
+				storageWrapper.getSettingsHandler().getTypeCategory(MemorySettingsCategory.class), ModCoreDataComponents.INPUT_FILTER_ATTRIBUTES);
+		outputFilterLogic = new TargetContentsFilterLogic(upgrade, upgradeSaveHandler, upgradeItem.getOutputFilterSlotCount(), storageWrapper::getInventoryHandler,
+				storageWrapper.getSettingsHandler().getTypeCategory(MemorySettingsCategory.class), ModDataComponents.OUTPUT_FILTER_ATTRIBUTES);
 
 		deserialize();
 	}
@@ -65,13 +64,13 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		}
 
 		for (Direction pushDirection : pushDirections) {
-			if (runOnItemHandler(level, pos, pushDirection, this::pushItems)) {
+			if (runOnItemHandlers(level, pos, pushDirection, this::pushItems)) {
 				break;
 			}
 		}
 
 		for (Direction pullDirection : pullDirections) {
-			if (runOnItemHandler(level, pos, pullDirection, this::pullItems)) {
+			if (runOnItemHandlers(level, pos, pullDirection, this::pullItems)) {
 				break;
 			}
 		}
@@ -80,7 +79,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void initDirections(Level level, BlockPos pos) {
-		if (upgrade.hasTag() && (upgrade.getItem() != ModItems.HOPPER_UPGRADE || directionsInitialized)) {
+		if (upgrade.has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.has(ModDataComponents.PULL_DIRECTIONS)) {
 			return;
 		}
 		BlockState state = level.getBlockState(pos);
@@ -90,16 +89,26 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			pullDirections.clear();
 			pushDirections.clear();
 			initDirections(BlockSide.BOTTOM.toDirection(horizontalDirection, verticalFacing), BlockSide.TOP.toDirection(horizontalDirection, verticalFacing));
-			directionsInitialized = true;
 		}
 	}
 
-	private boolean pullItems(Storage<ItemVariant> fromHandler) {
-		return moveItems(fromHandler, storageWrapper.getInventoryForUpgradeProcessing(), inputFilterLogic);
+	private boolean pullItems(List<Storage<ItemVariant>> fromHandlers) {
+		for (Storage<ItemVariant> fromHandler : fromHandlers) {
+			if (moveItems(fromHandler, storageWrapper.getInventoryForUpgradeProcessing(), inputFilterLogic)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	private boolean pushItems(Storage<ItemVariant> toHandler) {
-		return moveItems(storageWrapper.getInventoryForUpgradeProcessing(), toHandler, outputFilterLogic);
+	private boolean pushItems(List<Storage<ItemVariant>> toHandlers) {
+		for (Storage<ItemVariant> toHandler : toHandlers) {
+			outputFilterLogic.setInventory(toHandler);
+			if (moveItems(storageWrapper.getInventoryForUpgradeProcessing(), toHandler, outputFilterLogic)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean moveItems(Storage<ItemVariant> fromHandler, Storage<ItemVariant> toHandler, FilterLogic filterLogic) {
@@ -123,9 +132,27 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 
 	@Override
 	public void onNeighborChange(Level level, BlockPos pos, Direction direction) {
-		if (pushDirections.contains(direction) || pullDirections.contains(direction)) {
+		if (!level.isClientSide() && (pushDirections.contains(direction) || pullDirections.contains(direction))
+				&& needsCacheUpdate(level, pos, direction)) {
 			updateCacheOnSide(level, pos, direction);
 		}
+	}
+
+	private boolean needsCacheUpdate(Level level, BlockPos pos, Direction direction) {
+		ItemHandlerHolder holder = handlerCache.get(direction);
+		if (holder == null || holder.handlers().isEmpty()) {
+			return !level.getBlockState(pos).isAir();
+		} else if (holder.refreshOnEveryNeighborChange()) {
+			return true;
+		}
+
+		for (BlockApiCache<Storage<ItemVariant>, Direction> handler : holder.handlers()) {
+			if (handler.find(direction.getOpposite()) == null) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void updateCacheOnSide(Level level, BlockPos pos, Direction direction) {
@@ -134,14 +161,29 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			return;
 		}
 
-		handlerCache.computeIfAbsent(direction, k -> {
-			BlockState storageState = level.getBlockState(pos);
-			BlockPos offsetPos = storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : pos.relative(direction);
-			return BlockApiCache.create(ItemStorage.SIDED, serverLevel, offsetPos);
+		//WeakReference<HopperUpgradeWrapper> existRef = new WeakReference<>(this);
+
+		BlockState storageState = level.getBlockState(pos);
+		List<BlockPos> offsetPositions = storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : List.of(pos.relative(direction));
+
+		List<BlockApiCache<Storage<ItemVariant>, Direction>> caches = new ArrayList<>();
+
+		AtomicBoolean refreshOnEveryNeighborChange = new AtomicBoolean(false);
+		offsetPositions.forEach(offsetPos -> {
+			offsetPos = level.getBlockEntity(offsetPos, ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE.get())
+					.flatMap(storageInputBlockEntity -> {
+								refreshOnEveryNeighborChange.set(true);
+								return storageInputBlockEntity.getControllerPos();
+							}
+					).orElse(offsetPos);
+
+			caches.add(BlockApiCache.create(ItemStorage.SIDED, serverLevel, offsetPos));
+			// caches.add(BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, serverLevel, offsetPos, direction.getOpposite(), () -> existRef.get() != null, () -> updateCacheOnSide(level, pos, direction)));
 		});
+		handlerCache.put(direction, new ItemHandlerHolder(caches, refreshOnEveryNeighborChange.get()));
 	}
 
-	private boolean runOnItemHandler(Level level, BlockPos pos, Direction direction, Predicate<Storage<ItemVariant>> run) {
+	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<Storage<ItemVariant>>> run) {
 		if (!handlerCache.containsKey(direction)) {
 			updateCacheOnSide(level, pos, direction);
 		}
@@ -149,8 +191,9 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			return false;
 		}
 
-		@Nullable Storage<ItemVariant> handler = handlerCache.get(direction).find(direction.getOpposite());
-		return handler != null && run.test(handler);
+		List<Storage<ItemVariant>> handler = handlerCache.get(direction).handlers().stream().map(handlerCache -> handlerCache.find(direction.getOpposite())).filter(Objects::nonNull).toList();
+
+		return run.test(handler);
 	}
 
 	public ContentsFilterLogic getInputFilterLogic() {
@@ -188,26 +231,34 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void serializePullDirections() {
-		NBTHelper.putList(upgrade.getOrCreateTag(), "pullDirections", pullDirections, d -> StringTag.valueOf(d.getSerializedName()));
+		upgrade.set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
 		save();
 	}
 
 	private void serializePushDirections() {
-		NBTHelper.putList(upgrade.getOrCreateTag(), "pushDirections", pushDirections, d -> StringTag.valueOf(d.getSerializedName()));
+		upgrade.set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
 		save();
 	}
 
 	public void deserialize() {
 		pullDirections.clear();
 		pushDirections.clear();
-		if (upgrade.hasTag()) {
-			pullDirections = NBTHelper.getCollection(upgrade.getOrCreateTag(), "pullDirections", Tag.TAG_STRING, t -> Optional.ofNullable(Direction.byName(t.getAsString())), HashSet::new).orElseGet(HashSet::new);
-			pushDirections = NBTHelper.getCollection(upgrade.getOrCreateTag(), "pushDirections", Tag.TAG_STRING, t -> Optional.ofNullable(Direction.byName(t.getAsString())), HashSet::new).orElseGet(HashSet::new);
+		Set<Direction> directions = upgrade.get(ModDataComponents.PULL_DIRECTIONS);
+		if (directions != null) {
+			pullDirections.addAll(directions);
+		}
+		directions = upgrade.get(ModDataComponents.PUSH_DIRECTIONS);
+		if (directions != null) {
+			pushDirections.addAll(directions);
 		}
 	}
 
 	public void initDirections(Direction pushDirection, Direction pullDirection) {
 		setPushingTo(pushDirection, true);
 		setPullingFrom(pullDirection, true);
+	}
+
+	private record ItemHandlerHolder(List<BlockApiCache<Storage<ItemVariant>, Direction>> handlers,
+									 boolean refreshOnEveryNeighborChange) {
 	}
 }

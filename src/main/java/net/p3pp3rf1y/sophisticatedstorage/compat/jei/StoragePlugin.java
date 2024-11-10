@@ -3,17 +3,17 @@ package net.p3pp3rf1y.sophisticatedstorage.compat.jei;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.helpers.IStackHelper;
-import mezz.jei.api.ingredients.subtypes.IIngredientSubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import mezz.jei.api.registration.*;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.CraftingContainerRecipeTransferHandlerBase;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.SettingsGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.StorageGhostIngredientHandler;
@@ -21,19 +21,15 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
-import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.BarrelSubtypeInterpreter;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.ShulkerBoxSubtypeInterpreter;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.WoodStorageSubtypeInterpreter;
+import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromVanillaShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
-import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -48,43 +44,59 @@ public class StoragePlugin implements IModPlugin {
 
 	@Override
 	public ResourceLocation getPluginUid() {
-		return new ResourceLocation(SophisticatedStorage.MOD_ID, "default");
+		return ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "default");
 	}
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		IIngredientSubtypeInterpreter<ItemStack> woodStorageNbtInterpreter = (itemStack, context) -> {
-			StringJoiner result = new StringJoiner(",");
-			WoodStorageBlockItem.getWoodType(itemStack).ifPresent(woodName -> result.add("woodName:" + woodName));
-			StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
-			StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
-			return "{" + result + "}";
-		};
-		IIngredientSubtypeInterpreter<ItemStack> barrelNbtInterpreter = (itemStack, context) -> {
-			StringJoiner result = new StringJoiner(",");
-			WoodStorageBlockItem.getWoodType(itemStack).ifPresent(woodName -> result.add("woodName:" + woodName));
-			StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
-			StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
-			result.add("flatTop:" + BarrelBlockItem.isFlatTop(itemStack));
-			return "{" + result + "}";
-		};
+		ISubtypeInterpreter<ItemStack> woodStorageNbtInterpreter = new WoodStorageSubtypeInterpreter();
+		ISubtypeInterpreter<ItemStack> barrelNbtInterpreter = new BarrelSubtypeInterpreter();
 
-		for (BlockItem item : ModBlocks.ALL_BARREL_ITEMS) {
-			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, barrelNbtInterpreter);
-		}
-		for (BlockItem item : ModBlocks.CHEST_ITEMS) {
-			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, woodStorageNbtInterpreter);
-		}
+		registration.registerSubtypeInterpreter(ModBlocks.BARREL_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.COPPER_BARREL_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.IRON_BARREL_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.GOLD_BARREL_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_BARREL_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_BARREL_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.CHEST_ITEM.get(), woodStorageNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.COPPER_CHEST_ITEM.get(), woodStorageNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.IRON_CHEST_ITEM.get(), woodStorageNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.GOLD_CHEST_ITEM.get(), woodStorageNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_CHEST_ITEM.get(), woodStorageNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_CHEST_ITEM.get(), woodStorageNbtInterpreter);
 
-		IIngredientSubtypeInterpreter<ItemStack> shulkerBoxNbtInterpreter = (itemStack, context) -> {
-			StringJoiner result = new StringJoiner(",");
-			StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
-			StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
-			return "{" + result + "}";
-		};
-		for (BlockItem item : ModBlocks.SHULKER_BOX_ITEMS) {
-			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, shulkerBoxNbtInterpreter);
-		}
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_1_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_2_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_3_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_4_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_1_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_2_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_3_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_4_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_1_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_2_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_3_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_4_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_1_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_2_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_3_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_4_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM.get(), barrelNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM.get(), barrelNbtInterpreter);
+
+		ISubtypeInterpreter<ItemStack> shulkerBoxNbtInterpreter = new ShulkerBoxSubtypeInterpreter();
+		registration.registerSubtypeInterpreter(ModBlocks.SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.COPPER_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.IRON_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.GOLD_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
 	}
 
 	@Override
@@ -117,13 +129,14 @@ public class StoragePlugin implements IModPlugin {
 		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
 		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
 		registration.addRecipes(RecipeTypes.CRAFTING, ShulkerBoxFromChestRecipesMaker.getRecipes());
+		registration.addRecipes(RecipeTypes.CRAFTING, ClientRecipeHelper.transformAllRecipesOfType(RecipeType.CRAFTING, ShulkerBoxFromVanillaShapelessRecipe.class, ClientRecipeHelper::copyShapelessRecipe));
 		registration.addRecipes(RecipeTypes.CRAFTING, FlatBarrelRecipesMaker.getRecipes());
 	}
 
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		registration.addRecipeCatalyst(new ItemStack(ModItems.CRAFTING_UPGRADE), RecipeTypes.CRAFTING);
-		registration.addRecipeCatalyst(new ItemStack(ModItems.STONECUTTER_UPGRADE), RecipeTypes.STONECUTTING);
+		registration.addRecipeCatalyst(new ItemStack(ModItems.CRAFTING_UPGRADE.get()), RecipeTypes.CRAFTING);
+		registration.addRecipeCatalyst(new ItemStack(ModItems.STONECUTTER_UPGRADE.get()), RecipeTypes.STONECUTTING);
 		additionalCatalystRegistrar.accept(registration);
 	}
 

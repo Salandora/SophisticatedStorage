@@ -1,11 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SortBy;
@@ -34,11 +35,13 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class StorageWrapper implements IStorageWrapper {
-	private static final String MAIN_COLOR_TAG = "mainColor";
-	private static final String ACCENT_COLOR_TAG = "accentColor";
+	public static final String MAIN_COLOR_TAG = "mainColor";
+	public static final String ACCENT_COLOR_TAG = "accentColor";
 	private static final String UUID_TAG = "uuid";
 	private static final String OPEN_TAB_ID_TAG = "openTabId";
 	public static final String CONTENTS_TAG = "contents";
+	public static final String NUMBER_OF_INVENTORY_SLOTS_TAG = "numberOfInventorySlots";
+	public static final String NUMBER_OF_UPGRADE_SLOTS_TAG = "numberOfUpgradeSlots";
 	private final Supplier<Runnable> getSaveHandler;
 
 	@Nullable
@@ -119,8 +122,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 				upgradeCachesInvalidatedHandler.run();
 			}) {
 				@Override
-				public boolean isItemValid(int slot, ItemVariant resource, int count) {
-					return super.isItemValid(slot, resource, count) && (resource.isBlank() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(resource.getItem()).getNamespace()) || resource.toStack(count).is(ModItems.STORAGE_UPGRADE_TAG));
+				public boolean isItemValid(int slot, ItemStack stack) {
+					return super.isItemValid(slot, stack) && (stack.isEmpty() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace()) || stack.is(ModItems.STORAGE_UPGRADE_TAG));
 				}
 
 				@Override
@@ -175,36 +178,36 @@ public abstract class StorageWrapper implements IStorageWrapper {
 			tag.putInt("columnsTaken", columnsTaken);
 		}
 		if (numberOfInventorySlots > 0) {
-			tag.putInt("numberOfInventorySlots", numberOfInventorySlots);
+			tag.putInt(NUMBER_OF_INVENTORY_SLOTS_TAG, numberOfInventorySlots);
 		}
 		if (numberOfUpgradeSlots > -1) {
-			tag.putInt("numberOfUpgradeSlots", numberOfUpgradeSlots);
+			tag.putInt(NUMBER_OF_UPGRADE_SLOTS_TAG, numberOfUpgradeSlots);
 		}
-		if (mainColor > -1) {
+		if (mainColor != -1) {
 			tag.putInt(MAIN_COLOR_TAG, mainColor);
 		}
-		if (accentColor > -1) {
+		if (accentColor != -1) {
 			tag.putInt(ACCENT_COLOR_TAG, accentColor);
 		}
 		return tag;
 	}
 
-	public void load(CompoundTag tag) {
+	public void load(HolderLookup.Provider registries, CompoundTag tag) {
 		loadContents(tag);
-		loadData(tag);
+		loadData(registries, tag);
 
 		initInventoryHandler();
 		getUpgradeHandler().refreshUpgradeWrappers();
-		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlotCount()) {
+		if (SophisticatedCore.isLogicalServerThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlotCount()) {
 			getUpgradeHandler().setRenderUpgradeItems();
 		}
 	}
 
-	private void loadData(CompoundTag tag) {
+	private void loadData(HolderLookup.Provider registries, CompoundTag tag) {
 		settingsNbt = tag.getCompound("settings");
 		settingsHandler.reloadFrom(settingsNbt);
 		renderInfoNbt = tag.getCompound("renderInfo");
-		renderInfo.deserializeFrom(renderInfoNbt);
+		renderInfo.deserializeFrom(registries, renderInfoNbt);
 		contentsUuid = NBTHelper.getTagValue(tag, UUID_TAG, CompoundTag::get).map(NbtUtils::loadUUID).orElse(null);
 		openTabId = NBTHelper.getInt(tag, OPEN_TAB_ID_TAG).orElse(-1);
 		sortBy = NBTHelper.getString(tag, "sortBy").map(SortBy::fromName).orElse(SortBy.NAME);
@@ -215,8 +218,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	protected void loadSlotNumbers(CompoundTag tag) {
-		numberOfInventorySlots = NBTHelper.getInt(tag, "numberOfInventorySlots").orElse(0);
-		numberOfUpgradeSlots = NBTHelper.getInt(tag, "numberOfUpgradeSlots").orElse(-1);
+		numberOfInventorySlots = NBTHelper.getInt(tag, NUMBER_OF_INVENTORY_SLOTS_TAG).orElse(0);
+		numberOfUpgradeSlots = NBTHelper.getInt(tag, NUMBER_OF_UPGRADE_SLOTS_TAG).orElse(-1);
 	}
 
 	private void loadContents(CompoundTag tag) {
@@ -247,8 +250,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private void initInventoryHandler() {
 		inventoryHandler = new InventoryHandler(getNumberOfInventorySlots(), this, getContentsNbt(), getSaveHandler.get(), StackUpgradeItem.getInventorySlotLimit(this), Config.SERVER.stackUpgrade) {
 			@Override
-			protected boolean isAllowed(ItemVariant resource) {
-				return isAllowedInStorage(resource.toStack());
+			protected boolean isAllowed(ItemStack stack) {
+				return isAllowedInStorage(stack);
 			}
 		};
 		inventoryHandler.addListener(getSettingsHandler().getTypeCategory(ItemDisplaySettingsCategory.class)::itemChanged);
@@ -313,7 +316,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	public boolean hasMainColor() {
-		return mainColor > -1;
+		return mainColor != -1;
 	}
 
 	public void setMainColor(int mainColor) {
@@ -326,7 +329,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	public boolean hasAccentColor() {
-		return accentColor > -1;
+		return accentColor != -1;
 	}
 
 	public void setAccentColor(int accentColor) {

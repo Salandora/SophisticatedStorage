@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage;
 
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -24,7 +25,6 @@ import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeConfig;
-import fuzs.forgeconfigapiport.api.config.v3.ModConfigEvents;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +38,7 @@ public class Config {
 
 	public static final Client CLIENT;
 	public static final ModConfigSpec CLIENT_SPEC;
+
 	public static final Server SERVER;
 	public static final ModConfigSpec SERVER_SPEC;
 	public static final Common COMMON;
@@ -163,8 +164,8 @@ public class Config {
 		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
 
 		public void initListeners() {
-			ModConfigEvents.reloading(SophisticatedStorage.MOD_ID).register(this::onConfigReload);
-			ModConfigEvents.loading(SophisticatedStorage.MOD_ID).register(this::onConfigLoad);
+			NeoForgeModConfigEvents.reloading(SophisticatedStorage.MOD_ID).register(this::onConfigReload);
+			NeoForgeModConfigEvents.loading(SophisticatedStorage.MOD_ID).register(this::onConfigLoad);
 		}
 
 		public void onConfigLoad(ModConfig config) {
@@ -344,7 +345,7 @@ public class Config {
 				disallowedItemsSet = new HashSet<>();
 
 				for (String disallowedItemName : disallowedItemsList.get()) {
-					ResourceLocation registryName = new ResourceLocation(disallowedItemName);
+					ResourceLocation registryName = ResourceLocation.parse(disallowedItemName);
 					BuiltInRegistries.ITEM.getOptional(registryName).ifPresent(disallowedItemsSet::add);
 				}
 			}

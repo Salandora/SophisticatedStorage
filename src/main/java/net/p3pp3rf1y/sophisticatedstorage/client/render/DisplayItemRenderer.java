@@ -24,7 +24,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
@@ -40,12 +39,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 public class DisplayItemRenderer {
-	private static final ItemStack EMPTY_UPGRADE_STACK = new ItemStack(ModItems.UPGRADE_BASE);
+	private static final ItemStack EMPTY_UPGRADE_STACK = new ItemStack(ModItems.UPGRADE_BASE.get());
 	public static final float SMALL_3D_ITEM_SCALE = 0.5f;
 	static final float BIG_2D_ITEM_SCALE = 0.5f;
 	static final float SMALL_2D_ITEM_SCALE = 0.25f;
 	static final float UPGRADE_ITEM_SCALE = 0.125f;
-	private static final ItemStack INACCESSIBLE_SLOT_STACK = new ItemStack(ModItems.INACCESSIBLE_SLOT);
+	private static final ItemStack INACCESSIBLE_SLOT_STACK = new ItemStack(ModItems.INACCESSIBLE_SLOT.get());
 	private static final RandomSource RAND = new ThreadSafeLegacyRandomSource(RandomSupport.generateUniqueSeed());
 	private final double yCenterTranslation;
 	private final Vec3 upgradesOffset;
@@ -156,7 +155,7 @@ public class DisplayItemRenderer {
 	}
 
 	public static double getDisplayItemOffset(ItemStack item, BakedModel itemModel, float additionalScale) {
-		int hash = ItemStackKey.getHashCode(item) * 31 + Float.hashCode(additionalScale);
+		int hash = ItemStack.hashItemAndComponents(item) * 31 + Float.hashCode(additionalScale);
 		Double offset = ITEM_HASHCODE_OFFSETS.getIfPresent(hash);
 		if (offset != null) {
 			return offset;
@@ -186,6 +185,7 @@ public class DisplayItemRenderer {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private static double transformBoundsCornersAndCalculateOffset(BakedModel itemModel, Set<Vector3f> points, float additionalScale) {
 		ItemTransform transform = itemModel.getTransforms().getTransform(ItemDisplayContext.FIXED);
 		points = scalePoints(points, transform.scale);
@@ -196,9 +196,8 @@ public class DisplayItemRenderer {
 		return ((zScale * (2 / 15.95D)) - getMaxZ(points)) * additionalScale; //15.95 because of z-fighting if displayed model had surface offset exactly 1 pixel from the top most surface
 	}
 
-	@SuppressWarnings("deprecation")
 	private static Set<Vector3f> getBoundsCornersFromShape(Block block, ClientLevel level) {
-		VoxelShape shape = block.getShape(block.defaultBlockState(), level, BlockPos.ZERO, CollisionContext.empty());
+		VoxelShape shape = block.defaultBlockState().getShape(level, BlockPos.ZERO, CollisionContext.empty());
 		return getCornerPointsRelativeToCenter(shape.bounds());
 	}
 

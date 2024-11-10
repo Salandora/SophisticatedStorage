@@ -1,6 +1,13 @@
 package net.p3pp3rf1y.sophisticatedstorage.common;
 
 import com.google.common.collect.Queues;
+import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -9,7 +16,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -19,26 +25,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketHelper;
-import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsPacket;
+import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
+import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsPayload;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
-import net.p3pp3rf1y.sophisticatedstorage.block.ISneakItemInteractionBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
-import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
@@ -55,15 +50,11 @@ public class CommonEventHandler {
 	private final Queue<TickTask> pendingTickTasks = Queues.newConcurrentLinkedQueue();
 
 	public void registerHandlers() {
-		ServerPlayConnectionEvents.JOIN.register(this::onPlayerLoggedIn);
 		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register(this::onPlayerChangedDimension);
 		ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
-
 		PlayerBlockBreakEvents.BEFORE.register(this::onBlockBreak);
-
 		AttackBlockCallback.EVENT.register(this::onLimitedBarrelLeftClicked);
 		UseBlockCallback.EVENT.register(this::onSneakItemBlockInteraction);
-
 		ServerTickEvents.END_SERVER_TICK.register(this::onLevelTick);
 	}
 
@@ -102,13 +93,11 @@ public class CommonEventHandler {
 		sendPlayerSettingsToClient(player);
 	}
 
-	private void onPlayerLoggedIn(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) {
-		sendPlayerSettingsToClient(handler.player);
-	}
-
 	private void sendPlayerSettingsToClient(Player player) {
-		String playerTagName = StorageSettingsHandler.SOPHISTICATED_STORAGE_SETTINGS_PLAYER_TAG;
-		PacketHelper.sendToPlayer(new SyncPlayerSettingsPacket(playerTagName, SettingsManager.getPlayerSettingsTag(player, playerTagName)), player);
+		if (player instanceof ServerPlayer serverPlayer) {
+			String playerTagName = StorageSettingsHandler.SOPHISTICATED_STORAGE_SETTINGS_PLAYER_TAG;
+			PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerSettingsPayload(playerTagName, SettingsManager.getPlayerSettingsTag(player, playerTagName)));
+		}
 	}
 
 	private void onPlayerRespawn(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
@@ -143,8 +132,19 @@ public class CommonEventHandler {
 			}
 
 			AtomicInteger droppedItemEntityCount = new AtomicInteger(0);
-			InventoryHelper.iterate(wbe.getStorageWrapper().getInventoryHandler(), (slot, stack) -> {
-				if (stack.isEmpty()) {
+
+			int startCountingFromSlot;
+			InventoryHandler inventoryHandler;
+			if (wbe instanceof ChestBlockEntity cbe && !cbe.isMainChest() && level.getBlockState(pos).getBlock() instanceof ChestBlock chestBlock) {
+				startCountingFromSlot = chestBlock.getNumberOfInventorySlots();
+				inventoryHandler = cbe.getMainStorageWrapper().getInventoryHandler();
+			} else {
+				startCountingFromSlot = 0;
+				inventoryHandler = wbe.getStorageWrapper().getInventoryHandler();
+			}
+
+			InventoryHelper.iterate(inventoryHandler, (slot, stack) -> {
+				if (stack.isEmpty() || slot < startCountingFromSlot) {
 					return;
 				}
 				droppedItemEntityCount.addAndGet((int) Math.ceil(stack.getCount() / (double) Math.min(stack.getMaxStackSize(), AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT)));
@@ -152,7 +152,7 @@ public class CommonEventHandler {
 
 			if (droppedItemEntityCount.get() > Config.SERVER.tooManyItemEntityDrops.get()) {
 				cancelEvent.set(true);
-				ItemBase packingTapeItem = ModItems.PACKING_TAPE;
+				ItemBase packingTapeItem = ModItems.PACKING_TAPE.get();
 				Component packingTapeItemName = packingTapeItem.getName(new ItemStack(packingTapeItem)).copy().withStyle(ChatFormatting.GREEN);
 
 				ItemStack clonedStack;

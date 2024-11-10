@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -27,15 +28,11 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
-import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.BarrelBlockEntityAccessor;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ChestBlockEntityAccessor;
-import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ShulkerBoxBlockEntityAccessor;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -57,11 +54,11 @@ public class StorageTierUpgradeItem extends ItemBase {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
 		if (hasTooltip) {
 			tooltipComponents.addAll(StorageTranslationHelper.INSTANCE.getTranslatedLines(stack.getItem().getDescriptionId() + TranslationHelper.TOOLTIP_SUFFIX, null, ChatFormatting.DARK_GRAY));
 		}
-		super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+		super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
 	}
 
 	@Override
@@ -130,12 +127,12 @@ public class StorageTierUpgradeItem extends ItemBase {
 
 		private StorageBlockEntity upgradeStorageBlock(BlockPos pos, Level level, StorageBlockEntity blockEntity, BlockState newBlockState, int newInventorySize, int newUpgradeSize) {
 			CompoundTag beTag = new CompoundTag();
-			blockEntity.saveAdditional(beTag);
+			blockEntity.saveAdditional(beTag, level.registryAccess());
 
 			StorageBlockEntity newBlockEntity = newBlock().newBlockEntity(pos, newBlockState);
 			//noinspection ConstantConditions - all storage blocks create a block entity so no chancde of null here
 			newBlockEntity.setBeingUpgraded(true);
-			newBlockEntity.load(beTag);
+			newBlockEntity.loadAdditional(beTag, level.registryAccess());
 
 			blockEntity.setBeingUpgraded(true);
 			level.removeBlockEntity(pos);
@@ -190,7 +187,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 
 	private static class VanillaTintedShulkerBoxTierUpgradeDefinition extends VanillaTierUpgradeDefinition<ShulkerBoxBlockEntity> {
 		private VanillaTintedShulkerBoxTierUpgradeDefinition(DyeColor color, net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock newBlock) {
-			super(ShulkerBoxBlockEntity.class, shulkerBoxBlockEntity -> ((ShulkerBoxBlockEntityAccessor) shulkerBoxBlockEntity).getOpenCount() > 0, newBlock, null, color, ShulkerBoxBlock.FACING, StorageBlockBase.TICKING);
+			super(ShulkerBoxBlockEntity.class, shulkerBoxBlockEntity -> shulkerBoxBlockEntity.openCount > 0, newBlock, null, color, ShulkerBoxBlock.FACING, StorageBlockBase.TICKING);
 		}
 	}
 
@@ -203,7 +200,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 		}
 
 		private VanillaTierUpgradeDefinition(Class<B> blockEntityClass, Predicate<B> isUpgradingBlocked, StorageBlockBase newBlock, @Nullable WoodType woodType, DyeColor color, Property<?>... propertiesToCopy) {
-			this(blockEntityClass, isUpgradingBlocked, newBlock, woodType, ColorHelper.getColor(color.getTextureDiffuseColors()), propertiesToCopy);
+			this(blockEntityClass, isUpgradingBlocked, newBlock, woodType, color.getTextureDiffuseColor(), propertiesToCopy);
 		}
 
 		private VanillaTierUpgradeDefinition(Class<B> blockEntityClass, Predicate<B> isUpgradingBlocked, StorageBlockBase newBlock, @Nullable WoodType woodType, int color, Property<?>... propertiesToCopy) {
@@ -231,7 +228,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 				return false;
 			}
 			BlockState otherState;
-			if (state.getBlock() instanceof net.minecraft.world.level.block.ChestBlock) {
+			if (state.getBlock() instanceof net.minecraft.world.level.block.ChestBlock && state.getValue(net.minecraft.world.level.block.ChestBlock.TYPE) != ChestType.SINGLE) {
 				otherState = level.getBlockState(pos.relative(net.minecraft.world.level.block.ChestBlock.getConnectedDirection(state)));
 				if (otherState.getBlock() != state.getBlock()) {
 					otherState = null;
@@ -249,9 +246,9 @@ public class StorageTierUpgradeItem extends ItemBase {
 					return true;
 				}
 				upgradeStorage(otherPos, level, otherState, otherBE);
-				level.getBlockEntity(otherPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE)
+				level.getBlockEntity(otherPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get())
 						.ifPresent(otherChestBE -> {
-							level.getBlockEntity(pos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).ifPresent(mainBE -> {
+							level.getBlockEntity(pos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).ifPresent(mainBE -> {
 								if (state.getValue(net.minecraft.world.level.block.ChestBlock.TYPE) == ChestType.LEFT) {
 									mainBE.joinWithChest(otherChestBE);
 								} else {
@@ -308,7 +305,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 				wbe.setWoodType(woodType);
 			}
 
-			if (color > -1) {
+			if (color != -1) {
 				storageWrapper.setMainColor(color);
 				storageWrapper.setAccentColor(color);
 			}
@@ -365,7 +362,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 
 	private static Map<Block, TierUpgradeDefinition<?>> getVanillaShulkerBoxTierUpgradeDefinitions(net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock toShulkerBox) {
 		return new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.SHULKER_BOX, new VanillaTierUpgradeDefinition<>(ShulkerBoxBlockEntity.class, shulkerBoxBlockEntity -> ((ShulkerBoxBlockEntityAccessor) shulkerBoxBlockEntity).getOpenCount() > 0, toShulkerBox, null, ShulkerBoxBlock.FACING))
+				.put(Blocks.SHULKER_BOX, new VanillaTierUpgradeDefinition<>(ShulkerBoxBlockEntity.class, shulkerBoxBlockEntity -> shulkerBoxBlockEntity.openCount > 0, toShulkerBox, null, ShulkerBoxBlock.FACING))
 				.put(Blocks.WHITE_SHULKER_BOX, new VanillaTintedShulkerBoxTierUpgradeDefinition(DyeColor.WHITE, toShulkerBox))
 				.put(Blocks.ORANGE_SHULKER_BOX, new VanillaTintedShulkerBoxTierUpgradeDefinition(DyeColor.ORANGE, toShulkerBox))
 				.put(Blocks.MAGENTA_SHULKER_BOX, new VanillaTintedShulkerBoxTierUpgradeDefinition(DyeColor.MAGENTA, toShulkerBox))
@@ -387,168 +384,168 @@ public class StorageTierUpgradeItem extends ItemBase {
 
 	public enum TierUpgrade {
 		BASIC(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> ((BarrelBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.BARREL, WoodType.SPRUCE, BlockStateProperties.FACING))
-				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, chestBlockEntity -> ((ChestBlockEntityAccessor) chestBlockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.CHEST, WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.SHULKER_BOX))
+				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.BARREL.get(), WoodType.SPRUCE, BlockStateProperties.FACING))
+				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, chestBlockEntity -> chestBlockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.CHEST.get(), WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.SHULKER_BOX.get()))
 				.build())),
 		BASIC_TO_COPPER(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> ((BarrelBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.COPPER_BARREL, WoodType.SPRUCE, BlockStateProperties.FACING))
-				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, blockEntity -> ((ChestBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.COPPER_CHEST, WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.COPPER_SHULKER_BOX))
-				.put(ModBlocks.BARREL, new StorageTierUpgradeDefinition(ModBlocks.COPPER_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.CHEST, new StorageTierUpgradeDefinition(ModBlocks.COPPER_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.COPPER_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_1))
-				.put(ModBlocks.LIMITED_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_2))
-				.put(ModBlocks.LIMITED_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_3))
-				.put(ModBlocks.LIMITED_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_4))
+				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.COPPER_BARREL.get(), WoodType.SPRUCE, BlockStateProperties.FACING))
+				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.COPPER_CHEST.get(), WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.COPPER_SHULKER_BOX.get()))
+				.put(ModBlocks.BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.COPPER_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.COPPER_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.COPPER_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_COPPER_BARREL_4.get()))
 				.build())),
 		BASIC_TO_IRON(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> ((BarrelBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.IRON_BARREL, WoodType.SPRUCE, BlockStateProperties.FACING))
-				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, chestBlockEntity -> ((ChestBlockEntityAccessor) chestBlockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.IRON_CHEST, WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.IRON_SHULKER_BOX))
-				.put(ModBlocks.BARREL, new StorageTierUpgradeDefinition(ModBlocks.IRON_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.CHEST, new StorageTierUpgradeDefinition(ModBlocks.IRON_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.IRON_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_1))
-				.put(ModBlocks.LIMITED_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_2))
-				.put(ModBlocks.LIMITED_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_3))
-				.put(ModBlocks.LIMITED_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_4))
+				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.IRON_BARREL.get(), WoodType.SPRUCE, BlockStateProperties.FACING))
+				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.IRON_CHEST.get(), WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.IRON_SHULKER_BOX.get()))
+				.put(ModBlocks.BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.IRON_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.IRON_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.IRON_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_4.get()))
 				.build())),
 		BASIC_TO_GOLD(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> ((BarrelBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.GOLD_BARREL, WoodType.SPRUCE, BlockStateProperties.FACING))
-				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, chestBlockEntity -> ((ChestBlockEntityAccessor) chestBlockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.GOLD_CHEST, WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.GOLD_SHULKER_BOX))
-				.put(ModBlocks.BARREL, new StorageTierUpgradeDefinition(ModBlocks.GOLD_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.CHEST, new StorageTierUpgradeDefinition(ModBlocks.GOLD_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.GOLD_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_1))
-				.put(ModBlocks.LIMITED_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_2))
-				.put(ModBlocks.LIMITED_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_3))
-				.put(ModBlocks.LIMITED_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_4))
+				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.GOLD_BARREL.get(), WoodType.SPRUCE, BlockStateProperties.FACING))
+				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.GOLD_CHEST.get(), WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.GOLD_SHULKER_BOX.get()))
+				.put(ModBlocks.BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_4.get()))
 				.build()
 		)),
 		BASIC_TO_DIAMOND(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> ((BarrelBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.DIAMOND_BARREL, WoodType.SPRUCE, BlockStateProperties.FACING))
-				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, chestBlockEntity -> ((ChestBlockEntityAccessor) chestBlockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.DIAMOND_CHEST, WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.DIAMOND_SHULKER_BOX))
-				.put(ModBlocks.BARREL, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.CHEST, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1))
-				.put(ModBlocks.LIMITED_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2))
-				.put(ModBlocks.LIMITED_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3))
-				.put(ModBlocks.LIMITED_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4))
+				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.DIAMOND_BARREL.get(), WoodType.SPRUCE, BlockStateProperties.FACING))
+				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.DIAMOND_CHEST.get(), WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.DIAMOND_SHULKER_BOX.get()))
+				.put(ModBlocks.BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4.get()))
 				.build()
 		)),
 		BASIC_TO_NETHERITE(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> ((BarrelBlockEntityAccessor) blockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.NETHERITE_BARREL, WoodType.SPRUCE, BlockStateProperties.FACING))
-				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, chestBlockEntity -> ((ChestBlockEntityAccessor) chestBlockEntity).getOpenersCounter().getOpenerCount() > 0, ModBlocks.NETHERITE_CHEST, WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.NETHERITE_SHULKER_BOX))
-				.put(ModBlocks.BARREL, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.CHEST, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1))
-				.put(ModBlocks.LIMITED_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2))
-				.put(ModBlocks.LIMITED_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3))
-				.put(ModBlocks.LIMITED_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4))
+				.put(Blocks.BARREL, new VanillaTierUpgradeDefinition<>(BarrelBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.NETHERITE_BARREL.get(), WoodType.SPRUCE, BlockStateProperties.FACING))
+				.put(Blocks.CHEST, new VanillaTierUpgradeDefinition<>(net.minecraft.world.level.block.entity.ChestBlockEntity.class, blockEntity -> blockEntity.openersCounter.getOpenerCount() > 0, ModBlocks.NETHERITE_CHEST.get(), WoodType.OAK, BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.putAll(getVanillaShulkerBoxTierUpgradeDefinitions(ModBlocks.NETHERITE_SHULKER_BOX.get()))
+				.put(ModBlocks.BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4.get()))
 				.build()
 		)),
 		COPPER_TO_IRON(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(ModBlocks.COPPER_BARREL, new StorageTierUpgradeDefinition(ModBlocks.IRON_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.COPPER_CHEST, new StorageTierUpgradeDefinition(ModBlocks.IRON_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.COPPER_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.IRON_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_1))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_2))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_3))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_4))
+				.put(ModBlocks.COPPER_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.IRON_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.COPPER_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.IRON_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.COPPER_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.IRON_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_IRON_BARREL_4.get()))
 				.build()
 		)),
 		COPPER_TO_GOLD(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(ModBlocks.COPPER_BARREL, new StorageTierUpgradeDefinition(ModBlocks.GOLD_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.COPPER_CHEST, new StorageTierUpgradeDefinition(ModBlocks.GOLD_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.COPPER_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.GOLD_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_1))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_2))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_3))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_4))
+				.put(ModBlocks.COPPER_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.COPPER_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.COPPER_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_4.get()))
 				.build()
 		)),
 		COPPER_TO_DIAMOND(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(ModBlocks.COPPER_BARREL, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.COPPER_CHEST, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.COPPER_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4))
+				.put(ModBlocks.COPPER_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.COPPER_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.COPPER_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4.get()))
 				.build()
 		)),
 		COPPER_TO_NETHERITE(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(ModBlocks.COPPER_BARREL, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.COPPER_CHEST, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.COPPER_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3))
-				.put(ModBlocks.LIMITED_COPPER_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4))
+				.put(ModBlocks.COPPER_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.COPPER_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.COPPER_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_COPPER_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4.get()))
 				.build()
 		)),
 		IRON_TO_GOLD(Map.of(
-				ModBlocks.IRON_BARREL, new StorageTierUpgradeDefinition(ModBlocks.GOLD_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
-				ModBlocks.IRON_CHEST, new StorageTierUpgradeDefinition(ModBlocks.GOLD_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
-				ModBlocks.IRON_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.GOLD_SHULKER_BOX, BlockStateProperties.FACING),
-				ModBlocks.LIMITED_IRON_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_1),
-				ModBlocks.LIMITED_IRON_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_2),
-				ModBlocks.LIMITED_IRON_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_3),
-				ModBlocks.LIMITED_IRON_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_4)
+				ModBlocks.IRON_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
+				ModBlocks.IRON_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
+				ModBlocks.IRON_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.GOLD_SHULKER_BOX.get(), BlockStateProperties.FACING),
+				ModBlocks.LIMITED_IRON_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_1.get()),
+				ModBlocks.LIMITED_IRON_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_2.get()),
+				ModBlocks.LIMITED_IRON_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_3.get()),
+				ModBlocks.LIMITED_IRON_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_GOLD_BARREL_4.get())
 		)),
 		IRON_TO_DIAMOND(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(ModBlocks.IRON_BARREL, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.IRON_CHEST, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.IRON_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_IRON_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1))
-				.put(ModBlocks.LIMITED_IRON_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2))
-				.put(ModBlocks.LIMITED_IRON_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3))
-				.put(ModBlocks.LIMITED_IRON_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4))
+				.put(ModBlocks.IRON_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.IRON_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.IRON_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_IRON_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_IRON_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_IRON_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_IRON_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4.get()))
 				.build()
 		)),
 		IRON_TO_NETHERITE(new HashMap<>(new ImmutableMap.Builder<Block, TierUpgradeDefinition<?>>()
-				.put(ModBlocks.IRON_BARREL, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
-				.put(ModBlocks.IRON_CHEST, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
-				.put(ModBlocks.IRON_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX, BlockStateProperties.FACING))
-				.put(ModBlocks.LIMITED_IRON_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1))
-				.put(ModBlocks.LIMITED_IRON_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2))
-				.put(ModBlocks.LIMITED_IRON_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3))
-				.put(ModBlocks.LIMITED_IRON_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4))
+				.put(ModBlocks.IRON_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP))
+				.put(ModBlocks.IRON_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE))
+				.put(ModBlocks.IRON_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX.get(), BlockStateProperties.FACING))
+				.put(ModBlocks.LIMITED_IRON_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1.get()))
+				.put(ModBlocks.LIMITED_IRON_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2.get()))
+				.put(ModBlocks.LIMITED_IRON_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3.get()))
+				.put(ModBlocks.LIMITED_IRON_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4.get()))
 				.build()
 		)),
 		GOLD_TO_DIAMOND(Map.of(
-				ModBlocks.GOLD_BARREL, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
-				ModBlocks.GOLD_CHEST, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
-				ModBlocks.GOLD_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX, BlockStateProperties.FACING),
-				ModBlocks.LIMITED_GOLD_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1),
-				ModBlocks.LIMITED_GOLD_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2),
-				ModBlocks.LIMITED_GOLD_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3),
-				ModBlocks.LIMITED_GOLD_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4)
+				ModBlocks.GOLD_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
+				ModBlocks.GOLD_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
+				ModBlocks.GOLD_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.DIAMOND_SHULKER_BOX.get(), BlockStateProperties.FACING),
+				ModBlocks.LIMITED_GOLD_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_1.get()),
+				ModBlocks.LIMITED_GOLD_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_2.get()),
+				ModBlocks.LIMITED_GOLD_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_3.get()),
+				ModBlocks.LIMITED_GOLD_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_DIAMOND_BARREL_4.get())
 		)),
 		GOLD_TO_NETHERITE(Map.of(
-				ModBlocks.GOLD_BARREL, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
-				ModBlocks.GOLD_CHEST, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
-				ModBlocks.GOLD_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX, BlockStateProperties.FACING),
-				ModBlocks.LIMITED_GOLD_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1),
-				ModBlocks.LIMITED_GOLD_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2),
-				ModBlocks.LIMITED_GOLD_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3),
-				ModBlocks.LIMITED_GOLD_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4)
+				ModBlocks.GOLD_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
+				ModBlocks.GOLD_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
+				ModBlocks.GOLD_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX.get(), BlockStateProperties.FACING),
+				ModBlocks.LIMITED_GOLD_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1.get()),
+				ModBlocks.LIMITED_GOLD_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2.get()),
+				ModBlocks.LIMITED_GOLD_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3.get()),
+				ModBlocks.LIMITED_GOLD_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4.get())
 		)),
 		DIAMOND_TO_NETHERITE(Map.of(
-				ModBlocks.DIAMOND_BARREL, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL, BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
-				ModBlocks.DIAMOND_CHEST, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST, BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
-				ModBlocks.DIAMOND_SHULKER_BOX, new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX, BlockStateProperties.FACING),
-				ModBlocks.LIMITED_DIAMOND_BARREL_1, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1),
-				ModBlocks.LIMITED_DIAMOND_BARREL_2, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2),
-				ModBlocks.LIMITED_DIAMOND_BARREL_3, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3),
-				ModBlocks.LIMITED_DIAMOND_BARREL_4, new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4)
+				ModBlocks.DIAMOND_BARREL.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_BARREL.get(), BlockStateProperties.FACING, StorageBlockBase.TICKING, BarrelBlock.FLAT_TOP),
+				ModBlocks.DIAMOND_CHEST.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_CHEST.get(), BlockStateProperties.HORIZONTAL_FACING, StorageBlockBase.TICKING, BlockStateProperties.WATERLOGGED, BlockStateProperties.CHEST_TYPE),
+				ModBlocks.DIAMOND_SHULKER_BOX.get(), new StorageTierUpgradeDefinition(ModBlocks.NETHERITE_SHULKER_BOX.get(), BlockStateProperties.FACING),
+				ModBlocks.LIMITED_DIAMOND_BARREL_1.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_1.get()),
+				ModBlocks.LIMITED_DIAMOND_BARREL_2.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_2.get()),
+				ModBlocks.LIMITED_DIAMOND_BARREL_3.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_3.get()),
+				ModBlocks.LIMITED_DIAMOND_BARREL_4.get(), new LimitedBarrelTierUpgradeDefinition(ModBlocks.LIMITED_NETHERITE_BARREL_4.get())
 		));
 
 		private final Map<Block, TierUpgradeDefinition<?>> blockUpgradeDefinitions;

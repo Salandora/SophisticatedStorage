@@ -1,26 +1,33 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
 import com.google.common.collect.Lists;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
+import net.p3pp3rf1y.sophisticatedcore.util.StreamCodecHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 	public static final BaseTierWoodenStorageIngredient INSTANCE = new BaseTierWoodenStorageIngredient();
-	public static final Codec<BaseTierWoodenStorageIngredient> CODEC = MapCodec.unit(INSTANCE).stable().codec();
+	public static final MapCodec<BaseTierWoodenStorageIngredient> CODEC = MapCodec.unit(INSTANCE).stable();
+	public static final StreamCodec<RegistryFriendlyByteBuf, BaseTierWoodenStorageIngredient> STREAM_CODEC = StreamCodecHelper.singleton(() -> INSTANCE);
 
-	private BaseTierWoodenStorageIngredient() {
+	public BaseTierWoodenStorageIngredient() {
 		super();
+	}
+
+	@Override
+	public boolean test(@Nullable ItemStack stack) {
+		return stack != null && stack.is(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG);
 	}
 
 	@Override
@@ -34,11 +41,6 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 		}
 
 		return itemStacks;
-	}
-
-	@Override
-	public boolean test(@Nullable ItemStack stack) {
-		return stack != null && stack.is(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG);
 	}
 
 	@Override
@@ -60,18 +62,13 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 		}
 
 		@Override
-		public Codec<BaseTierWoodenStorageIngredient> getCodec(boolean allowEmpty) {
+		public MapCodec<BaseTierWoodenStorageIngredient> getCodec(boolean allowEmpty) {
 			return CODEC;
 		}
 
 		@Override
-		public BaseTierWoodenStorageIngredient read(FriendlyByteBuf buf) {
-			return new BaseTierWoodenStorageIngredient();
-		}
-
-		@Override
-		public void write(FriendlyByteBuf buf, BaseTierWoodenStorageIngredient ingredient) {
-			//noop
+		public StreamCodec<RegistryFriendlyByteBuf, BaseTierWoodenStorageIngredient> getPacketCodec() {
+			return STREAM_CODEC;
 		}
 	}
 }
