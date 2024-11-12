@@ -26,7 +26,7 @@ public class StackStorageWrapper extends StorageWrapper {
 
 	public static StackStorageWrapper fromStack(HolderLookup.Provider registries, ItemStack stack) {
 		StackStorageWrapper stackStorageWrapper = StorageWrapperRepository.getStorageWrapper(stack, StackStorageWrapper.class, StackStorageWrapper::new);
-		UUID uuid = stack.get(ModCoreDataComponents.STORAGE_UUID);
+		UUID uuid = stack.sophisticatedCore_get(ModCoreDataComponents.STORAGE_UUID);
 		if (uuid != null) {
 			CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
 			stackStorageWrapper.load(registries, compoundtag);
@@ -55,7 +55,7 @@ public class StackStorageWrapper extends StorageWrapper {
 	public void setContentsUuid(@Nullable UUID contentsUuid) {
 		super.setContentsUuid(contentsUuid);
 		if (contentsUuid != null) {
-			storageStack.set(ModCoreDataComponents.STORAGE_UUID, contentsUuid);
+			storageStack.sophisticatedCore_set(ModCoreDataComponents.STORAGE_UUID, contentsUuid);
 			ItemContentsStorage itemContentsStorage = ItemContentsStorage.get();
 			CompoundTag storageContents = itemContentsStorage.getOrCreateStorageContents(contentsUuid);
 			if (!storageContents.contains(StorageBlockEntity.STORAGE_WRAPPER_TAG)) {

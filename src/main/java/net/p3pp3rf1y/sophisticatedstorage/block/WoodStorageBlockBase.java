@@ -68,7 +68,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				CompoundTag storageContents = wbe.getStorageContentsTag();
 				if (!storageContents.isEmpty()) {
 					ItemContentsStorage.get().setStorageContents(storageUuid, storageContents);
-					stack.set(ModCoreDataComponents.STORAGE_UUID, storageUuid);
+					stack.sophisticatedCore_set(ModCoreDataComponents.STORAGE_UUID, storageUuid);
 				}
 				WoodStorageBlockItem.setPacked(stack, true);
 				StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
@@ -98,7 +98,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 			}
 		}
 		if (wbe.hasCustomName()) {
-			stack.set(DataComponents.CUSTOM_NAME, wbe.getCustomName());
+			stack.sophisticatedCore_set(DataComponents.CUSTOM_NAME, wbe.getCustomName());
 		}
 		wbe.getWoodType().ifPresent(n -> WoodStorageBlockItem.setWoodType(stack, n));
 	}
@@ -149,7 +149,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 		}
 
 		WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).ifPresent(be -> {
-			UUID storageUuid = stack.get(ModCoreDataComponents.STORAGE_UUID);
+			UUID storageUuid = stack.sophisticatedCore_get(ModCoreDataComponents.STORAGE_UUID);
 			if (storageUuid != null) {
 				ItemContentsStorage itemContentsStorage = ItemContentsStorage.get();
 				be.setBeingUpgraded(true);

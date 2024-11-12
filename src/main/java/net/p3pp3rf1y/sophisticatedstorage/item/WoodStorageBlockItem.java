@@ -36,7 +36,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     public static void setPacked(ItemStack storageStack, boolean packed) {
-        storageStack.set(ModDataComponents.PACKED, packed);
+        storageStack.sophisticatedCore_set(ModDataComponents.PACKED, packed);
     }
 
     public static boolean isPacked(ItemStack storageStack) {
@@ -91,15 +91,15 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     private void removeWoodType(ItemStack storageStack) {
-        storageStack.remove(ModDataComponents.WOOD_TYPE);
+        storageStack.sophisticatedCore_remove(ModDataComponents.WOOD_TYPE);
     }
 
     public static Optional<WoodType> getWoodType(ItemStack storageStack) {
-        return Optional.ofNullable(storageStack.get(ModDataComponents.WOOD_TYPE));
+        return Optional.ofNullable(storageStack.sophisticatedCore_get(ModDataComponents.WOOD_TYPE));
     }
 
     public static ItemStack setWoodType(ItemStack storageStack, WoodType woodType) {
-        storageStack.set(ModDataComponents.WOOD_TYPE, woodType);
+        storageStack.sophisticatedCore_set(ModDataComponents.WOOD_TYPE, woodType);
         return storageStack;
     }
 
@@ -116,10 +116,10 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-        storageStack.set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
+        storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
     }
 
     public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-        storageStack.set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
+        storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
     }
 }

@@ -50,7 +50,7 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 		ItemStack shulker = super.assemble(input, registries);
 		getChest(input).ifPresent(chest -> {
 			if (chest.has(DataComponents.CUSTOM_NAME)) {
-				shulker.set(DataComponents.CUSTOM_NAME, chest.getHoverName());
+				shulker.sophisticatedCore_set(DataComponents.CUSTOM_NAME, chest.getHoverName());
 			}
 			if (shulker.getItem() instanceof StorageBlockItem storageBlockItem) {
 				StorageBlockItem.getMainColorFromStack(chest).ifPresent(mc -> storageBlockItem.setMainColor(shulker, mc));

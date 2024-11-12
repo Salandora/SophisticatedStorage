@@ -18,6 +18,6 @@ public class ChestBlockItem extends WoodStorageBlockItem {
 	}
 
 	public static void setDoubleChest(ItemStack stack, boolean doubleChest) {
-		stack.set(ModDataComponents.DOUBLE_CHEST, doubleChest);
+		stack.sophisticatedCore_set(ModDataComponents.DOUBLE_CHEST, doubleChest);
 	}
 }
