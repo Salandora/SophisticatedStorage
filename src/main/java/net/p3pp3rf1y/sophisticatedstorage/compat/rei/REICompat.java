@@ -7,6 +7,7 @@ import me.shedaniel.rei.api.common.transfer.info.MenuInfoRegistry;
 import me.shedaniel.rei.api.common.transfer.info.simple.SimpleMenuInfoProvider;
 import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.ReiGridMenuInfo;
@@ -34,7 +35,7 @@ public class REICompat implements REIServerPlugin {
 			WoodStorageBlockItem.getWoodType(stack).ifPresent(woodType -> builder.set(ModDataComponents.WOOD_TYPE.get(), woodType));
 			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
 			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
-            return componentHasher.hash(context, builder.build());
+            return componentHasher.hash(context, new PatchedDataComponentMap(builder.build()));
         };
 
 		EntryComparator<ItemStack> barrelNbtInterpreter = (context, stack) -> {
@@ -43,7 +44,7 @@ public class REICompat implements REIServerPlugin {
 			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
 			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
 			builder.set(ModDataComponents.FLAT_TOP.get(), BarrelBlockItem.isFlatTop(stack));
-			return componentHasher.hash(context, builder.build());
+			return componentHasher.hash(context, new PatchedDataComponentMap(builder.build()));
 		};
 
 		registry.register(barrelNbtInterpreter, ModBlocks.ALL_BARREL_ITEMS.stream().map(Supplier::get).toArray(BlockItem[]::new));
@@ -53,7 +54,7 @@ public class REICompat implements REIServerPlugin {
 			var builder = DataComponentMap.builder();
 			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
 			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
-			return componentHasher.hash(context, builder.build());
+			return componentHasher.hash(context, new PatchedDataComponentMap(builder.build()));
 		};
 
 		registry.register(shulkerBoxNbtInterpreter, ModBlocks.SHULKER_BOX_ITEMS.stream().map(Supplier::get).toArray(BlockItem[]::new));
