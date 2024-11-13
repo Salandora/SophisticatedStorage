@@ -340,15 +340,15 @@ processResources {
 
 // Fix to make IDEA load the correct resources when build and run is delegated to it
 tasks.register('fixIntelliJResources', Copy) {
-    def ideaModuleCompileOutputPath = SourceSetHelper.getIdeaModuleCompileOutput(new SourceSetReference(sourceSets.main, project))
-    if (ideaModuleCompileOutputPath.empty)
+    def ideaResourceOutput = SourceSetHelper.getIdeaModuleCompileOutput(new SourceSetReference(sourceSets.main, project))
+    if (ideaResourceOutput.empty)
         return
 
     dependsOn processResources
     group "fabric"
 
     from processResources
-    into ideaModuleCompileOutputPath[1]
+    into ideaResourceOutput[1]
 }
 
 static def mavenVersionToFabric(String version) {
