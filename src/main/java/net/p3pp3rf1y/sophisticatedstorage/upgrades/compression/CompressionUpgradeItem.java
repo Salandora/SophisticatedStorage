@@ -100,7 +100,7 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
 
     @Override
     public ItemStack getCleanedUpgradeStack(ItemStack upgradeStack) {
-        upgradeStack.remove(ModDataComponents.FIRST_INVENTORY_SLOT);
+        upgradeStack.sophisticatedCore_remove(ModDataComponents.FIRST_INVENTORY_SLOT);
         return upgradeStack;
     }
 
@@ -108,7 +108,7 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
 
         @Override
         public void onAdded() {
-            upgrade.remove(ModDataComponents.FIRST_INVENTORY_SLOT);
+            upgrade.sophisticatedCore_remove(ModDataComponents.FIRST_INVENTORY_SLOT);
             InventoryPartitioner inventoryPartitioner = storageWrapper.getInventoryHandler().getInventoryPartitioner();
             inventoryPartitioner.getFirstSpace(Config.SERVER.compressionUpgrade.maxNumberOfSlots.get()).ifPresent(slotRange -> {
                 setFirstInventorySlot(slotRange.firstSlot());
@@ -118,7 +118,7 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
         }
 
         private void setFirstInventorySlot(int firstInventorySlot) {
-            upgrade.set(ModDataComponents.FIRST_INVENTORY_SLOT, firstInventorySlot);
+            upgrade.sophisticatedCore_set(ModDataComponents.FIRST_INVENTORY_SLOT, firstInventorySlot);
             save();
         }
 

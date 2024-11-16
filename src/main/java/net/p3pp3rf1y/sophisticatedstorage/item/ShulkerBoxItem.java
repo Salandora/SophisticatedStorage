@@ -106,7 +106,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 	}
 
 	public void setNumberOfInventorySlots(ItemStack shulkerBoxStack, int numberOfInventorySlots) {
-		shulkerBoxStack.set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
+		shulkerBoxStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
 	}
 
 	public int getNumberOfInventorySlots(HolderLookup.Provider registries, ItemStack shulkerBoxStack) {
@@ -120,7 +120,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 	}
 
 	public void setNumberOfUpgradeSlots(ItemStack shulkerBoxStack, int numberOfUpgradeSlots) {
-		shulkerBoxStack.set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
+		shulkerBoxStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
 	}
 
 	@Override

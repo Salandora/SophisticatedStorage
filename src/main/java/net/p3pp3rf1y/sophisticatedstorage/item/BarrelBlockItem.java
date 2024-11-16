@@ -38,9 +38,9 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 
 	public static void setFlatTop(ItemStack stack, boolean flatTop) {
 		if (flatTop) {
-			stack.set(ModDataComponents.FLAT_TOP, true);
+			stack.sophisticatedCore_set(ModDataComponents.FLAT_TOP, true);
 		} else {
-			stack.remove(ModDataComponents.FLAT_TOP);
+			stack.sophisticatedCore_remove(ModDataComponents.FLAT_TOP);
 		}
 	}
 
@@ -49,7 +49,7 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 	}
 
 	public static void setMaterials(ItemStack barrel, Map<BarrelMaterial, ResourceLocation> materials) {
-		barrel.set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
+		barrel.sophisticatedCore_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getMaterials(ItemStack barrel) {
@@ -57,7 +57,7 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 	}
 
 	public static void removeMaterials(ItemStack stack) {
-		stack.remove(ModDataComponents.BARREL_MATERIALS);
+		stack.sophisticatedCore_remove(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	@Override

@@ -2,8 +2,8 @@ package net.p3pp3rf1y.sophisticatedstorage.compat.rei;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
-import net.p3pp3rf1y.sophisticatedcore.compat.rei.SettingsGhostIngredientHandler;
-import net.p3pp3rf1y.sophisticatedcore.compat.rei.StorageGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.REISettingsGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.REIStorageGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.DyeRecipesMaker;
@@ -56,13 +56,13 @@ public class REIClientCompat implements REIClientPlugin {
 
 	@Override
     public void registerScreens(ScreenRegistry registry) {
-        registry.registerDraggableStackVisitor(new StorageGhostIngredientHandler<>() {
+        registry.registerDraggableStackVisitor(new REIStorageGhostIngredientHandler<>() {
             @Override
             public <R extends Screen> boolean isHandingScreen(R screen) {
                 return screen instanceof StorageScreen;
             }
         });
-		registry.registerDraggableStackVisitor(new SettingsGhostIngredientHandler<>());
+		registry.registerDraggableStackVisitor(new REISettingsGhostIngredientHandler<>());
     }
 
     @Override

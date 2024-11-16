@@ -231,23 +231,23 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void serializePullDirections() {
-		upgrade.set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
+		upgrade.sophisticatedCore_set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
 		save();
 	}
 
 	private void serializePushDirections() {
-		upgrade.set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
+		upgrade.sophisticatedCore_set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
 		save();
 	}
 
 	public void deserialize() {
 		pullDirections.clear();
 		pushDirections.clear();
-		Set<Direction> directions = upgrade.get(ModDataComponents.PULL_DIRECTIONS);
+		Set<Direction> directions = upgrade.sophisticatedCore_get(ModDataComponents.PULL_DIRECTIONS);
 		if (directions != null) {
 			pullDirections.addAll(directions);
 		}
-		directions = upgrade.get(ModDataComponents.PUSH_DIRECTIONS);
+		directions = upgrade.sophisticatedCore_get(ModDataComponents.PUSH_DIRECTIONS);
 		if (directions != null) {
 			pushDirections.addAll(directions);
 		}
