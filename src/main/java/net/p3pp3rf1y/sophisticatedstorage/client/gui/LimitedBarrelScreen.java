@@ -133,7 +133,7 @@ public class LimitedBarrelScreen extends StorageScreen {
 
 		guiGraphics.blit(barTexture.getTextureName(), x, y + yOffset, barTexture.getU(), barTexture.getV() + yOffset, barTexture.getWidth(), barHeight, barTexture.getTextureWidth(), barTexture.getTextureHeight());
 
-		String text = String.valueOf((int) (percentage * 100)) + "%";
+		String text = (int) (percentage * 100) + "%";
 		int percentageX = x;
 		if (left) {
 			percentageX -= 2 + minecraft.font.width(text);
@@ -146,5 +146,10 @@ public class LimitedBarrelScreen extends StorageScreen {
 	@Override
 	protected boolean shouldShowSortButtons() {
 		return false;
+	}
+
+	@Override
+	protected void addSearchBox() {
+		// No search box for limited barrels
 	}
 }

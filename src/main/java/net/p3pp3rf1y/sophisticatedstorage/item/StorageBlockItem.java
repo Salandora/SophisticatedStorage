@@ -17,64 +17,69 @@ import static net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity.STORAG
 
 public class StorageBlockItem extends BlockItemBase implements ITintableBlockItem {
 
-    public StorageBlockItem(Block block, Properties properties) {
-        super(block, properties);
-    }
+	public StorageBlockItem(Block block, Properties properties) {
+		super(block, properties);
+	}
 
 	public static Optional<CompoundTag> getEntityWrapperTagFromStack(ItemStack barrelStack) {
-        CustomData customData = barrelStack.get(DataComponents.BLOCK_ENTITY_DATA);
+		CustomData customData = barrelStack.get(DataComponents.BLOCK_ENTITY_DATA);
 		if (customData == null) {
-            return Optional.empty();
-        }
-        return Optional.of(customData.copyTag().getCompound(STORAGE_WRAPPER_TAG));
+			return Optional.empty();
+		}
+		return Optional.of(customData.copyTag().getCompound(STORAGE_WRAPPER_TAG));
 	}
 
 	public static Optional<Integer> getMainColorFromStack(ItemStack storageStack) {
-		return getEntityWrapperTagFromStack(storageStack).map(tag -> tag.getInt(StorageWrapper.MAIN_COLOR_TAG)).or(() -> Optional.ofNullable(storageStack.sophisticatedCore_get(ModCoreDataComponents.MAIN_COLOR)));
+		return getEntityWrapperTagFromStack(storageStack)
+				.flatMap(tag -> tag.contains(StorageWrapper.MAIN_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.MAIN_COLOR_TAG)) : Optional.empty())
+				.or(() -> Optional.ofNullable(storageStack.sophisticatedCore_get(ModCoreDataComponents.MAIN_COLOR)));
 	}
+
 	public static Optional<Integer> getAccentColorFromStack(ItemStack storageStack) {
-		return getEntityWrapperTagFromStack(storageStack).map(tag -> tag.getInt(StorageWrapper.ACCENT_COLOR_TAG)).or(() -> Optional.ofNullable(storageStack.sophisticatedCore_get(ModCoreDataComponents.ACCENT_COLOR)));
+		return getEntityWrapperTagFromStack(storageStack)
+				.flatMap(tag -> tag.contains(StorageWrapper.ACCENT_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.ACCENT_COLOR_TAG)) : Optional.empty())
+				.or(() -> Optional.ofNullable(storageStack.sophisticatedCore_get(ModCoreDataComponents.ACCENT_COLOR)));
 	}
 
-    @Override
-    public void setMainColor(ItemStack storageStack, int mainColor) {
-        storageStack.sophisticatedCore_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
-    }
+	@Override
+	public void setMainColor(ItemStack storageStack, int mainColor) {
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+	}
 
-    @Override
-    public Optional<Integer> getMainColor(ItemStack storageStack) {
-        return StorageBlockItem.getMainColorFromStack(storageStack);
-    }
+	@Override
+	public Optional<Integer> getMainColor(ItemStack storageStack) {
+		return StorageBlockItem.getMainColorFromStack(storageStack);
+	}
 
-    @Override
-    public void setAccentColor(ItemStack storageStack, int accentColor) {
-        storageStack.sophisticatedCore_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
-    }
+	@Override
+	public void setAccentColor(ItemStack storageStack, int accentColor) {
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
+	}
 
-    @Override
-    public void removeMainColor(ItemStack stack) {
-        stack.sophisticatedCore_remove(ModCoreDataComponents.MAIN_COLOR);
-    }
+	@Override
+	public void removeMainColor(ItemStack stack) {
+		stack.sophisticatedCore_remove(ModCoreDataComponents.MAIN_COLOR);
+	}
 
-    @Override
-    public void removeAccentColor(ItemStack stack) {
-        stack.sophisticatedCore_remove(ModCoreDataComponents.ACCENT_COLOR);
-    }
+	@Override
+	public void removeAccentColor(ItemStack stack) {
+		stack.sophisticatedCore_remove(ModCoreDataComponents.ACCENT_COLOR);
+	}
 
-    @Override
-    public Optional<Integer> getAccentColor(ItemStack stack) {
-        return StorageBlockItem.getAccentColorFromStack(stack);
-    }
+	@Override
+	public Optional<Integer> getAccentColor(ItemStack stack) {
+		return StorageBlockItem.getAccentColorFromStack(stack);
+	}
 
-    public static boolean showsTier(ItemStack stack) {
-        return stack.getOrDefault(ModDataComponents.SHOWS_TIER, true);
-    }
+	public static boolean showsTier(ItemStack stack) {
+		return stack.getOrDefault(ModDataComponents.SHOWS_TIER, true);
+	}
 
-    public static void setShowsTier(ItemStack stack, boolean showsTier) {
-        if (showsTier) {
-            stack.sophisticatedCore_remove(ModDataComponents.SHOWS_TIER);
-        } else {
-            stack.sophisticatedCore_set(ModDataComponents.SHOWS_TIER, false);
-        }
-    }
+	public static void setShowsTier(ItemStack stack, boolean showsTier) {
+		if (showsTier) {
+			stack.sophisticatedCore_remove(ModDataComponents.SHOWS_TIER);
+		} else {
+			stack.sophisticatedCore_set(ModDataComponents.SHOWS_TIER, false);
+		}
+	}
 }
