@@ -87,13 +87,13 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+	public boolean sophisticatedCore_addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
 		level.sendParticles(new CustomTintTerrainParticleData(state1, pos), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15D);
 		return true;
 	}
 
 	@Override
-	public boolean addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
+	public boolean sophisticatedCore_addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
 		Vec3 vec3 = entity.getDeltaMovement();
 		level.addParticle(new CustomTintTerrainParticleData(state, pos),
 				entity.getX() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(), entity.getY() + 0.1D, entity.getZ() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(),
@@ -103,13 +103,13 @@ public class BarrelBlock extends WoodStorageBlockBase {
 
 	@Environment(EnvType.CLIENT)
 	@Override
-	public boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
+	public boolean sophisticatedCore_addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
 		return BarrelBlockClientExtensions.addHitEffects(this, state, level, target, manager);
 	}
 
 	@Environment(EnvType.CLIENT)
 	@Override
-	public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
+	public boolean sophisticatedCore_addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
 		return BarrelBlockClientExtensions.addDestroyEffects(this, state, level, pos, manager);
 	}
 
