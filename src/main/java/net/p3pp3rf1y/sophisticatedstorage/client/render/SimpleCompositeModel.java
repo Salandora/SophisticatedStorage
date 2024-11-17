@@ -7,7 +7,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Either;
-import io.github.fabricators_of_create.porting_lib.models.ConcatenatedListView;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
@@ -149,11 +148,11 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		@NotNull
 		@Override
 		public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
-			List<List<BakedQuad>> quadLists = new ArrayList<>();
+			List<BakedQuad> quadLists = new ArrayList<>();
 			for (Map.Entry<String, BakedModel> entry : children.entrySet()) {
-				quadLists.add(entry.getValue().getQuads(state, side, rand));
+				quadLists.addAll(entry.getValue().getQuads(state, side, rand));
 			}
-			return ConcatenatedListView.of(quadLists);
+			return Collections.unmodifiableList(quadLists);
 		}
 
 		/*@Override
