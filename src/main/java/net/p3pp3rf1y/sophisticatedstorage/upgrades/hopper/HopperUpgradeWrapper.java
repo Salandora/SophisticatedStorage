@@ -79,7 +79,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void initDirections(Level level, BlockPos pos) {
-		if (upgrade.has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.has(ModDataComponents.PULL_DIRECTIONS)) {
+		if (upgrade.sophisticatedCore_has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.sophisticatedCore_has(ModDataComponents.PULL_DIRECTIONS)) {
 			return;
 		}
 		BlockState state = level.getBlockState(pos);

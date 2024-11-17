@@ -72,7 +72,7 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	}
 
 	public static boolean showsTier(ItemStack stack) {
-		return stack.getOrDefault(ModDataComponents.SHOWS_TIER, true);
+		return stack.sophisticatedCore_getOrDefault(ModDataComponents.SHOWS_TIER, true);
 	}
 
 	public static void setShowsTier(ItemStack stack, boolean showsTier) {

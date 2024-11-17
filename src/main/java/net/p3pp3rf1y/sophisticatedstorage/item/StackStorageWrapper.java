@@ -94,8 +94,8 @@ public class StackStorageWrapper extends StorageWrapper {
 			numberOfInventorySlots = wrapperTag.getInt(StorageWrapper.NUMBER_OF_INVENTORY_SLOTS_TAG);
 			numberOfUpgradeSlots = wrapperTag.getInt(StorageWrapper.NUMBER_OF_UPGRADE_SLOTS_TAG);
 		}, () -> {
-			numberOfInventorySlots = storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
-			numberOfUpgradeSlots = storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+			numberOfInventorySlots = storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
+			numberOfUpgradeSlots = storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
 		});
 	}
 

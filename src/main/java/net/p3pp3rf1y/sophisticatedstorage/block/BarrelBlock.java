@@ -133,7 +133,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		player.awardStat(Stats.OPEN_BARREL);
-		player.openMenu(
+		player.sophisticatedCore_openMenu(
 				new SimpleMenuProvider(
 						(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
 						WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())
