@@ -170,10 +170,10 @@ public class ClientEventHandler {
 			return InteractionResult.PASS;
 		}
 		ItemStack stack = player.getMainHandItem();
-		if (stack.getItem() != ModItems.STORAGE_TOOL) {
+		if (stack.getItem() != ModItems.STORAGE_TOOL.get()) {
 			return InteractionResult.PASS;
 		}
-		PacketDistributor.sendToServer(new ScrolledToolPayload(deltaY > 0));
+		PacketDistributor.sendToServer(new ScrolledToolPayload(deltaX > 0));
 		return InteractionResult.SUCCESS;
 	}
 
