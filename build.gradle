@@ -233,6 +233,7 @@ dependencies {
     modCompileOnly("curse.maven:balm-500525:${project.balm_cf_file_id}")
 
     modCompileOnly("earth.terrarium.chipped:Chipped-fabric-${minecraft_version}:${project.chipped_version}")
+    modLocalRuntime("earth.terrarium.chipped:Chipped-fabric-${minecraft_version}:${project.chipped_version}")
 
     /*modCompileOnly("committee.nova.mkb.fabric:mkb-${project.minecraft_version}:${project.mkb_mod_version}") {
         transitive = false
