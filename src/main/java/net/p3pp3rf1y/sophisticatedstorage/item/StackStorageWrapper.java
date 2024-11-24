@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-abstract class StackStorageWrapper extends StorageWrapper {
+public abstract class StackStorageWrapper extends StorageWrapper {
 	private static final String CONTENTS_TAG = "contents";
 	private final ItemStack storageStack;
 
@@ -31,6 +31,10 @@ abstract class StackStorageWrapper extends StorageWrapper {
 	@Override
 	public Optional<UUID> getContentsUuid() {
 		return Optional.ofNullable(contentsUuid);
+	}
+
+	public boolean hasContents() {
+		return StorageBlockItem.getEntityWrapperTagFromStack(storageStack).isPresent() || contentsUuid != null;
 	}
 
 	@Override
@@ -52,10 +56,12 @@ abstract class StackStorageWrapper extends StorageWrapper {
 
 	@Override
 	protected CompoundTag getContentsNbt() {
-		if (contentsUuid == null) {
-			contentsUuid = getNewUuid();
-		}
-		return ItemContentsStorage.get().getOrCreateStorageContents(contentsUuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG).getCompound(CONTENTS_TAG);
+		return StorageBlockItem.getEntityWrapperTagFromStack(storageStack).map(wrapperTag -> wrapperTag.getCompound(CONTENTS_TAG)).orElseGet(() -> {
+			if (contentsUuid == null) {
+				contentsUuid = getNewUuid();
+			}
+			return ItemContentsStorage.get().getOrCreateStorageContents(contentsUuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG).getCompound(CONTENTS_TAG);
+		});
 	}
 
 	@Override
@@ -70,8 +76,14 @@ abstract class StackStorageWrapper extends StorageWrapper {
 
 	@Override
 	protected void loadSlotNumbers(CompoundTag tag) {
-		numberOfInventorySlots = NBTHelper.getInt(storageStack, "numberOfInventorySlots").orElse(0);
-		numberOfUpgradeSlots = NBTHelper.getInt(storageStack, "numberOfUpgradeSlots").orElse(0);
+		StorageBlockItem.getEntityWrapperTagFromStack(storageStack).ifPresentOrElse(wrapperTag -> {
+			numberOfInventorySlots = wrapperTag.getInt("numberOfInventorySlots");
+			numberOfUpgradeSlots = wrapperTag.getInt("numberOfUpgradeSlots");
+		}, () -> {
+			numberOfInventorySlots = NBTHelper.getInt(storageStack, "numberOfInventorySlots").orElse(0);
+			numberOfUpgradeSlots = NBTHelper.getInt(storageStack, "numberOfUpgradeSlots").orElse(0);
+		});
+
 	}
 
 	@Override

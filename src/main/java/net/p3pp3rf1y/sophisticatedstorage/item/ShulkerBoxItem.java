@@ -97,12 +97,12 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		});
 	}
 
-	public static ItemApiLookup.ItemApiProvider<LazyOptional<StorageWrapper>, Void> initCapabilities() {
+	public static ItemApiLookup.ItemApiProvider<LazyOptional<StackStorageWrapper>, Void> initCapabilities() {
 		return new ItemApiLookup.ItemApiProvider<>() {
-			final Map<ItemStack, StorageWrapper> wrapperMap = new MapMaker().weakKeys().weakValues().makeMap();
+			final Map<ItemStack, StackStorageWrapper> wrapperMap = new MapMaker().weakKeys().weakValues().makeMap();
 
 			@Override
-			public LazyOptional<StorageWrapper> find(ItemStack stack, Void context) {
+			public LazyOptional<StackStorageWrapper> find(ItemStack stack, Void context) {
 				if (stack.getCount() == 1) {
 					return LazyOptional.of(() -> wrapperMap.computeIfAbsent(stack, this::initWrapper)).cast();
 				}
@@ -110,9 +110,9 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 				return LazyOptional.empty();
 			}
 
-			private StorageWrapper initWrapper(ItemStack stack) {
+			private StackStorageWrapper initWrapper(ItemStack stack) {
 				UUID uuid = getContentsUuid(stack).orElse(null);
-				StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
+				StackStorageWrapper storageWrapper = new StackStorageWrapper(stack) {
 					@Override
 					public String getStorageType() {
 						return "shulker_box";

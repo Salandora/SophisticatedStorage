@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
+import net.p3pp3rf1y.sophisticatedstorage.crafting.*;
 import org.apache.commons.lang3.ArrayUtils;
 
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
@@ -61,13 +62,6 @@ import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelSettingsContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageSettingsContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.BarrelMaterialRecipe;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.BaseTierWoodenStorageIngredient;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.FlatTopBarrelToggleRecipe;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromChestRecipe;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageDyeRecipe;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageTierUpgradeRecipe;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.StorageTierUpgradeShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
@@ -382,6 +376,7 @@ public class ModBlocks {
 	public static final SimpleCraftingRecipeSerializer<?> STORAGE_DYE_RECIPE_SERIALIZER = registerRecipeSerializer("storage_dye", () -> new SimpleCraftingRecipeSerializer<>(StorageDyeRecipe::new));
 	public static final RecipeSerializer<?> STORAGE_TIER_UPGRADE_RECIPE_SERIALIZER = registerRecipeSerializer("storage_tier_upgrade", StorageTierUpgradeRecipe.Serializer::new);
 	public static final RecipeSerializer<?> STORAGE_TIER_UPGRADE_SHAPELESS_RECIPE_SERIALIZER = registerRecipeSerializer("storage_tier_upgrade_shapeless", StorageTierUpgradeShapelessRecipe.Serializer::new);
+	public static final RecipeSerializer<?> SHULKER_BOX_FROM_VANILLA_SHAPELESS_RECIPE_SERIALIZER = registerRecipeSerializer("shulker_box_from_vanilla_shapeless", ShulkerBoxFromVanillaShapelessRecipe.Serializer::new);
 	public static final RecipeSerializer<?> SHULKER_BOX_FROM_CHEST_RECIPE_SERIALIZER = registerRecipeSerializer("shulker_box_from_chest", ShulkerBoxFromChestRecipe.Serializer::new);
 	public static final SimpleCraftingRecipeSerializer<?> FLAT_TOP_BARREL_TOGGLE_RECIPE_SERIALIZER = registerRecipeSerializer("flat_top_barrel_toggle", () -> new SimpleCraftingRecipeSerializer<>(FlatTopBarrelToggleRecipe::new));
 	public static final SimpleCraftingRecipeSerializer<?> BARREL_MATERIAL_RECIPE_SERIALIZER = registerRecipeSerializer("barrel_material", () -> new SimpleCraftingRecipeSerializer<>(BarrelMaterialRecipe::new));

@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "sophisticatedstorage:shulker_box_from_vanilla_shapeless",
   "conditions": [
     {
       "condition": "sophisticatedcore:item_enabled",

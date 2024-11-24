@@ -10,14 +10,15 @@ import net.p3pp3rf1y.sophisticatedstorage.block.StorageIOBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 
 public class CapabilityStorageWrapper {
-	public static final ItemApiLookup<LazyOptional<StorageWrapper>, Void> STORAGE_WRAPPER_CAPABILITY = ItemApiLookup.get(SophisticatedStorage.getRL("storage_wrapper"), (Class<LazyOptional<StorageWrapper>>) (Class<?>) LazyOptional.class, Void.class);
+	public static final ItemApiLookup<LazyOptional<StackStorageWrapper>, Void> STORAGE_WRAPPER_CAPABILITY = ItemApiLookup.get(SophisticatedStorage.getRL("storage_wrapper"), (Class<LazyOptional<StackStorageWrapper>>) (Class<?>) LazyOptional.class, Void.class);
 
-	public static LazyOptional<StorageWrapper> get(ItemStack provider) {
-		LazyOptional<StorageWrapper> wrapper = STORAGE_WRAPPER_CAPABILITY.find(provider, null);
+	public static LazyOptional<StackStorageWrapper> get(ItemStack provider) {
+		LazyOptional<StackStorageWrapper> wrapper = STORAGE_WRAPPER_CAPABILITY.find(provider, null);
 		if (wrapper != null) {
 			return wrapper;
 		}

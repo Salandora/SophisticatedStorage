@@ -46,9 +46,7 @@ import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.*;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -196,7 +194,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 
 		Direction direction = context.getHorizontalDirection().getOpposite();
 		return CapabilityStorageWrapper.get(chestBeingPlaced)
-				.filter(wrapper -> wrapper.getContentsUuid().isPresent())
+				.filter(StackStorageWrapper::hasContents)
 				.map(wrapper ->
 						getStateForPlacement(context, direction, fluidstate,
 								StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
