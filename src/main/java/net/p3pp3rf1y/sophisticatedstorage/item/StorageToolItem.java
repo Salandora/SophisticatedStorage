@@ -173,7 +173,7 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	public static Mode getMode(ItemStack tool) {
-		return tool.getOrDefault(ModDataComponents.TOOL_MODE, Mode.LINK);
+		return tool.sophisticatedCore_getOrDefault(ModDataComponents.TOOL_MODE, Mode.LINK);
 	}
 
 	public static void cycleMode(ItemStack tool, boolean next) {

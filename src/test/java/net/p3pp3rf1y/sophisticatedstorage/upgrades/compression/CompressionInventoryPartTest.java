@@ -56,6 +56,19 @@ public class CompressionInventoryPartTest {
 		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.IRON_BLOCK)).thenReturn(new RecipeHelper.UncompactingResult(Items.IRON_INGOT, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.IRON_INGOT)).thenReturn(new RecipeHelper.UncompactingResult(Items.IRON_NUGGET, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.QUARTZ, RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.QUARTZ_BLOCK), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.QUARTZ_BLOCK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.STICK), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.STICK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.DEAD_BUSH), Collections.emptyList()));
+
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.QUARTZ)).thenReturn(Set.of(RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.QUARTZ_BLOCK)).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.STICK)).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.DEAD_BUSH)).thenReturn(new RecipeHelper.UncompactingResult(Items.STICK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.STICK)).thenReturn(new RecipeHelper.UncompactingResult(Items.QUARTZ_BLOCK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.QUARTZ_BLOCK)).thenReturn(new RecipeHelper.UncompactingResult(Items.QUARTZ, RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE));
+
+
 		ss = Mockito.mockStatic(SophisticatedStorage.class);
 		ss.when(() -> SophisticatedStorage.getRL(anyString())).thenAnswer(i -> ResourceLocation.parse(i.getArgument(0)));
 	}
@@ -417,12 +430,12 @@ public class CompressionInventoryPartTest {
 
 		assertStackEquals(params.insertResult, result, "Insert result doesn't match");
 		assertCalculatedStacks(params.calculatedStacksAfter, minSlot, part);
-		assertInternalStacks(params.internalStacksAfter, invHandler);
+		assertInternalStacks(params.changedInternalStacks, invHandler);
 	}
 
 	public record InsertItemUpdatesStacksParams(Map<Integer, ItemStack> internalStacksBefore, int baseSlotLimit,
 												int insertSlot, ItemStack stack, ItemStack insertResult,
-												Map<Integer, ItemStack> internalStacksAfter,
+												Map<Integer, ItemStack> changedInternalStacks,
 												Map<Integer, ItemStack> calculatedStacksAfter) {
 	}
 
@@ -516,6 +529,35 @@ public class CompressionInventoryPartTest {
 						new ItemStack(Items.IRON_INGOT, 7),
 						Map.of(0, new ItemStack(Items.IRON_INGOT, 64)),
 						Map.of(0, new ItemStack(Items.IRON_INGOT, 64), 1, new ItemStack(Items.IRON_NUGGET, 576))
+				),
+				new InsertItemUpdatesStacksParams(
+						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.STICK, 1), 2, new ItemStack(Items.QUARTZ_BLOCK, 1), 3, new ItemStack(Items.QUARTZ, 1)),
+						64,
+						0,
+						new ItemStack(Items.DEAD_BUSH, 1),
+						ItemStack.EMPTY,
+						Map.of(0, new ItemStack(Items.DEAD_BUSH, 1)),
+						Map.of(0, new ItemStack(Items.DEAD_BUSH, 1), 1, new ItemStack(Items.STICK, 10), 2, new ItemStack(Items.QUARTZ_BLOCK, 91), 3, new ItemStack(Items.QUARTZ, 365))
+				),
+				new InsertItemUpdatesStacksParams(
+						Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.STICK, 1), 2, new ItemStack(Items.QUARTZ_BLOCK, 1), 3, new ItemStack(Items.QUARTZ, 1)),
+						64,
+						0,
+						new ItemStack(Items.DEAD_BUSH, 65),
+						new ItemStack(Items.DEAD_BUSH, 1),
+						Map.of(0, new ItemStack(Items.DEAD_BUSH, 64)),
+						Map.of(0, new ItemStack(Items.DEAD_BUSH, 64), 1, new ItemStack(Items.STICK, 577), 2, new ItemStack(Items.QUARTZ_BLOCK, 5194), 3, new ItemStack(Items.QUARTZ, 20777))
+
+				),
+				new InsertItemUpdatesStacksParams(
+						Map.of(0, new ItemStack(Items.DEAD_BUSH, 64), 1, new ItemStack(Items.STICK, 64), 2, new ItemStack(Items.QUARTZ_BLOCK, 64), 3, new ItemStack(Items.QUARTZ, 23)),
+						64,
+						3,
+						new ItemStack(Items.QUARTZ, 64),
+						new ItemStack(Items.QUARTZ, 23),
+						Map.of(3, new ItemStack(Items.QUARTZ, 64)),
+						Map.of(0, new ItemStack(Items.DEAD_BUSH, 64), 1, new ItemStack(Items.STICK, 640), 2, new ItemStack(Items.QUARTZ_BLOCK, 5824), 3, new ItemStack(Items.QUARTZ, 23360))
+
 				)
 		);
 	}
@@ -719,6 +761,14 @@ public class CompressionInventoryPartTest {
 						Map.of(0, new ItemStack(Items.IRON_SWORD), 1, ItemStack.EMPTY),
 						64,
 						Map.of(0, ImmutablePair.of(new ItemStack(Items.IRON_SWORD), 1), 1, ImmutablePair.of(new ItemStack(Items.IRON_SWORD), 0))
+				),
+				new StackLimitsAreSetCorrectlyOnInitParams(
+						Map.of(0, new ItemStack(Items.DEAD_BUSH), 1, ItemStack.EMPTY, 2, ItemStack.EMPTY, 3, ItemStack.EMPTY),
+						64,
+						Map.of(
+								0, ImmutablePair.of(new ItemStack(Items.DEAD_BUSH), 64), 1, ImmutablePair.of(new ItemStack(Items.STICK), 9 * 64 + 64),
+								2, ImmutablePair.of(new ItemStack(Items.QUARTZ_BLOCK), 9 * 9 * 64 + 9 * 64 + 64), 3, ImmutablePair.of(new ItemStack(Items.QUARTZ), 9 * 9 * 4 * 64 + 9 * 4 * 64 + 4 * 64 + 64)
+						)
 				)
 		);
 	}

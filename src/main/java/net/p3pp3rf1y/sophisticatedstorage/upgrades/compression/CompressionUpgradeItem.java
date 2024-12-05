@@ -140,7 +140,7 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
         }
 
         private int getFirstInventorySlot() {
-            return upgrade.getOrDefault(ModDataComponents.FIRST_INVENTORY_SLOT, -1);
+            return upgrade.sophisticatedCore_getOrDefault(ModDataComponents.FIRST_INVENTORY_SLOT, -1);
         }
 
         protected Wrapper(IStorageWrapper storageWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {

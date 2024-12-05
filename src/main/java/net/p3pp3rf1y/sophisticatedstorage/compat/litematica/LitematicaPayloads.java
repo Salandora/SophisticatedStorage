@@ -11,7 +11,6 @@ public class LitematicaPayloads {
 	public static void registerClientPackets() {
 		PayloadTypeRegistry.playS2C().register(LitematicaItemStorageContentsPayload.TYPE, LitematicaItemStorageContentsPayload.STREAM_CODEC);
 
-
 		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
 			ClientPlayNetworking.registerGlobalReceiver(LitematicaItemStorageContentsPayload.TYPE, LitematicaItemStorageContentsPayload::handlePayload);
 		}

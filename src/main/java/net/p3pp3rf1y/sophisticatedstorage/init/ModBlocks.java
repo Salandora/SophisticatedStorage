@@ -32,7 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
-import net.p3pp3rf1y.sophisticatedcore.extensions.inventory.IMenuTypeExtension;
+import net.p3pp3rf1y.sophisticatedcore.util.IMenuTypeExtension;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;

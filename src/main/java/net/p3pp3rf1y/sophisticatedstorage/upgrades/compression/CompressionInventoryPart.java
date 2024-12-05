@@ -117,14 +117,10 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	}
 
 	private void updateSlotLimits(Map<Integer, SlotDefinition> definitions) {
-		int lastMultiplier = 1;
 		int totalLimit = 0;
 		for (int slot = slotRange.firstSlot(); slot < slotRange.firstSlot() + slotRange.numberOfSlots(); slot++) {
 			if (definitions.containsKey(slot) && definitions.get(slot).isAccessible()) {
-				if (slot != slotRange.firstSlot()) {
-					lastMultiplier = intMaxCappedMultiply(lastMultiplier, definitions.get(slot).prevSlotMultiplier);
-				}
-				totalLimit = intMaxCappedAddition(totalLimit, intMaxCappedMultiply(lastMultiplier, parent.getBaseStackLimit(new ItemStack(definitions.get(slot).item))));
+				totalLimit = intMaxCappedAddition(parent.getBaseStackLimit(new ItemStack(definitions.get(slot).item)), intMaxCappedMultiply(definitions.get(slot).prevSlotMultiplier, totalLimit));
 
 				definitions.get(slot).setSlotLimit(totalLimit);
 			}

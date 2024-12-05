@@ -39,9 +39,6 @@
             "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REIClientCompat"
         ]
     },
-    "mixins": [
-        "sophisticatedstorage.mixins.json"
-    ],
     "accessWidener": "sophisticatedstorage.accesswidener",
     "depends": {
         "fabricloader": ">=${loader_version}",

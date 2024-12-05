@@ -180,7 +180,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	protected abstract String getStorageType();
 
 	protected void onUpgradeCachesInvalidated() {
-		invalidateCapabilities();
+		sophisticatedCore_invalidateCapabilities();
 	}
 
 	public boolean isOpen() {
@@ -281,8 +281,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void onLoad() {
-		super.onLoad();
+	public void sophisticatedCore_onLoad() {
+		super.sophisticatedCore_onLoad();
 		storageWrapper.onInit();
 		registerWithControllerOnLoad();
 	}
@@ -303,8 +303,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void onChunkUnloaded() {
-		super.onChunkUnloaded();
+	public void sophisticatedCore_onChunkUnloaded() {
+		super.sophisticatedCore_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 
@@ -521,7 +521,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
 			contentsFilteredItemHandler = null;
-			invalidateCapabilities();
+			sophisticatedCore_invalidateCapabilities();
 		}
 		setChanged();
 		WorldHelper.notifyBlockUpdate(this);
@@ -541,7 +541,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
 			contentsFilteredItemHandler = null;
-			invalidateCapabilities();
+			sophisticatedCore_invalidateCapabilities();
 		}
 		setChanged();
 		setUpdateBlockRender();

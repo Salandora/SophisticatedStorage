@@ -40,7 +40,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     public static boolean isPacked(ItemStack storageStack) {
-        return storageStack.getOrDefault(ModDataComponents.PACKED, false);
+        return storageStack.sophisticatedCore_getOrDefault(ModDataComponents.PACKED, false);
     }
 
     @Override
