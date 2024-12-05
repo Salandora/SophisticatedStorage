@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "sophisticatedstorage:upgrade_base"
+    },
+    "L": {
+      "tag": "minecraft:logs"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "pattern": [
+    "LLL",
+    "PBP",
+    "P P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "sophisticatedstorage:decoration_table"
+  }
+}

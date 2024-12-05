@@ -16,6 +16,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeType;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
@@ -39,7 +40,7 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
     }
 
     private UpgradeSlotChangeResult checkCompressionSpace(IStorageWrapper storageWrapper) {
-        Optional<InventoryPartitioner.SlotRange> slotRange = storageWrapper.getInventoryHandler().getInventoryPartitioner().getFirstSpace(Config.SERVER.compressionUpgrade.maxNumberOfSlots.get());
+        Optional<SlotRange> slotRange = storageWrapper.getInventoryHandler().getInventoryPartitioner().getFirstSpace(Config.SERVER.compressionUpgrade.maxNumberOfSlots.get());
 
         return slotRange.map(range -> canUseForCompression(storageWrapper, range))
                 .orElseGet(() -> UpgradeSlotChangeResult.fail(StorageTranslationHelper.INSTANCE.translError("add.compression_no_space"), Collections.emptySet(), Collections.emptySet(), Collections.emptySet()));
@@ -59,7 +60,7 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
         return UPGRADE_CONFLICT_DEFINITIONS;
     }
 
-    private UpgradeSlotChangeResult canUseForCompression(IStorageWrapper storageWrapper, InventoryPartitioner.SlotRange slotRange) {
+    private UpgradeSlotChangeResult canUseForCompression(IStorageWrapper storageWrapper, SlotRange slotRange) {
         boolean allRemainingSlotsMustBeEmpty = false;
         Item nextItemToMatch = Items.AIR;
         Set<Integer> errorSlots = new LinkedHashSet<>();

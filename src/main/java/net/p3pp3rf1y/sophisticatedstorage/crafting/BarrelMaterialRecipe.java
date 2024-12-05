@@ -12,12 +12,13 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
-import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BarrelMaterialRecipe extends CustomRecipe {
 	public BarrelMaterialRecipe(CraftingBookCategory category) {
@@ -105,77 +106,17 @@ public class BarrelMaterialRecipe extends CustomRecipe {
 
 		Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
 		materials.putAll(BarrelBlockItem.getMaterials(barrelStackCopy));
-		uncompactMaterials(materials);
+		BarrelBlockItem.uncompactMaterials(materials);
 
 		fillGridMaterials(input, barrelColumn, barrelRow, materials);
 		fillEmptyMaterialsWithDefaults(materials);
-		compactMaterials(materials);
+		BarrelBlockItem.compactMaterials(materials);
 
 		BarrelBlockItem.setMaterials(barrelStackCopy, materials);
 
-		removeCoveredTints(barrelStackCopy, materials);
+		BarrelBlockItem.removeCoveredTints(barrelStackCopy, materials);
 
 		return barrelStackCopy;
-	}
-
-	private void uncompactMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
-		if (materials.isEmpty()) {
-			return;
-		}
-
-		Map<BarrelMaterial, ResourceLocation> uncompactedMaterials = new EnumMap<>(BarrelMaterial.class);
-		materials.forEach((mat, texture) -> {
-			for (BarrelMaterial child : mat.getChildren()) {
-				uncompactedMaterials.put(child, texture);
-			}
-		});
-
-		materials.clear();
-		materials.putAll(uncompactedMaterials);
-	}
-
-	private static void removeCoveredTints(ItemStack barrelStackCopy, Map<BarrelMaterial, ResourceLocation> materials) {
-		if (barrelStackCopy.getItem() instanceof ITintableBlockItem tintableBlockItem) {
-			boolean hasMainTint = tintableBlockItem.getMainColor(barrelStackCopy).isPresent();
-			boolean hasAccentTint = tintableBlockItem.getAccentColor(barrelStackCopy).isPresent();
-
-			if (hasMainTint || hasAccentTint) {
-				Set<BarrelMaterial.MaterialModelPart> materialModelParts = materials.keySet().stream().map(BarrelMaterial::getMaterialModelPart).collect(Collectors.toSet());
-
-				if (hasMainTint && (materialModelParts.contains(BarrelMaterial.MaterialModelPart.BOTH) || materialModelParts.contains(BarrelMaterial.MaterialModelPart.CORE))) {
-					tintableBlockItem.removeMainColor(barrelStackCopy);
-				}
-				if (hasAccentTint && (materialModelParts.contains(BarrelMaterial.MaterialModelPart.BOTH) || materialModelParts.contains(BarrelMaterial.MaterialModelPart.TRIM))) {
-					tintableBlockItem.removeAccentColor(barrelStackCopy);
-				}
-			}
-		}
-	}
-
-	private static void compactMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
-		for (BarrelMaterial material : BarrelMaterial.values()) {
-			if (!material.isLeaf()) {
-				//if all children have the same texture remove them and convert to the parent
-				ResourceLocation firstChildTexture = null;
-				boolean allChildrenHaveSameTexture = true;
-				for (BarrelMaterial child : material.getChildren()) {
-					ResourceLocation texture = materials.get(child);
-					if (texture == null || (firstChildTexture != null && !firstChildTexture.equals(texture))) {
-						allChildrenHaveSameTexture = false;
-						break;
-					} else if (firstChildTexture == null) {
-						firstChildTexture = texture;
-					}
-				}
-
-				if (firstChildTexture != null && allChildrenHaveSameTexture) {
-					materials.put(material, firstChildTexture);
-					for (BarrelMaterial child : material.getChildren()) {
-						materials.remove(child);
-					}
-				}
-			}
-		}
 	}
 
 	private static void fillEmptyMaterialsWithDefaults(Map<BarrelMaterial, ResourceLocation> materials) {

@@ -1,10 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.init;
 
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.LimitedBarrelScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.LimitedBarrelSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.*;
 
 import static net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks.*;
 
@@ -14,5 +11,6 @@ public class ModBlocksClient {
 		MenuScreens.register(SETTINGS_CONTAINER_TYPE.get(), StorageSettingsScreen::constructScreen);
 		MenuScreens.register(LIMITED_BARREL_CONTAINER_TYPE.get(), LimitedBarrelScreen::new);
 		MenuScreens.register(LIMITED_BARREL_SETTINGS_CONTAINER_TYPE.get(), LimitedBarrelSettingsScreen::new);
+		MenuScreens.register(DECORATION_TABLE_CONTAINER_TYPE.get(), DecorationTableScreen::new);
 	}
 }

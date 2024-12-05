@@ -36,10 +36,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.IMenuTypeExtension;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelSettingsContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageSettingsContainerMenu;
+import net.p3pp3rf1y.sophisticatedstorage.common.gui.*;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.*;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
@@ -264,13 +261,17 @@ public class ModBlocks {
 	public static final Supplier<BlockItem> STORAGE_INPUT_ITEM = ITEMS.register(STORAGE_INPUT_REG_NAME, () -> new BlockItemBase(STORAGE_INPUT.get(), new Properties()));
 	public static final Supplier<BlockItem> STORAGE_OUTPUT_ITEM = ITEMS.register(STORAGE_OUTPUT_REG_NAME, () -> new BlockItemBase(STORAGE_OUTPUT.get(), new Properties()));
 
+	public static final Supplier<DecorationTableBlock> DECORATION_TABLE = BLOCKS.register("decoration_table", DecorationTableBlock::new);
+
+	public static final Supplier<BlockItem> DECORATION_TABLE_ITEM = ITEMS.register("decoration_table", () -> new BlockItemBase(DECORATION_TABLE.get(), new Properties()));
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// BLOCK_ENTITY_TYPES
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	///
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
 	public static final Supplier<BlockEntityType<BarrelBlockEntity>> BARREL_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(BARREL_REG_NAME, () ->
 			BlockEntityType.Builder.of(BarrelBlockEntity::new, BARRELS.stream().map(Supplier::get).toArray(Block[]::new))
@@ -316,6 +317,10 @@ public class ModBlocks {
 			BlockEntityType.Builder.of(StorageOutputBlockEntity::new, STORAGE_OUTPUT.get())
 					.build(null));
 
+	public static final Supplier<BlockEntityType<DecorationTableBlockEntity>> DECORATION_TABLE_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register("decoration_table", () ->
+			BlockEntityType.Builder.of(DecorationTableBlockEntity::new, DECORATION_TABLE.get())
+					.build(null));
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -334,6 +339,9 @@ public class ModBlocks {
 
 	public static final Supplier<MenuType<LimitedBarrelSettingsContainerMenu>> LIMITED_BARREL_SETTINGS_CONTAINER_TYPE = MENU_TYPES.register("limited_barrel_settings",
 			() -> IMenuTypeExtension.create(LimitedBarrelSettingsContainerMenu::fromBuffer));
+
+	public static final Supplier<MenuType<DecorationTableMenu>> DECORATION_TABLE_CONTAINER_TYPE = MENU_TYPES.register("decoration_table",
+			() -> IMenuTypeExtension.create(DecorationTableMenu::fromBuffer));
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
