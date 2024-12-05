@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
@@ -18,12 +19,16 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 		super(block, properties);
 	}
 
+	public static Optional<CompoundTag> getEntityWrapperTagFromStack(ItemStack barrelStack) {
+		return NBTHelper.getCompound(barrelStack, "BlockEntityTag").flatMap(tag -> NBTHelper.getCompound(tag, "storageWrapper"));
+	}
+
 	public static Optional<Integer> getMainColorFromStack(ItemStack barrelStack) {
-		return NBTHelper.getInt(barrelStack, MAIN_COLOR_TAG);
+		return getEntityWrapperTagFromStack(barrelStack).map(tag -> NBTHelper.getInt(tag, MAIN_COLOR_TAG)).orElse(NBTHelper.getInt(barrelStack, MAIN_COLOR_TAG));
 	}
 
 	public static Optional<Integer> getAccentColorFromStack(ItemStack barrelStack) {
-		return NBTHelper.getInt(barrelStack, ACCENT_COLOR_TAG);
+		return getEntityWrapperTagFromStack(barrelStack).map(tag -> NBTHelper.getInt(tag, ACCENT_COLOR_TAG)).orElse(NBTHelper.getInt(barrelStack, ACCENT_COLOR_TAG));
 	}
 
 	@Override
