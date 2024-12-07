@@ -14,6 +14,7 @@
     "client": [
         "client.accessor.BakedQuadAccessor",
         "client.accessor.BlockModelAccessor",
+        "client.accessor.ItemRendererAccessor",
         "client.accessor.LevelRendererAccessor",
         "client.accessor.MinecraftAccessor",
         "client.accessor.MultiPlayerGameModeAccessor",

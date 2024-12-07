@@ -7,8 +7,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
+import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,6 +52,64 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 
 	public static void removeMaterials(ItemStack stack) {
 		NBTHelper.removeTag(stack, MATERIALS_TAG);
+	}
+
+	public static void uncompactMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
+		if (materials.isEmpty()) {
+			return;
+		}
+
+		Map<BarrelMaterial, ResourceLocation> uncompactedMaterials = new EnumMap<>(BarrelMaterial.class);
+		materials.forEach((mat, texture) -> {
+			for (BarrelMaterial child : mat.getChildren()) {
+				uncompactedMaterials.put(child, texture);
+			}
+		});
+
+		materials.clear();
+		materials.putAll(uncompactedMaterials);
+	}
+
+	public static void compactMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
+		for (BarrelMaterial material : BarrelMaterial.values()) {
+			if (!material.isLeaf()) {
+				//if all children have the same texture remove them and convert to the parent
+				ResourceLocation firstChildTexture = null;
+				boolean allChildrenHaveSameTexture = true;
+				for (BarrelMaterial child : material.getChildren()) {
+					ResourceLocation texture = materials.get(child);
+					if (texture == null || (firstChildTexture != null && !firstChildTexture.equals(texture))) {
+						allChildrenHaveSameTexture = false;
+						break;
+					} else if (firstChildTexture == null) {
+						firstChildTexture = texture;
+					}
+				}
+
+				if (firstChildTexture != null && allChildrenHaveSameTexture) {
+					materials.put(material, firstChildTexture);
+					for (BarrelMaterial child : material.getChildren()) {
+						materials.remove(child);
+					}
+				}
+			}
+		}
+	}
+
+	public static void removeCoveredTints(ItemStack barrelStackCopy, Map<BarrelMaterial, ResourceLocation> materials) {
+		if (barrelStackCopy.getItem() instanceof ITintableBlockItem tintableBlockItem) {
+			boolean hasMainTint = tintableBlockItem.getMainColor(barrelStackCopy).isPresent();
+			boolean hasAccentTint = tintableBlockItem.getAccentColor(barrelStackCopy).isPresent();
+
+			if (hasMainTint || hasAccentTint) {
+				if (hasMainTint && (materials.containsKey(BarrelMaterial.ALL) || materials.containsKey(BarrelMaterial.ALL_BUT_TRIM))) {
+					tintableBlockItem.removeMainColor(barrelStackCopy);
+				}
+				if (hasAccentTint && (materials.containsKey(BarrelMaterial.ALL) || materials.containsKey(BarrelMaterial.ALL_TRIM))) {
+					tintableBlockItem.removeAccentColor(barrelStackCopy);
+				}
+			}
+		}
 	}
 
 	@Override

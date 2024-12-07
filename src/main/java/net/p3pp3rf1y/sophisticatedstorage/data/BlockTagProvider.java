@@ -18,7 +18,9 @@ public class BlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
 	@Override
 	protected void addTags(HolderLookup.Provider arg) {
-		getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE).add(ModBlocks.ALL_WOODSTORAGES);
+		getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE)
+				.add(ModBlocks.ALL_WOODSTORAGES)
+						.add(ModBlocks.DECORATION_TABLE);
 		getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
 				.add(ModBlocks.SHULKER_BOXES)
 				.add(ModBlocks.CONTROLLER, ModBlocks.STORAGE_LINK, ModBlocks.STORAGE_IO, ModBlocks.STORAGE_INPUT, ModBlocks.STORAGE_OUTPUT

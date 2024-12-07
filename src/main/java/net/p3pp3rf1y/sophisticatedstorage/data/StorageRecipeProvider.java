@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.BlockFamily;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -70,6 +72,16 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.requires(Items.PAPER)
 				.unlockedBy("has_slime", has(Items.SLIME_BALL))
 				.condition(new DropPackedDisabledCondition())
+				.save(consumer);
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.DECORATION_TABLE_ITEM)
+				.pattern("LLL")
+				.pattern("PBP")
+				.pattern("P P")
+				.define('L', ItemTags.LOGS)
+				.define('P', ItemTags.PLANKS)
+				.define('B', ModItems.UPGRADE_BASE)
+				.unlockedBy("has_upgrade_base", has(ModItems.UPGRADE_BASE))
 				.save(consumer);
 	}
 

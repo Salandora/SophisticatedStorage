@@ -80,6 +80,8 @@ public class StorageBlockLootProvider extends LootTableProvider {
 			add(ModBlocks.STORAGE_IO, dropBlock(ModBlocks.STORAGE_IO_ITEM));
 			add(ModBlocks.STORAGE_INPUT, dropBlock(ModBlocks.STORAGE_INPUT_ITEM));
 			add(ModBlocks.STORAGE_OUTPUT, dropBlock(ModBlocks.STORAGE_OUTPUT_ITEM));
+
+			add(ModBlocks.DECORATION_TABLE, dropBlock(ModBlocks.DECORATION_TABLE_ITEM));
 		}
 
 		private static LootTable.Builder dropStorageWithContents(Item storageItem) {
