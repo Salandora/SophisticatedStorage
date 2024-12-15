@@ -401,10 +401,15 @@ public class ModBlocks {
 		registerCauldronInteractions();
 		registerRecipeSerializers();
 
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleIdentifiablePrepareableReloadListener<>(SophisticatedStorage.getRL("recipes")) {
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleIdentifiablePrepareableReloadListener<>(SophisticatedStorage.getRL("recipes")) {
+			@Override
+			protected Object prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+				onResourceReload();
+				return super.prepare(resourceManager, profiler);
+			}
+
 			@Override
 			protected void apply(Object object, ResourceManager resourceManager, ProfilerFiller profiler) {
-				onResourceReload();
 			}
 		});
 	}
