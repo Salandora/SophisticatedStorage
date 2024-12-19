@@ -261,6 +261,10 @@ public class ModBlocks {
 	public static final Supplier<BlockItem> STORAGE_INPUT_ITEM = ITEMS.register(STORAGE_INPUT_REG_NAME, () -> new BlockItemBase(STORAGE_INPUT.get(), new Properties()));
 	public static final Supplier<BlockItem> STORAGE_OUTPUT_ITEM = ITEMS.register(STORAGE_OUTPUT_REG_NAME, () -> new BlockItemBase(STORAGE_OUTPUT.get(), new Properties()));
 
+	public static final Supplier<BlockItem>[] WOODEN_STORAGE_INGREDIENT_ITEMS = new Supplier[] {
+			CONTROLLER_ITEM, STORAGE_IO_ITEM, STORAGE_INPUT_ITEM, STORAGE_OUTPUT_ITEM
+	};
+
 	public static final Supplier<DecorationTableBlock> DECORATION_TABLE = BLOCKS.register("decoration_table", DecorationTableBlock::new);
 
 	public static final Supplier<BlockItem> DECORATION_TABLE_ITEM = ITEMS.register("decoration_table", () -> new BlockItemBase(DECORATION_TABLE.get(), new Properties()));
@@ -369,7 +373,7 @@ public class ModBlocks {
 		MENU_TYPES.register();
 		RECIPE_SERIALIZERS.register();
 		//INGREDIENT_TYPES.register(modBus);
-		CustomIngredientSerializer.register(BaseTierWoodenStorageIngredient.Serializer.INSTANCE);
+		CustomIngredientSerializer.register(BaseTierWoodenStorageIngredient.SERIALIZER);
 		registerCapabilities();
 	}
 

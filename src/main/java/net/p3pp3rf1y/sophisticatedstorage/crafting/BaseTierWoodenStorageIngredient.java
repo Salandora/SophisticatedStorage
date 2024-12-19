@@ -18,11 +18,9 @@ import java.util.List;
 
 public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 	public static final BaseTierWoodenStorageIngredient INSTANCE = new BaseTierWoodenStorageIngredient();
-	public static final MapCodec<BaseTierWoodenStorageIngredient> CODEC = MapCodec.unit(INSTANCE).stable();
-	public static final StreamCodec<RegistryFriendlyByteBuf, BaseTierWoodenStorageIngredient> STREAM_CODEC = StreamCodecHelper.singleton(() -> INSTANCE);
+	public static final CustomIngredientSerializer<BaseTierWoodenStorageIngredient> SERIALIZER = new Serializer();
 
 	public BaseTierWoodenStorageIngredient() {
-		super();
 	}
 
 	@Override
@@ -33,10 +31,10 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 	@Override
 	public List<ItemStack> getMatchingStacks() {
 		List<ItemStack> itemStacks = Lists.newArrayList();
-		if (ModBlocks.CHEST_ITEM instanceof BlockItemBase itemBase) {
+		if (ModBlocks.CHEST_ITEM.get() instanceof BlockItemBase itemBase) {
 			itemBase.addCreativeTabItems(itemStacks::add);
 		}
-		if (ModBlocks.BARREL_ITEM instanceof BlockItemBase itemBase) {
+		if (ModBlocks.BARREL_ITEM.get() instanceof BlockItemBase itemBase) {
 			itemBase.addCreativeTabItems(itemStacks::add);
 		}
 
@@ -45,16 +43,17 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 
 	@Override
 	public boolean requiresTesting() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public CustomIngredientSerializer<?> getSerializer() {
-		return Serializer.INSTANCE;
+		return SERIALIZER;
 	}
 
 	public static class Serializer implements CustomIngredientSerializer<BaseTierWoodenStorageIngredient> {
-		public static Serializer INSTANCE = new Serializer();
+		public static final MapCodec<BaseTierWoodenStorageIngredient> CODEC = MapCodec.unit(BaseTierWoodenStorageIngredient::new);
+		public static final StreamCodec<RegistryFriendlyByteBuf, BaseTierWoodenStorageIngredient> PACKET_CODEC = StreamCodecHelper.singleton(BaseTierWoodenStorageIngredient::new);
 
 		@Override
 		public ResourceLocation getIdentifier() {
@@ -68,7 +67,7 @@ public class BaseTierWoodenStorageIngredient implements CustomIngredient {
 
 		@Override
 		public StreamCodec<RegistryFriendlyByteBuf, BaseTierWoodenStorageIngredient> getPacketCodec() {
-			return STREAM_CODEC;
+			return PACKET_CODEC;
 		}
 	}
 }
