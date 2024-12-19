@@ -10,16 +10,21 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 
+import dev.emi.emi.registry.EmiTags;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
+import net.p3pp3rf1y.sophisticatedcore.compat.common.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
@@ -29,15 +34,14 @@ import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.TierUpgradeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedstorage.crafting.BaseTierWoodenStorageIngredient;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class EmiCompat implements EmiPlugin {
@@ -71,11 +75,15 @@ public class EmiCompat implements EmiPlugin {
         registry.addDragDropHandler(StorageScreen.class, new EmiStorageGhostDragDropHandler<>());
         registry.addDragDropHandler(SettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
 
-        registerCraftingRecipes(registry, DyeRecipesMaker.getRecipes());
-		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
-		registerCraftingRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
-		registerCraftingRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes());
-		registerCraftingRecipes(registry, FlatBarrelRecipesMaker.getRecipes());
+		for (BlockItem item : ModBlocks.WOODEN_STORAGE_INGREDIENT_ITEMS) {
+			ClientRecipeHelper.getRecipeByKey(BuiltInRegistries.ITEM.getKey(item)).ifPresent(r -> registerRecipes(registry, Collections.singletonList(r)));
+		}
+
+        registerRecipes(registry, DyeRecipesMaker.getRecipes());
+		registerRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
+		registerRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
+		registerRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes());
+		registerRecipes(registry, FlatBarrelRecipesMaker.getRecipes());
 
 		Comparison woodStorageNbtInterpreter = Comparison.compareData(emiStack -> {
 			CompoundTag tag = new CompoundTag();
@@ -126,13 +134,33 @@ public class EmiCompat implements EmiPlugin {
 		}
     }
 
-    private static void registerCraftingRecipes(EmiRegistry registry, Collection<CraftingRecipe> recipes) {
-        recipes.forEach(r -> registry.addRecipe(
-            new EmiCraftingRecipe(
-                r.getIngredients().stream().map(EmiIngredient::of).toList(),
-                EmiStack.of(r.getResultItem(null)),
-                r.getId())
-            )
-        );
+    private static void registerRecipes(EmiRegistry registry, Collection<? extends Recipe<?>> recipes) {
+        recipes.forEach(r -> {
+			NonNullList<Ingredient> ingredients = r.getIngredients();
+			NonNullList<EmiIngredient> ingredientsCopy = NonNullList.createWithCapacity(ingredients.size());
+			int i = 0;
+			for (Ingredient ingredient : ingredients) {
+				if (ingredient.getCustomIngredient() instanceof BaseTierWoodenStorageIngredient) {
+					ItemStack[] stacks = ingredient.getItems();
+					int amount = 1;
+					if (stacks.length != 0) {
+						amount = stacks[0].getCount();
+						for (int j = 1; j < stacks.length; j++) {
+							if (stacks[j].getCount() != amount) {
+								amount = 1;
+								break;
+							}
+						}
+					}
+
+					ingredientsCopy.add(i, EmiTags.getIngredient(Item.class, Arrays.stream(ingredient.getItems()).map(stack -> EmiStack.of(stack).comparison(Comparison.compareNbt())).toList(), amount));
+				} else {
+					ingredientsCopy.add(i, EmiIngredient.of(ingredient));
+				}
+				i++;
+			}
+
+			registry.addRecipe(new EmiCraftingRecipe(ingredientsCopy, EmiStack.of(r.getResultItem(null)), r.getId()));
+		});
     }
 }

@@ -42,9 +42,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadL
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.*;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.*;
-import net.p3pp3rf1y.sophisticatedstorage.crafting.*;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
@@ -279,6 +277,10 @@ public class ModBlocks {
 	public static final BlockItem STORAGE_IO_ITEM = registerItem(STORAGE_IO_REG_NAME, () -> new BlockItemBase(STORAGE_IO, new Item.Properties()));
 	public static final BlockItem STORAGE_INPUT_ITEM = registerItem(STORAGE_INPUT_REG_NAME, () -> new BlockItemBase(STORAGE_INPUT, new Item.Properties()));
 	public static final BlockItem STORAGE_OUTPUT_ITEM = registerItem(STORAGE_OUTPUT_REG_NAME, () -> new BlockItemBase(STORAGE_OUTPUT, new Item.Properties()));
+
+	public static final BlockItem[] WOODEN_STORAGE_INGREDIENT_ITEMS = new BlockItem[] {
+			CONTROLLER_ITEM, STORAGE_IO_ITEM, STORAGE_INPUT_ITEM, STORAGE_OUTPUT_ITEM
+	};
 
 	public static final DecorationTableBlock DECORATION_TABLE = register("decoration_table", DecorationTableBlock::new);
 
