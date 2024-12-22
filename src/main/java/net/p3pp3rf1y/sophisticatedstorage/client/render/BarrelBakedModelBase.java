@@ -199,7 +199,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
-		modelData = ModelData.EMPTY;
+		modelData = null;
 		// TODO: Still needed?
 		/*if (this.barrelItemOverrides != null) {
 			// need this here because of REI's fast entry rendering feature
@@ -214,7 +214,11 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return getQuads(state, side, rand, modelData, null);
 	}
 
-	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData extraData, @Nullable RenderType renderType) {
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, @Nullable ModelData extraData, @Nullable RenderType renderType) {
+		if (extraData == null) {
+			extraData = ModelData.EMPTY;
+		}
+
 		int hash = createHash(state, side, extraData, renderType);
 		List<BakedQuad> quads = BAKED_QUADS_CACHE.getIfPresent(hash);
 		if (quads != null) {
@@ -746,9 +750,8 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return getParticleIcon();
 	}
 
-	@Nonnull
 	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData) {
-		return Optional.of(world.getBlockEntityRenderData(pos) instanceof ModelData data ? data : ModelData.EMPTY).orElse(ModelData.EMPTY);
+		return world.getBlockEntityRenderData(pos) instanceof ModelData data ? data : ModelData.EMPTY;
 		/// Moved to {@link BarrelBlockEntity#getRenderData()}
 		/*return WorldHelper.getBlockEntity(world, pos, BarrelBlockEntity.class)
 				.map(be -> {
