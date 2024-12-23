@@ -276,6 +276,7 @@ public class ClientEventHandler {
 		BlockEntityRenderers.register(ModBlocks.CHEST_BLOCK_ENTITY_TYPE, ChestRenderer::new);
 		BlockEntityRenderers.register(ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE, ShulkerBoxRenderer::new);
 		BlockEntityRenderers.register(ModBlocks.CONTROLLER_BLOCK_ENTITY_TYPE, context -> new ControllerRenderer());
+		BlockEntityRenderers.register(ModBlocks.DECORATION_TABLE_BLOCK_ENTITY_TYPE, DecorationTableRenderer::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), ModBlocks.getBlocksByPredicate((id, block) -> id.getPath().contains("barrel")).toArray(new Block[0]));
 	}

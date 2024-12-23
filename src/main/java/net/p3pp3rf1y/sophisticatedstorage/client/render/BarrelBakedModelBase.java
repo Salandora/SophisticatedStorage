@@ -233,7 +233,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 		List<BakedQuad> ret = new ArrayList<>();
 
-		boolean isBakedDynamically = !materials.isEmpty() && woodDynamicBakingData.containsKey(woodName);
+		boolean isBakedDynamically = !materials.isEmpty();
 		Set<BarrelMaterial.MaterialModelPart> materialModelParts = materials.keySet().stream().map(BarrelMaterial::getMaterialModelPart).collect(Collectors.toSet());
 		boolean rendersUsingSplitModel = materialModelParts.contains(BarrelMaterial.MaterialModelPart.CORE) || materialModelParts.contains(BarrelMaterial.MaterialModelPart.TRIM);
 
@@ -309,7 +309,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	private List<BakedModel> bakeAndAddDynamicQuads(@Nullable Direction spriteSide, RandomSource rand, @Nullable String woodName,
 			Map<BarrelMaterial, ResourceLocation> barrelMaterials, boolean rendersUsingSplitModel, boolean renderCore, boolean renderTrim) {
 
-		Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData> bakingData = woodDynamicBakingData.get(woodName);
+		Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData> bakingData = woodDynamicBakingData.get(woodName != null ? woodName : WoodType.ACACIA.name());
 
 		Map<String, Either<Material, String>> materials = new HashMap<>();
 		for (Map.Entry<BarrelMaterial, ResourceLocation> entry : barrelMaterials.entrySet()) {
@@ -754,14 +754,14 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 			boolean hasMainColor = StorageBlockItem.getMainColorFromStack(stack).isPresent();
 			boolean hasAccentColor = StorageBlockItem.getAccentColorFromStack(stack).isPresent();
+			Map<BarrelMaterial, ResourceLocation> materials = BarrelBlockItem.getMaterials(stack);
 			String woodName = WoodStorageBlockItem.getWoodType(stack).map(WoodType::name)
-					.orElse(barrelBakedModel.barrelHasAccentColor && barrelBakedModel.barrelHasMainColor ? null : WoodType.ACACIA.name());
+					.orElse(barrelBakedModel.barrelHasAccentColor && barrelBakedModel.barrelHasMainColor && materials.isEmpty() ? null : WoodType.ACACIA.name());
 			boolean packed = WoodStorageBlockItem.isPacked(stack);
 			boolean barrelShowsTier = StorageBlockItem.showsTier(stack);
 			Item item = stack.getItem();
-			Map<BarrelMaterial, ResourceLocation> materials = BarrelBlockItem.getMaterials(stack);
 
-			int hash = Objects.hash(item, woodName, hasMainColor, hasAccentColor, packed, barrelShowsTier, materials);
+			int hash = Objects.hash(item, woodName, hasMainColor, hasAccentColor, packed, barrelShowsTier, flatTop, materials);
 
 			BakedModel resolvedModel = resolvedModels.getIfPresent(hash);
 			if (resolvedModel == null) {

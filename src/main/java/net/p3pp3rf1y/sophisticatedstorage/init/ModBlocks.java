@@ -41,27 +41,8 @@ import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
-import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.ControllerBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ControllerBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageIOBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageIOBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageInputBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageLinkBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageLinkBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageOutputBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelSettingsContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageSettingsContainerMenu;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
+import net.p3pp3rf1y.sophisticatedstorage.common.gui.*;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
@@ -81,7 +62,8 @@ public class ModBlocks {
 
 	private static final String LIMITED_BARREL_NAME = "limited_barrel";
 
-	private ModBlocks() {}
+	private ModBlocks() {
+	}
 
 	public static final TagKey<Item> BASE_TIER_WOODEN_STORAGE_TAG = TagKey.create(Registries.ITEM, SophisticatedStorage.getRL("base_tier_wooden_storage"));
 
@@ -296,6 +278,13 @@ public class ModBlocks {
 	public static final BlockItem STORAGE_INPUT_ITEM = registerItem(STORAGE_INPUT_REG_NAME, () -> new BlockItemBase(STORAGE_INPUT, new Item.Properties()));
 	public static final BlockItem STORAGE_OUTPUT_ITEM = registerItem(STORAGE_OUTPUT_REG_NAME, () -> new BlockItemBase(STORAGE_OUTPUT, new Item.Properties()));
 
+	public static final BlockItem[] WOODEN_STORAGE_INGREDIENT_ITEMS = new BlockItem[] {
+			CONTROLLER_ITEM, STORAGE_IO_ITEM, STORAGE_INPUT_ITEM, STORAGE_OUTPUT_ITEM
+	};
+
+	public static final DecorationTableBlock DECORATION_TABLE = register("decoration_table", DecorationTableBlock::new);
+
+	public static final BlockItem DECORATION_TABLE_ITEM = registerItem("decoration_table", () -> new BlockItemBase(DECORATION_TABLE, new Properties()));
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -348,6 +337,10 @@ public class ModBlocks {
 			BlockEntityType.Builder.of(StorageOutputBlockEntity::new, STORAGE_OUTPUT)
 					.build(null));
 
+	public static final BlockEntityType<DecorationTableBlockEntity> DECORATION_TABLE_BLOCK_ENTITY_TYPE = registerEntityType("decoration_table", () ->
+			BlockEntityType.Builder.of(DecorationTableBlockEntity::new, DECORATION_TABLE)
+					.build(null));
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// MENU_TYPES
@@ -365,6 +358,9 @@ public class ModBlocks {
 
 	public static final MenuType<LimitedBarrelSettingsContainerMenu> LIMITED_BARREL_SETTINGS_CONTAINER_TYPE = registerMenuType("limited_barrel_settings",
 			() -> new ExtendedScreenHandlerType<>(LimitedBarrelSettingsContainerMenu::fromBuffer));
+
+	public static final MenuType<DecorationTableMenu> DECORATION_TABLE_CONTAINER_TYPE = registerMenuType("decoration_table",
+			() -> new ExtendedScreenHandlerType<>(DecorationTableMenu::fromBuffer));
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,10 +403,15 @@ public class ModBlocks {
 		registerCauldronInteractions();
 		registerRecipeSerializers();
 
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleIdentifiablePrepareableReloadListener<>(SophisticatedStorage.getRL("recipes")) {
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleIdentifiablePrepareableReloadListener<>(SophisticatedStorage.getRL("recipes")) {
+			@Override
+			protected Object prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+				onResourceReload();
+				return super.prepare(resourceManager, profiler);
+			}
+
 			@Override
 			protected void apply(Object object, ResourceManager resourceManager, ProfilerFiller profiler) {
-				onResourceReload();
 			}
 		});
 	}
@@ -455,6 +456,7 @@ public class ModBlocks {
 	@SuppressWarnings("java:S6548") //singleton is correct here
 	public static class WoodStorageCauldronInteraction extends StorageCauldronInteraction {
 		private static final WoodStorageCauldronInteraction INSTANCE = new WoodStorageCauldronInteraction();
+
 		@Override
 		protected void removePaint(ItemStack stack) {
 			super.removePaint(stack);
