@@ -1,0 +1,570 @@
+
+package net.p3pp3rf1y.sophisticatedstorage.client.gui;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec2;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.*;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.*;
+import net.p3pp3rf1y.sophisticatedcore.util.Easing;
+import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.common.gui.DecorationTableMenu;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.IntConsumer;
+import java.util.function.Supplier;
+
+public class DecorationTableScreen extends AbstractContainerScreen<DecorationTableMenu> {
+	public static final ResourceLocation GUI_BACKGROUND = SophisticatedStorage.getRL("textures/gui/decoration_table.png");
+	public static final ResourceLocation GUI_DECORATION_TABLE_ELEMENTS = SophisticatedStorage.getRL("textures/gui/decoration_table_elements.png");
+	public static final Dimension SQUARE_64 = new Dimension(64, 64);
+	public static final Dimension SQUARE_8 = new Dimension(8, 8);
+	public static final TextureBlitData TOP_INNER_TRIM_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(0, 0), Dimension.SQUARE_16);
+	public static final TextureBlitData TOP_TRIM_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(0, 16), Dimension.SQUARE_16);
+	public static final TextureBlitData SIDE_TRIM_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(0, 32), Dimension.SQUARE_16);
+	public static final TextureBlitData BOTTOM_TRIM_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(0, 48), Dimension.SQUARE_16);
+	public static final TextureBlitData TOP_CORE_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(16, 16), Dimension.SQUARE_16);
+	public static final TextureBlitData SIDE_CORE_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(16, 32), Dimension.SQUARE_16);
+	public static final TextureBlitData BOTTOM_CORE_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(16, 48), Dimension.SQUARE_16);
+	public static final TextureBlitData ACCENT_TINT_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(32, 48), Dimension.SQUARE_16);
+	public static final TextureBlitData MAIN_TINT_HIGHLIGHT = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(48, 48), Dimension.SQUARE_16);
+	public static final TextureBlitData STORAGE_INFO = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(32, 16), Dimension.SQUARE_16);
+
+	private static final TextureBlitData VERTICAL_ARROW_BACKGROUND = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(56, 0), SQUARE_8);
+	private static final TextureBlitData VERTICAL_ARROW_HOVERED_BACKGROUND = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(48, 0), SQUARE_8);
+	private static final TextureBlitData HORIZONTAL_ARROW_BACKGROUND = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(56, 8), SQUARE_8);
+	private static final TextureBlitData HORIZONTAL_ARROW_HOVERED_BACKGROUND = new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(48, 8), SQUARE_8);
+
+	private static final ButtonDefinition.Toggle<Boolean> VERTICAL_INHERITANCE_ARROW = new ButtonDefinition.Toggle<>(SQUARE_8, VERTICAL_ARROW_BACKGROUND, Map.of(
+			true, new ToggleButton.StateData(new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(32, 0), SQUARE_8),
+					Component.translatable(StorageTranslationHelper.INSTANCE.translButton("decoration_inheritance_on"))),
+			false, new ToggleButton.StateData(new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(40, 0), SQUARE_8),
+					Component.translatable(StorageTranslationHelper.INSTANCE.translButton("decoration_inheritance_off")))
+	), VERTICAL_ARROW_HOVERED_BACKGROUND);
+
+	private static final ButtonDefinition.Toggle<Boolean> HORIZONTAL_INHERITANCE_ARROW = new ButtonDefinition.Toggle<>(SQUARE_8, HORIZONTAL_ARROW_BACKGROUND, Map.of(
+			true, new ToggleButton.StateData(new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(32, 8), SQUARE_8),
+					Component.translatable(StorageTranslationHelper.INSTANCE.translButton("decoration_inheritance_on"))),
+			false, new ToggleButton.StateData(new TextureBlitData(GUI_DECORATION_TABLE_ELEMENTS, SQUARE_64, new UV(40, 8), SQUARE_8),
+					Component.translatable(StorageTranslationHelper.INSTANCE.translButton("decoration_inheritance_off")))
+	), HORIZONTAL_ARROW_HOVERED_BACKGROUND);
+
+	private BlockPreviewWidget blockPreview;
+	private long lastRotationSetTime = 0;
+
+	@Nullable
+	private ColorPicker colorPicker;
+
+	private final List<Component> resultPartsNeededTooltip = new ArrayList<>();
+
+	public DecorationTableScreen(DecorationTableMenu menu, Inventory playerInventory, Component title) {
+		super(menu, playerInventory, title);
+		imageWidth = 250;
+		imageHeight = 226;
+		inventoryLabelX = 45;
+	}
+
+	@Override
+	protected void init() {
+		super.init();
+		inventoryLabelY = getMenu().getSlot(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT).y + 18 + 2;
+		int lastDyeSlotIndex = getMenu().getDyeSlotRange().firstSlot() + getMenu().getDyeSlotRange().numberOfSlots() - 1;
+		Slot lastDyeSlot = getMenu().getSlot(lastDyeSlotIndex);
+		Slot resultSlot = menu.getResultSlot();
+		blockPreview = new BlockPreviewWidget(new Position(leftPos + lastDyeSlot.x + 16 + 1 + 8 + 1, topPos + lastDyeSlot.y), new Dimension(80, resultSlot.y - lastDyeSlot.y + 16 + 4), () -> menu.getSlot(11).getItem());
+
+		addRenderableWidget(blockPreview);
+		addVerticalInheritanceArrow(DecorationTableBlockEntity.TOP_TRIM_SLOT);
+		addVerticalInheritanceArrow(DecorationTableBlockEntity.SIDE_TRIM_SLOT);
+		addVerticalInheritanceArrow(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT);
+
+		int slotIndex = DecorationTableBlockEntity.TOP_CORE_SLOT;
+		addInheritanceArrow(slotIndex, -11, 4, HORIZONTAL_INHERITANCE_ARROW);
+
+		addVerticalInheritanceArrow(DecorationTableBlockEntity.SIDE_CORE_SLOT);
+		addVerticalInheritanceArrow(DecorationTableBlockEntity.BOTTOM_CORE_SLOT);
+
+		addPartHint(DecorationTableBlockEntity.TOP_INNER_TRIM_SLOT, TOP_INNER_TRIM_HIGHLIGHT, "top_inner_trim");
+		addPartHint(DecorationTableBlockEntity.TOP_TRIM_SLOT, TOP_TRIM_HIGHLIGHT, "top_trim");
+		addPartHint(DecorationTableBlockEntity.SIDE_TRIM_SLOT, SIDE_TRIM_HIGHLIGHT, "side_trim");
+		addPartHint(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT, BOTTOM_TRIM_HIGHLIGHT, "bottom_trim");
+		addPartHint(DecorationTableBlockEntity.TOP_CORE_SLOT, TOP_CORE_HIGHLIGHT, "top_core");
+		addPartHint(DecorationTableBlockEntity.SIDE_CORE_SLOT, SIDE_CORE_HIGHLIGHT, "side_core");
+		addPartHint(DecorationTableBlockEntity.BOTTOM_CORE_SLOT, BOTTOM_CORE_HIGHLIGHT, "bottom_core");
+
+		Slot slot = menu.getSlot(DecorationTableBlockEntity.TOP_INNER_TRIM_SLOT);
+		addRenderableWidget(new PartStorageInfo(new Position(leftPos + slot.x + 57, topPos + slot.y), menu::getPartsStored));
+
+		addDyeElements();
+
+		if (colorPicker != null) {
+			colorPicker.setPosition(new Position(leftPos + (imageWidth - ColorPicker.DIMENSIONS.width()) / 2, topPos + (imageHeight - ColorPicker.DIMENSIONS.height()) / 2));
+		}
+	}
+
+	private void addDyeElements() {
+		Slot greenDyeSlot = menu.getSlot(menu.getDyeSlotRange().firstSlot() + 1);
+		Slot topTrimSlot = menu.getSlot(DecorationTableBlockEntity.TOP_TRIM_SLOT);
+		Slot sideTrimSlot = menu.getSlot(DecorationTableBlockEntity.SIDE_TRIM_SLOT);
+
+		ColorButton mainColorButton = new ColorButton(new Position(leftPos + greenDyeSlot.x - 1, topPos + topTrimSlot.y), new Dimension(18, 18), menu::getMainColor,
+				button -> openColorPicker(menu.getMainColor(), menu::setMainColor), Component.translatable(StorageTranslationHelper.INSTANCE.translButton("pick_color")));
+		addRenderableWidget(mainColorButton);
+		ColorButton accentColorButton = new ColorButton(new Position(leftPos + greenDyeSlot.x - 1, topPos + sideTrimSlot.y), new Dimension(18, 18), menu::getAccentColor,
+				button -> openColorPicker(menu.getAccentColor(), menu::setAccentColor), Component.translatable(StorageTranslationHelper.INSTANCE.translButton("pick_color")));
+		addRenderableWidget(accentColorButton);
+
+		addRenderableWidget(new PartIcon(new Position(mainColorButton.getX() + mainColorButton.getWidth() + 1, mainColorButton.getY() + 1), MAIN_TINT_HIGHLIGHT, Component.translatable(StorageTranslationHelper.INSTANCE.translGui("tint.main"))));
+		addRenderableWidget(new PartIcon(new Position(accentColorButton.getX() + accentColorButton.getWidth() + 1, accentColorButton.getY() + 1), ACCENT_TINT_HIGHLIGHT, Component.translatable(StorageTranslationHelper.INSTANCE.translGui("tint.accent"))));
+	}
+
+	private void openColorPicker(int color, IntConsumer colorSetter) {
+		colorPicker = new ColorPicker(this, new Position(leftPos + (imageWidth - ColorPicker.DIMENSIONS.width()) / 2, topPos + (imageHeight - ColorPicker.DIMENSIONS.height()) / 2),
+				color, c -> {
+			colorSetter.accept(c);
+			colorPicker = null;
+			blockPreview.setVisible(true);
+		});
+		blockPreview.setVisible(false);
+	}
+
+	private void addVerticalInheritanceArrow(int slotIndex) {
+		addInheritanceArrow(slotIndex, 4, -11, VERTICAL_INHERITANCE_ARROW);
+	}
+
+	private void addInheritanceArrow(int slotIndex, int xOffset, int yOffset, ButtonDefinition.Toggle<Boolean> arrowDefinition) {
+		Slot slot = menu.getSlot(slotIndex);
+		addRenderableWidget(new ToggleButton<>(new Position(leftPos + slot.x + xOffset, topPos + slot.y + yOffset), arrowDefinition,
+				button -> {
+					resultPartsNeededTooltip.clear();
+					getMenu().setSlotMaterialInheritance(slotIndex, !getMenu().isSlotMaterialInherited(slotIndex));
+				}, () -> getMenu().isSlotMaterialInherited(slotIndex)) {
+			@Override
+			public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+				super.render(guiGraphics, mouseX, mouseY, partialTicks);
+				if (isMouseOver(mouseX, mouseY)) {
+					Vec2 rotations = SLOT_PREVIEW_ROTATIONS.get(slotIndex);
+					if (rotations != null) {
+						setPreviewRotations((int) rotations.x, (int) rotations.y);
+					}
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+		guiGraphics.blit(GUI_BACKGROUND, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+
+		renderDyeSlotsOverlays(guiGraphics);
+
+		if (colorPicker != null) {
+			PoseStack pose = guiGraphics.pose();
+			pose.pushPose();
+			pose.translate(0, 0, 500);
+			colorPicker.renderBg(guiGraphics, minecraft, i, i1);
+			pose.popPose();
+		}
+	}
+
+	private void renderDyeSlotsOverlays(GuiGraphics guiGraphics) {
+		PoseStack pose = guiGraphics.pose();
+		pose.pushPose();
+		pose.translate(leftPos, topPos, 0);
+		Slot redSlot = getMenu().getSlot(getMenu().getDyeSlotRange().firstSlot());
+		renderSlotOverlay(guiGraphics, redSlot, 0x33_FF0000);
+		Slot greenSlot = getMenu().getSlot(getMenu().getDyeSlotRange().firstSlot() + 1);
+		renderSlotOverlay(guiGraphics, greenSlot, 0x33_00FF00);
+		Slot blueSlot = getMenu().getSlot(getMenu().getDyeSlotRange().firstSlot() + 2);
+		renderSlotOverlay(guiGraphics, blueSlot, 0x33_0000FF);
+		pose.popPose();
+	}
+
+	private void renderSlotOverlay(GuiGraphics guiGraphics, Slot slot, int slotColor) {
+		RenderSystem.enableBlend();
+		RenderSystem.disableDepthTest();
+		RenderSystem.colorMask(true, true, true, false);
+		guiGraphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0, slotColor);
+		RenderSystem.colorMask(true, true, true, true);
+		RenderSystem.enableDepthTest();
+		RenderSystem.disableBlend();
+	}
+
+	private void addPartHint(int slotIndex, TextureBlitData texture, String barrelPart) {
+		Slot slot = menu.getSlot(slotIndex);
+		addRenderableWidget(new PartIcon(new Position(leftPos + slot.x + 18, topPos + slot.y), texture, Component.translatable(StorageTranslationHelper.INSTANCE.translGui("barrel_part." + barrelPart))));
+	}
+
+	@Override
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+		updatePreviewRotation(mouseX, mouseY);
+		super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+		if (colorPicker != null) {
+			renderTransparentBackground(guiGraphics);
+			RenderSystem.disableBlend();
+			PoseStack pose = guiGraphics.pose();
+			pose.pushPose();
+			pose.translate(0, 0, 500);
+			colorPicker.render(guiGraphics, mouseX, mouseY, partialTick);
+			colorPicker.renderTooltip(this, guiGraphics, mouseX, mouseY);
+			pose.popPose();
+		} else {
+			this.renderTooltip(guiGraphics, mouseX, mouseY);
+		}
+	}
+
+	// TODO: there is no equivalent in fabric for that
+	/*@Override
+	protected void renderSlotContents(GuiGraphics guiGraphics, ItemStack itemstack, Slot slot, @org.jetbrains.annotations.Nullable String countString) {
+		if (colorPicker != null) {
+			return;
+		}
+
+		super.renderSlotContents(guiGraphics, itemstack, slot, countString);
+	}*/
+
+	@Override
+	public void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+		if (slot.getItem().isEmpty() && getMenu().isSlotMaterialInherited(slot.index)) {
+			ItemStack inheritedItem = getMenu().getInheritedItem(slot.index);
+			if (!inheritedItem.isEmpty()) {
+				guiGraphics.renderItem(inheritedItem, slot.x, slot.y, slot.x + slot.y * this.imageWidth);
+				PoseStack pose = guiGraphics.pose();
+				pose.pushPose();
+				RenderSystem.enableBlend();
+				RenderSystem.disableDepthTest();
+				guiGraphics.blit(GuiHelper.GUI_CONTROLS, slot.x, slot.y, 77, 0, 16, 16);
+				RenderSystem.enableDepthTest();
+				RenderSystem.disableBlend();
+				pose.popPose();
+			}
+		}
+		super.renderSlot(guiGraphics, slot);
+	}
+
+	@Override
+	protected List<Component> getTooltipFromContainerItem(ItemStack stack) {
+		List<Component> tooltip = super.getTooltipFromContainerItem(stack);
+		if (hoveredSlot == getMenu().getResultSlot() && !hoveredSlot.getItem().isEmpty()) {
+			Map<ResourceLocation, Integer> partsNeeded = getMenu().getPartsNeeded();
+			tooltip.addAll(getResultPartsNeededTooltip(partsNeeded));
+		} else if (!resultPartsNeededTooltip.isEmpty()) {
+			resultPartsNeededTooltip.clear();
+		}
+
+		return tooltip;
+	}
+
+	private List<Component> getResultPartsNeededTooltip(Map<ResourceLocation, Integer> partsNeeded) {
+		if (!resultPartsNeededTooltip.isEmpty()) {
+			return resultPartsNeededTooltip;
+		}
+		addPartCountInfo(partsNeeded, resultPartsNeededTooltip, location -> getMenu().getMissingDyes().contains(location) ? ChatFormatting.RED : ChatFormatting.DARK_GRAY);
+		return resultPartsNeededTooltip;
+	}
+
+	private static void addPartCountInfo(Map<ResourceLocation, Integer> partCounts, List<Component> tooltip, Function<ResourceLocation, ChatFormatting> getPartFormatting) {
+		Map<ItemStack, Tuple<ResourceLocation, Integer>> itemCounts = new LinkedHashMap<>();
+		partCounts.forEach((part, count) -> {
+			if (BuiltInRegistries.ITEM.containsKey(part)) {
+				Item item = BuiltInRegistries.ITEM.get(part);
+				itemCounts.put(new ItemStack(item), new Tuple<>(part, count));
+			} else {
+				BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, part))
+						.flatMap(set -> set.stream().findFirst()).ifPresent(dye -> itemCounts.put(new ItemStack(dye), new Tuple<>(part, count)));
+			}
+		});
+
+		itemCounts.entrySet().stream().sorted(Comparator.comparing(entry -> entry.getKey().getHoverName().getString())).forEach(entry -> {
+			ItemStack itemStack = entry.getKey();
+			ResourceLocation location = entry.getValue().getA();
+			int count = entry.getValue().getB();
+			MutableComponent partCountText = Component.literal(count + "/" + DecorationTableBlockEntity.BLOCK_TOTAL_PARTS + " (" + String.format("%.0f%%", (float) count / DecorationTableBlockEntity.BLOCK_TOTAL_PARTS * 100) + ") of ");
+			tooltip.add(partCountText.append(itemStack.getHoverName()).withStyle(getPartFormatting.apply(location)));
+		});
+	}
+
+	private static final Map<Integer, Vec2> SLOT_PREVIEW_ROTATIONS = Map.of(
+			0, new Vec2(90, 0),
+			1, new Vec2(90, 0),
+			4, new Vec2(90, 0),
+			2, new Vec2(0, 0),
+			5, new Vec2(0, 0),
+			3, new Vec2(-90, 0),
+			6, new Vec2(-90, 0)
+	);
+
+	private void updatePreviewRotation(int mouseX, int mouseY) {
+		SLOT_PREVIEW_ROTATIONS.forEach(
+				(slotIndex, rotation) -> updatePreviewRotationForSlot(slotIndex, mouseX, mouseY, (int) rotation.x, (int) rotation.y)
+		);
+		if (lastRotationSetTime != 0 && System.currentTimeMillis() - lastRotationSetTime > 1000) {
+			blockPreview.setTargetRotations(30, 45);
+		}
+	}
+
+	private void updatePreviewRotationForSlot(int slotIndex, int mouseX, int mouseY, int xAxisRotation, int yAxisRotation) {
+		Slot slot = getMenu().getSlot(slotIndex);
+		int slotLeft = leftPos + slot.x;
+		int slotTop = topPos + slot.y;
+		if (leftPos + slot.x <= mouseX && mouseX < slotLeft + 16 + 18 && slotTop <= mouseY && mouseY < slotTop + 16) {
+			setPreviewRotations(xAxisRotation, yAxisRotation);
+		}
+	}
+
+	private void setPreviewRotations(int xAxisRotation, int yAxisRotation) {
+		blockPreview.setTargetRotations(xAxisRotation, yAxisRotation);
+		lastRotationSetTime = System.currentTimeMillis();
+	}
+
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+		if (colorPicker != null) {
+			return colorPicker.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+		}
+
+		for (GuiEventListener child : children()) {
+			if (child.isMouseOver(mouseX, mouseY) && child.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
+				if (child instanceof BlockPreviewWidget) {
+					lastRotationSetTime = System.currentTimeMillis() + 100_000;
+				}
+
+				return true;
+			}
+		}
+		return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+	}
+
+	@Override
+	protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
+		super.renderTooltip(guiGraphics, x, y);
+
+		renderables.forEach(renderable -> {
+			if (renderable instanceof WidgetBase widget) {
+				widget.renderTooltip(this, guiGraphics, x, y);
+			}
+		});
+	}
+
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (colorPicker != null) {
+			return colorPicker.mouseClicked(mouseX, mouseY, button);
+		}
+		GuiEventListener focused = getFocused();
+		if (focused != null && !focused.isMouseOver(mouseX, mouseY) && (focused instanceof WidgetBase widgetBase)) {
+			widgetBase.setFocused(false);
+		}
+
+		return super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	private static class PartIcon extends WidgetBase {
+		private final TextureBlitData texture;
+		private final Component tooltip;
+
+		protected PartIcon(Position position, TextureBlitData texture, Component tooltip) {
+			super(position, new Dimension(texture.getWidth(), texture.getHeight()));
+			this.texture = texture;
+			this.tooltip = tooltip;
+		}
+
+		@Override
+		protected void renderBg(GuiGraphics guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
+			GuiHelper.blit(guiGraphics, x, y, texture);
+		}
+
+		@Override
+		protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+			//noop
+		}
+
+		@Override
+		public void renderTooltip(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+			if (isMouseOver(mouseX, mouseY)) {
+				guiGraphics.renderTooltip(screen.font, tooltip, mouseX, mouseY);
+			}
+		}
+	}
+
+	private static class PartStorageInfo extends WidgetBase {
+		private final List<Component> partStorageTooltip = new ArrayList<>();
+		private final Supplier<Map<ResourceLocation, Integer>> getPartsStored;
+
+		protected PartStorageInfo(Position position, Supplier<Map<ResourceLocation, Integer>> getPartsStored) {
+			super(position, Dimension.SQUARE_16);
+			this.getPartsStored = getPartsStored;
+		}
+
+		@Override
+		protected void renderBg(GuiGraphics guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
+			if (hasNoPartsToShow()) {
+				return;
+			}
+
+			GuiHelper.blit(guiGraphics, x, y, STORAGE_INFO);
+		}
+
+		private boolean hasNoPartsToShow() {
+			return getPartsStored.get().isEmpty();
+		}
+
+		@Override
+		protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+			//noop
+		}
+
+		@Override
+		public void renderTooltip(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+			if (hasNoPartsToShow()) {
+				return;
+			}
+
+			if (isMouseOver(mouseX, mouseY)) {
+				guiGraphics.renderTooltip(screen.font, getPartStorageTooltip(), Optional.empty(), mouseX, mouseY);
+			} else if (!partStorageTooltip.isEmpty()) {
+				partStorageTooltip.clear();
+			}
+		}
+
+		private List<Component> getPartStorageTooltip() {
+			if (!partStorageTooltip.isEmpty() || hasNoPartsToShow()) {
+				return partStorageTooltip;
+			}
+
+			partStorageTooltip.add(Component.translatable(StorageTranslationHelper.INSTANCE.translGuiTooltip("parts_stored")));
+			DecorationTableScreen.addPartCountInfo(getPartsStored.get(), partStorageTooltip, location -> ChatFormatting.GRAY);
+			return partStorageTooltip;
+		}
+	}
+
+	private static class BlockPreviewWidget extends WidgetBase {
+		private final Supplier<ItemStack> blockStackSupplier;
+		private float xAxisRotation = 30;
+		private float yAxisRotation = 45;
+
+		private float fromXAxisRotation = xAxisRotation;
+		private float fromYAxisRotation = yAxisRotation;
+		private float targetXAxisRotation = xAxisRotation;
+		private float targetYAxisRotation = yAxisRotation;
+		private long lastTargetSetTime = 0;
+
+		protected BlockPreviewWidget(Position position, Dimension dimension, Supplier<ItemStack> blockStackSupplier) {
+			super(position, dimension);
+			this.blockStackSupplier = blockStackSupplier;
+		}
+
+		public void setTargetRotations(int xAxisRotation, int yAxisRotation) {
+			if ((this.targetXAxisRotation == xAxisRotation && this.targetYAxisRotation == yAxisRotation)) {
+				return;
+			}
+
+			this.fromXAxisRotation = this.xAxisRotation;
+			this.fromYAxisRotation = this.yAxisRotation;
+			this.targetXAxisRotation = xAxisRotation;
+			this.targetYAxisRotation = yAxisRotation;
+			lastTargetSetTime = System.currentTimeMillis();
+		}
+
+		@Override
+		protected void renderBg(GuiGraphics guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
+			guiGraphics.fill(x, y, x + getWidth(), y + getHeight(), 0xFF_000000);
+		}
+
+		@Override
+		protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+			ItemStack slotStack = blockStackSupplier.get();
+			if (slotStack.isEmpty()) {
+				return;
+			}
+
+			updateRotations();
+
+			PoseStack pose = guiGraphics.pose();
+			pose.pushPose();
+			pose.translate(x + getWidth() / 2f, y + getHeight() / 2f, 150);
+			pose.mulPose(Axis.XN.rotationDegrees(xAxisRotation));
+			pose.mulPose(Axis.YP.rotationDegrees(yAxisRotation));
+			int scale = 48;
+			pose.scale(scale, -scale, scale);
+			pose.translate(-0.5, -0.5, -0.5);
+			ItemRenderer itemRenderer = minecraft.getItemRenderer();
+			BakedModel bakedModel = itemRenderer.getModel(slotStack, null, null, 0);
+			int combinedLight = 15728880;
+			if (bakedModel.isCustomRenderer()) {
+				BuiltinItemRendererRegistry.INSTANCE.get(slotStack.getItem()).render(slotStack, ItemDisplayContext.GUI, pose, guiGraphics.bufferSource(), combinedLight, OverlayTexture.NO_OVERLAY);
+			} else {
+				/*Iterator<BakedModel> renderPasses = bakedModel.getRenderPasses(slotStack, true).iterator();
+				renderPasses.forEachRemaining(model -> {
+					Iterator<RenderType> renderTypes = model.getRenderTypes(slotStack, true).iterator();*/
+					RenderType renderType = ItemBlockRenderTypes.getRenderType(slotStack, true);
+					//renderTypes.forEachRemaining(renderType -> {
+						VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect(guiGraphics.bufferSource(), renderType, true, slotStack.hasFoil());
+						itemRenderer.renderModelLists(bakedModel, slotStack, combinedLight, OverlayTexture.NO_OVERLAY, pose, vertexconsumer);
+					/*});
+				});*/
+			}
+			pose.popPose();
+		}
+
+		private void updateRotations() {
+			float secondsDuration = 1;
+			long currentTime = System.currentTimeMillis();
+			if (currentTime - lastTargetSetTime <= secondsDuration * 1000) {
+				float ratio = (currentTime - lastTargetSetTime) / (secondsDuration * 1000);
+				ratio = Easing.EASE_IN_OUT_CUBIC.ease(ratio);
+				xAxisRotation = (fromXAxisRotation + (targetXAxisRotation - fromXAxisRotation) * ratio);
+				yAxisRotation = (fromYAxisRotation + (targetYAxisRotation - fromYAxisRotation) * ratio);
+			} else {
+				xAxisRotation = targetXAxisRotation;
+				yAxisRotation = targetYAxisRotation;
+			}
+		}
+
+		@Override
+		public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+			yAxisRotation += 2 * dragX;
+			yAxisRotation = yAxisRotation % 360;
+			xAxisRotation += 2 * dragY;
+			xAxisRotation = xAxisRotation % 360;
+			targetXAxisRotation = xAxisRotation;
+			targetYAxisRotation = yAxisRotation;
+			return true;
+		}
+	}
+}

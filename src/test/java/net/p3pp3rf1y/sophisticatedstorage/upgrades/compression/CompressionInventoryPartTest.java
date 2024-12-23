@@ -8,10 +8,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
-import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartitioner;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.MathHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -132,14 +132,14 @@ public class CompressionInventoryPartTest {
 	}
 
 	private CompressionInventoryPart initCompressionInventoryPart(Map<Integer, ItemStack> slotStacksInput, InventoryHandler invHandler, Supplier<MemorySettingsCategory> getMemorySettings) {
-		return initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(Collections.min(slotStacksInput.keySet()), Collections.min(slotStacksInput.keySet()) + slotStacksInput.size()), getMemorySettings);
+		return initCompressionInventoryPart(invHandler, new SlotRange(Collections.min(slotStacksInput.keySet()), Collections.min(slotStacksInput.keySet()) + slotStacksInput.size()), getMemorySettings);
 	}
 
 	private CompressionInventoryPart initCompressionInventoryPart(Map<Integer, ItemStack> slotStacksInput, InventoryHandler invHandler, int minSlot) {
-		return initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + slotStacksInput.size()), () -> getMemorySettings(invHandler, Map.of()));
+		return initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + slotStacksInput.size()), () -> getMemorySettings(invHandler, Map.of()));
 	}
 
-	private CompressionInventoryPart initCompressionInventoryPart(InventoryHandler invHandler, InventoryPartitioner.SlotRange slotRange, Supplier<MemorySettingsCategory> getMemorySettings) {
+	private CompressionInventoryPart initCompressionInventoryPart(InventoryHandler invHandler, SlotRange slotRange, Supplier<MemorySettingsCategory> getMemorySettings) {
 		CompressionInventoryPart spiedPart = spy(new CompressionInventoryPart(invHandler, slotRange, getMemorySettings));
 		doReturn(Optional.empty()).when(spiedPart).getDecompressionResultFromConfig(any(Item.class));
 		spiedPart.onInit();
@@ -590,7 +590,7 @@ public class CompressionInventoryPartTest {
 		Map<Integer, ItemStack> slotStacksInput = Map.of(0, new ItemStack(Items.IRON_BLOCK, 63), 1, ItemStack.EMPTY, 2, ItemStack.EMPTY);
 		InventoryHandler invHandler = getFilledInventoryHandler(slotStacksInput, 64);
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> getMemorySettings(invHandler, Map.of()));
 		part.extractItem(0, 63, false);
 
 		ItemStack insertResult = part.insertItem(1, new ItemStack(Items.GOLD_NUGGET, 10), false, (s, st, sim) -> ItemStack.EMPTY);
@@ -604,7 +604,7 @@ public class CompressionInventoryPartTest {
 		MemorySettingsCategory memorySettings = getMemorySettings(invHandler, Map.of());
 		when(memorySettings.getSlotFilterStack(eq(0), anyBoolean())).thenReturn(Optional.of(new ItemStack(Items.IRON_BLOCK)));
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> memorySettings);
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> memorySettings);
 		part.extractItem(0, 32, false);
 
 		assertStackEquals(new ItemStack(Items.GOLD_BLOCK, 32), part.insertItem(1, new ItemStack(Items.GOLD_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
@@ -616,7 +616,7 @@ public class CompressionInventoryPartTest {
 		MemorySettingsCategory memorySettings = getMemorySettings(invHandler, Map.of());
 		when(memorySettings.getSlotFilterStack(1, true)).thenReturn(Optional.of(new ItemStack(Items.IRON_BLOCK)));
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> memorySettings);
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> memorySettings);
 
 		assertStackEquals(new ItemStack(Items.GOLD_BLOCK, 32), part.insertItem(1, new ItemStack(Items.GOLD_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
 		assertStackEquals(ItemStack.EMPTY, part.insertItem(1, new ItemStack(Items.IRON_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
@@ -679,7 +679,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, ItemStack.EMPTY, 2, ItemStack.EMPTY), 64);
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
 		ItemStack damagedItem = new ItemStack(Items.NETHERITE_AXE);
 		damagedItem.setDamageValue(10);
@@ -694,7 +694,7 @@ public class CompressionInventoryPartTest {
 		damagedItem.setDamageValue(10);
 
 		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, damagedItem, 2, ItemStack.EMPTY), 64);
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(0, 3), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> getMemorySettings(invHandler, Map.of()));
 
 		assertStackEquals(damagedItem, part.getStackInSlot(1, s -> ItemStack.EMPTY), "Damaged item doesn't match");
 	}
@@ -707,7 +707,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, damagedItem, 2, ItemStack.EMPTY), 64);
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
 		ItemStack damagedItemToMatch = new ItemStack(Items.NETHERITE_AXE);
 		damagedItemToMatch.setDamageValue(10);
@@ -719,7 +719,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, new ItemStack(Items.COBBLESTONE, 10), 2, ItemStack.EMPTY), 64);
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
 		assertStackEquals(new ItemStack(Items.COBBLESTONE, 1), part.extractItem(1, 1, false), "Extracted item doesn't match");
 		assertStackEquals(new ItemStack(Items.COBBLESTONE, 9), part.getStackInSlot(1, s -> ItemStack.EMPTY), "Item left in slot doesn't match");
@@ -731,7 +731,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
 		params.expectedLimits().forEach((slot, stackLimit) -> assertEquals(stackLimit.getRight(), part.getStackLimit(slot, stackLimit.getLeft()), "Stack limit doesn't match"));
 	}
@@ -779,7 +779,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
 		part.insertItem(params.insertedStack.getLeft(), params.insertedStack.getRight(), false, (slot, itemStack, simulate) -> ItemStack.EMPTY);
 
@@ -822,7 +822,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
 		part.extractItem(params.extractedStack.getLeft(), params.extractedStack.getRight(), false);
 
@@ -876,7 +876,7 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;
 
-		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new InventoryPartitioner.SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
+		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
 		assertCalculatedStacks(params.calculatedStacks(), 0, part);
 	}

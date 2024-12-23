@@ -8,9 +8,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IInventoryPartHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
-import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryPartitioner;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import org.apache.commons.lang3.function.TriFunction;
@@ -31,7 +31,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	public static final String NAME = "compression";
 	public static final Pair<ResourceLocation, ResourceLocation> EMPTY_COMPRESSION_SLOT = new Pair<>(InventoryMenu.BLOCK_ATLAS, SophisticatedStorage.getRL("item/empty_compression_slot"));
 	private final InventoryHandler parent;
-	private final InventoryPartitioner.SlotRange slotRange;
+	private final SlotRange slotRange;
 	private final Supplier<MemorySettingsCategory> getMemorySettings;
 	@SuppressWarnings("FieldCanBeLocal")
 	//need field instead of local variable because it's wrapped in WeakReference in RecipeHelper
@@ -40,7 +40,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	private Map<Integer, SlotDefinition> slotDefinitions = new HashMap<>();
 	private final Map<Integer, ItemStack> calculatedStacks = new HashMap<>();
 
-	public CompressionInventoryPart(InventoryHandler parent, InventoryPartitioner.SlotRange slotRange, Supplier<MemorySettingsCategory> getMemorySettings) {
+	public CompressionInventoryPart(InventoryHandler parent, SlotRange slotRange, Supplier<MemorySettingsCategory> getMemorySettings) {
 		this.parent = parent;
 		this.slotRange = slotRange;
 		this.getMemorySettings = getMemorySettings;
