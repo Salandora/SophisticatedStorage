@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.emi;
 
+import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
@@ -39,6 +40,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@EmiEntrypoint
 public class EmiCompat implements EmiPlugin {
 	public static Event<WorkstationCallback> WORKSTATIONS = EventFactory.createArrayBacked(WorkstationCallback.class, (listeners) -> (consumer) -> {
 		for (WorkstationCallback listener : listeners) {
@@ -143,14 +145,28 @@ public class EmiCompat implements EmiPlugin {
 						}
 					}
 
-					ingredientsCopy.add(i, EmiTags.getIngredient(Item.class, Arrays.stream(ingredient.getItems()).map(stack -> EmiStack.of(stack).comparison(Comparison.compareComponents())).toList(), amount));
+					ingredientsCopy.add(
+							i,
+							EmiTags.getIngredient(
+									Item.class,
+									Arrays.stream(ingredient.getItems())
+											.map(stack -> EmiStack.of(stack).comparison(Comparison.compareComponents())).toList(),
+									amount
+							)
+					);
 				} else {
 					ingredientsCopy.add(i, EmiIngredient.of(ingredient));
 				}
 				i++;
 			}
 
-			registry.addRecipe(new EmiCraftingRecipe(ingredientsCopy, EmiStack.of(r.getResultItem(null)), holder.id()));
+			registry.removeRecipes(holder.id());
+			registry.addRecipe(new EmiCraftingRecipe(
+							ingredientsCopy,
+							EmiStack.of(r.getResultItem(null)),
+							ResourceLocation.fromNamespaceAndPath(holder.id().getNamespace(), "/" + holder.id().getPath())
+					)
+			);
 		});
     }
 }
