@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
@@ -54,6 +55,8 @@ import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
+import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.PaintbrushOverlay;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.ToolInfoOverlay;
@@ -66,6 +69,7 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.PaintbrushItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.LevelRendererAccessor;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameModeAccessor;
@@ -74,6 +78,7 @@ import net.p3pp3rf1y.sophisticatedstorage.network.StoragePacketHandler;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
@@ -130,11 +135,12 @@ public class ClientEventHandler {
 	private static boolean onRenderHighlight(WorldRenderContext context, @Nullable HitResult hitResult) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		if (player == null) {
+		if (player == null || minecraft.screen != null) {
 			return true;
 		}
 
-		if (player.getMainHandItem().getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(player.getMainHandItem())) {
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(stack)) {
 			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
 			BlockPos otherPos = blockHitResult.getBlockPos().relative(player.getDirection().getClockWise());
 			Level level = player.level();
@@ -144,6 +150,28 @@ public class ClientEventHandler {
 				Vec3 cameraPos = context.camera().getPosition();
 				LevelRendererAccessor.renderShape(context.matrixStack(), vertexConsumer, blockState.getShape(level, otherPos, CollisionContext.of(context.camera().getEntity())),
 						otherPos.getX() - cameraPos.x, otherPos.getY() - cameraPos.y, otherPos.getZ() - cameraPos.z, 0.0F, 0.0F, 0.0F, 0.4F);
+			}
+		}
+
+		if (stack.getItem() instanceof PaintbrushItem) {
+			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+			Level level = player.level();
+			BlockPos pos = blockHitResult.getBlockPos();
+			BlockState blockState = level.getBlockState(pos);
+
+			if (blockState.getBlock() instanceof StorageBlockBase || blockState.getBlock() == ModBlocks.CONTROLLER) {
+				AtomicBoolean cancel = new AtomicBoolean(false);
+				PaintbrushOverlay.getItemRequirementsFor(stack, player, level, pos).ifPresent(itemRequirements -> {
+					float red = !itemRequirements.itemsMissing().isEmpty() ? 1 : 0;
+					float green = itemRequirements.itemsMissing().isEmpty() ? 1 : 0;
+					VertexConsumer vertexConsumer = context.consumers().getBuffer(RenderType.lines());
+					Vec3 cameraPos = context.camera().getPosition();
+					PoseStack poseStack = context.matrixStack();
+					LevelRendererAccessor.renderShape(poseStack, vertexConsumer, blockState.getShape(level, pos, CollisionContext.of(context.camera().getEntity())),
+							pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z, red, green, 0.0F, 1);
+					cancel.set(true);
+				});
+				return !cancel.get();
 			}
 		}
 
@@ -268,6 +296,7 @@ public class ClientEventHandler {
 
 	private static void registerOverlay() {
 		HudRenderCallback.EVENT.register(ToolInfoOverlay.HUD_TOOL_INFO);
+		HudRenderCallback.EVENT.register(PaintbrushOverlay.HUD_PAINTBRUSH_INFO);
 	}
 
 	private static void registerEntityRenderers() {

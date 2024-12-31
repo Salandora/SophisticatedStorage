@@ -325,6 +325,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	public void setMainColor(int mainColor) {
 		this.mainColor = mainColor;
+		save();
 	}
 
 	@Override
@@ -338,6 +339,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	public void setAccentColor(int accentColor) {
 		this.accentColor = accentColor;
+		save();
 	}
 
 	@Override

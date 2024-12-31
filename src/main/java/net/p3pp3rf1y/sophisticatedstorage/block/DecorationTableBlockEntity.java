@@ -3,14 +3,13 @@ package net.p3pp3rf1y.sophisticatedstorage.block;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,10 +20,13 @@ import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.PaintbrushItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.util.DecorationHelper;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DecorationTableBlockEntity extends BlockEntity {
 	public static final int TOP_INNER_TRIM_SLOT = 0;
@@ -37,21 +39,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	public static final int RED_DYE_SLOT = 0;
 	public static final int GREEN_DYE_SLOT = 1;
 	public static final int BLUE_DYE_SLOT = 2;
-
-	public static final int BLOCK_TOTAL_PARTS = 24;
-	private static final int MAIN_COLOR_PARTS = 18;
-	private static final int ACCENT_COLOR_PARTS = 6;
-	private static final Map<Integer, Integer> DECORATIVE_SLOT_PARTS_NEEDED = Map.of(
-			TOP_INNER_TRIM_SLOT, 1,
-			TOP_TRIM_SLOT, 1,
-			SIDE_TRIM_SLOT, 4,
-			BOTTOM_TRIM_SLOT, 1,
-			TOP_CORE_SLOT, 3,
-			SIDE_CORE_SLOT, 12,
-			BOTTOM_CORE_SLOT, 3
-	);
-
-	private static final Set<Item> STORAGES_WIHOUT_TOP_INNER_TRIM = Set.of(ModBlocks.BARREL_ITEM, ModBlocks.COPPER_BARREL_ITEM, ModBlocks.IRON_BARREL_ITEM, ModBlocks.GOLD_BARREL_ITEM, ModBlocks.DIAMOND_BARREL_ITEM, ModBlocks.NETHERITE_BARREL_ITEM,
+	public static final Set<Item> STORAGES_WIHOUT_TOP_INNER_TRIM = Set.of(ModBlocks.BARREL_ITEM, ModBlocks.COPPER_BARREL_ITEM, ModBlocks.IRON_BARREL_ITEM, ModBlocks.GOLD_BARREL_ITEM, ModBlocks.DIAMOND_BARREL_ITEM, ModBlocks.NETHERITE_BARREL_ITEM,
 			ModBlocks.LIMITED_BARREL_1_ITEM, ModBlocks.LIMITED_COPPER_BARREL_1_ITEM, ModBlocks.LIMITED_IRON_BARREL_1_ITEM, ModBlocks.LIMITED_GOLD_BARREL_1_ITEM, ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM, ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM);
 
 	private final Map<ResourceLocation, Integer> remainingParts = new HashMap<>();
@@ -87,6 +75,14 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		}
 	};
 
+	private ItemStack result = ItemStack.EMPTY;
+
+	private final Map<Integer, Boolean> slotMaterialInheritance = new HashMap<>();
+	private int accentColor = -1;
+	private int mainColor = -1;
+
+	private final Set<ResourceLocation> missingDyes = new HashSet<>();
+
 	public void updateResultAndSetChanged() {
 		updateResult();
 		setChanged();
@@ -101,29 +97,40 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		@Override
 		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return resource.getItem() instanceof StorageBlockItem;
+			return resource.getItem() instanceof StorageBlockItem || resource.getItem() instanceof PaintbrushItem;
 		}
 	};
 
-	private ItemStack result = ItemStack.EMPTY;
-
-	private final Map<Integer, Boolean> slotMaterialInheritance = new HashMap<>();
-	private int accentColor = -1;
-	private int mainColor = -1;
-
-	private final Set<ResourceLocation> missingDyes = new HashSet<>();
-
 	private void updateResult() {
 		missingDyes.clear();
+		result = ItemStack.EMPTY;
 
 		ItemStack storage = storageBlock.getStackInSlot(0);
-		if (storage.isEmpty() || (
-				(InventoryHelper.isEmpty(decorativeBlocks)
-						|| !(storage.getItem() instanceof BarrelBlockItem)
-						|| isTintedStorage(storage)
-				) && colorsTransparentOrSameAs(storage))) {
-			result = ItemStack.EMPTY;
+		if (storage.isEmpty()) {
 			return;
+		}
+
+		if (storage.getItem() instanceof PaintbrushItem) {
+			updatePaintbrushResult(storage);
+			return;
+		}
+
+		DecorationResult decorationResult = decorateStack(storage);
+		result = decorationResult.result();
+		missingDyes.addAll(decorationResult.missingDyes());
+	}
+
+	public boolean hasMaterials() {
+		return !InventoryHelper.isEmpty(decorativeBlocks);
+	}
+
+	public record DecorationResult(ItemStack result, Set<ResourceLocation> missingDyes) {
+		public static final DecorationResult EMPTY = new DecorationResult(ItemStack.EMPTY, Collections.emptySet());
+	}
+	public DecorationResult decorateStack(ItemStack storage) {
+		ItemStack result;
+		if ((InventoryHelper.isEmpty(decorativeBlocks) || !(storage.getItem() instanceof BarrelBlockItem) || isTintedStorage(storage)) && (colorsTransparentOrSameAs(storage) || !BarrelBlockItem.getMaterials(storage).isEmpty())) {
+			return DecorationResult.EMPTY;
 		}
 		if (!(storage.getItem() instanceof BarrelBlockItem) || InventoryHelper.isEmpty(decorativeBlocks) || isTintedStorage(storage)) {
 			result = storage.copy();
@@ -137,13 +144,12 @@ public class DecorationTableBlockEntity extends BlockEntity {
 					tintableBlockItem.setAccentColor(result, accentColor & 0x00FFFFFF);
 				}
 			}
-			calculateMissingDyes(storage);
-			return;
+			Set<ResourceLocation> missingDyes = calculateMissingDyes(storage);
+			return new DecorationResult(result, missingDyes);
 		}
 
 		if (InventoryHelper.isEmpty(decorativeBlocks)) {
-			result = ItemStack.EMPTY;
-			return;
+			return DecorationResult.EMPTY;
 		}
 
 		Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
@@ -154,8 +160,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		BarrelBlockItem.compactMaterials(materials);
 
 		if (allMaterialsMatch(materials, BarrelBlockItem.getMaterials(storage))) {
-			result = ItemStack.EMPTY;
-			return;
+			return DecorationResult.EMPTY;
 		}
 
 		result = storage.copy();
@@ -163,6 +168,37 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		BarrelBlockItem.removeCoveredTints(result, materials);
 		BarrelBlockItem.setMaterials(result, materials);
+
+		return new DecorationResult(result, Collections.emptySet());
+	}
+
+	private void updatePaintbrushResult(ItemStack paintbrush) {
+		if (!InventoryHelper.isEmpty(decorativeBlocks)) {
+			Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
+			setMaterialsFromDecorativeBlocks(materials, true);
+			BarrelBlockItem.compactMaterials(materials);
+
+			if (allMaterialsMatch(materials, BarrelBlockItem.getMaterials(paintbrush))) {
+				return;
+			}
+
+			result = paintbrush.copy();
+			result.setCount(1);
+			PaintbrushItem.setBarrelMaterials(result, materials);
+		} else {
+			if ((mainColor == -1 && accentColor == -1) || (mainColor == PaintbrushItem.getMainColor(paintbrush) && accentColor == PaintbrushItem.getAccentColor(paintbrush))) {
+				return;
+			}
+
+			result = paintbrush.copy();
+			result.setCount(1);
+			if (mainColor != -1) {
+				PaintbrushItem.setMainColor(result, mainColor);
+			}
+			if (accentColor != -1) {
+				PaintbrushItem.setAccentColor(result, accentColor);
+			}
+		}
 	}
 
 	private boolean isTintedStorage(ItemStack storage) {
@@ -183,13 +219,16 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		return true;
 	}
 
-	private void calculateMissingDyes(ItemStack storage) {
+	private Set<ResourceLocation> calculateMissingDyes(ItemStack storage) {
+		Set<ResourceLocation> missingDyes = new HashSet<>();
 		if (!dyes.getStackInSlot(RED_DYE_SLOT).isEmpty() && !dyes.getStackInSlot(GREEN_DYE_SLOT).isEmpty() && !dyes.getStackInSlot(BLUE_DYE_SLOT).isEmpty()) {
-			return;
+			return missingDyes;
 		}
 
-		Map<ResourceLocation, Integer> partsNeeded = new HashMap<>();
-		addDyePartsNeeded(storage, partsNeeded);
+		Map<ResourceLocation, Integer> partsNeeded =
+				DecorationHelper.getDyePartsNeeded(mainColor, accentColor,
+								StorageBlockItem.getMainColorFromStack(storage).orElse(-1), StorageBlockItem.getAccentColorFromStack(storage).orElse(-1))
+						.entrySet().stream().map(entry -> Map.entry(entry.getKey().location(), entry.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 		for (Map.Entry<ResourceLocation, Integer> entry : partsNeeded.entrySet()) {
 			if (entry.getKey().equals(ConventionalItemTags.RED_DYES.location()) && dyes.getStackInSlot(RED_DYE_SLOT).isEmpty()) {
@@ -200,6 +239,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 				missingDyes.add(entry.getKey());
 			}
 		}
+		return missingDyes;
 	}
 
 	public Set<ResourceLocation> getMissingDyes() {
@@ -223,7 +263,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	@Nullable
 	private ResourceLocation setMaterialFromBlock(int slotIndex, @Nullable ResourceLocation defaultMaterialLocation, Map<BarrelMaterial, ResourceLocation> materials, BarrelMaterial material, boolean addToMaterials) {
 		ItemStack decorativeBlock = decorativeBlocks.getStackInSlot(slotIndex);
-		ResourceLocation materialLocation = getMaterialLocation(decorativeBlock).orElse(isSlotMaterialInherited(slotIndex) ? defaultMaterialLocation : null);
+		ResourceLocation materialLocation = DecorationHelper.getMaterialLocation(decorativeBlock).orElse(isSlotMaterialInherited(slotIndex) ? defaultMaterialLocation : null);
 		if (materialLocation != null) {
 			if (addToMaterials) {
 				materials.put(material, materialLocation);
@@ -231,13 +271,6 @@ public class DecorationTableBlockEntity extends BlockEntity {
 			return materialLocation;
 		}
 		return null;
-	}
-
-	private Optional<ResourceLocation> getMaterialLocation(ItemStack stack) {
-		if (stack.getItem() instanceof BlockItem blockItem) {
-			return Optional.of(BuiltInRegistries.BLOCK.getKey(blockItem.getBlock()));
-		}
-		return Optional.empty();
 	}
 
 	public DecorationTableBlockEntity(BlockPos pos, BlockState blockState) {
@@ -390,159 +423,41 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	}
 
 	public void consumeIngredientsOnCraft() {
-		if (InventoryHelper.isEmpty(decorativeBlocks)) {
-			consumeDyes();
-		} else {
-			consumeMaterials();
+		if (getStorageBlock().getStackInSlot(0).getItem() instanceof PaintbrushItem) {
+			return; //paintbrush consumes ingredients by itself on application to storage block
+		}
+		ItemStack storageStack = storageBlock.getStackInSlot(0);
+		try (Transaction ctx = Transaction.openOuter()) {
+			if (InventoryHelper.isEmpty(decorativeBlocks)) {
+				DecorationHelper.consumeDyes(mainColor, accentColor, this.remainingParts, List.of(dyes), StorageBlockItem.getMainColorFromStack(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromStack(storageStack).orElse(-1), ctx);
+			} else {
+				Map<BarrelMaterial, ResourceLocation> originalMaterials = BarrelBlockItem.getUncompactedMaterials(storageStack);
+				DecorationHelper.consumeMaterials(this.remainingParts, List.of(decorativeBlocks), originalMaterials, getMaterialsToApply(storageStack), ctx);
+			}
+			ctx.commit();
 		}
 
 		setChanged();
 		WorldHelper.notifyBlockUpdate(this);
 	}
 
-	private void consumeDyes() {
-		ItemStack storageStack = storageBlock.getStackInSlot(0);
-		Map<ResourceLocation, Integer> partsNeeded = new HashMap<>();
-		Map<ResourceLocation, Integer> firstSlotWithMaterial = new HashMap<>();
-		firstSlotWithMaterial.put(ConventionalItemTags.RED_DYES.location(), RED_DYE_SLOT);
-		firstSlotWithMaterial.put(ConventionalItemTags.GREEN_DYES.location(), GREEN_DYE_SLOT);
-		firstSlotWithMaterial.put(ConventionalItemTags.BLUE_DYES.location(), BLUE_DYE_SLOT);
-
-		addDyePartsNeeded(storageStack, partsNeeded);
-
-		if (partsNeeded.isEmpty()) {
-			return;
-		}
-
-		consumePartsNeeded(partsNeeded, firstSlotWithMaterial, dyes);
-	}
-
-	private void addDyePartsNeeded(ItemStack storageStack, Map<ResourceLocation, Integer> partsNeeded) {
-		if (mainColor != -1 && mainColor != StorageBlockItem.getMainColorFromStack(storageStack).orElse(-1)) {
-			int[] rgbPartsNeeded = calculateRGBPartsNeeded(mainColor, MAIN_COLOR_PARTS);
-			addPartsNeededIfAny(rgbPartsNeeded, partsNeeded);
-		}
-		if (accentColor != -1 && accentColor != StorageBlockItem.getAccentColorFromStack(storageStack).orElse(-1)) {
-			int[] rgbPartsNeeded = calculateRGBPartsNeeded(accentColor, ACCENT_COLOR_PARTS);
-			addPartsNeededIfAny(rgbPartsNeeded, partsNeeded);
-		}
-	}
-
-	private static void addPartsNeededIfAny(int[] rgbPartsNeeded, Map<ResourceLocation, Integer> partsNeeded) {
-		addPartsNeededIfAny(rgbPartsNeeded[0], partsNeeded, ConventionalItemTags.RED_DYES.location());
-		addPartsNeededIfAny(rgbPartsNeeded[1], partsNeeded, ConventionalItemTags.GREEN_DYES.location());
-		addPartsNeededIfAny(rgbPartsNeeded[2], partsNeeded, ConventionalItemTags.BLUE_DYES.location());
-	}
-
-	private static void addPartsNeededIfAny(int parts, Map<ResourceLocation, Integer> partsNeeded, ResourceLocation dyeName) {
-		if (parts != 0) {
-			partsNeeded.compute(dyeName, (location, partsTotal) -> partsTotal == null ? parts : partsTotal + parts);
-		}
-	}
-
-	private int[] calculateRGBPartsNeeded(int color, int totalParts) {
-		float[] ratios = new float[3];
-		ratios[0] = FastColor.ARGB32.red(color) / 255f;
-		ratios[1] = FastColor.ARGB32.green(color) / 255f;
-		ratios[2] = FastColor.ARGB32.blue(color) / 255f;
-
-		float totalRaios = ratios[0] + ratios[1] + ratios[2];
-		ratios[0] /= totalRaios;
-		ratios[1] /= totalRaios;
-		ratios[2] /= totalRaios;
-
-		int n = ratios.length;
-		int[] result = new int[n];
-		double[] remainders = new double[n];
-
-		double[] scaled = new double[n];
-		for (int i = 0; i < n; i++) {
-			scaled[i] = ratios[i] * totalParts;
-			result[i] = (int) scaled[i];
-			remainders[i] = scaled[i] - result[i];
-		}
-
-		int remaining = totalParts - Arrays.stream(result).sum();
-
-		Integer[] indices = new Integer[n];
-		for (int i = 0; i < n; i++) indices[i] = i;
-
-		Arrays.sort(indices, Comparator.comparingDouble(i -> -remainders[i]));
-
-		for (int i = 0; i < remaining; i++) {
-			result[indices[i % n]]++;
-		}
-
-		return result;
-	}
-
-	private void consumeMaterials() {
-		Map<ResourceLocation, Integer> partsNeeded = new HashMap<>();
-		Map<ResourceLocation, Integer> firstSlotWithMaterial = new HashMap<>();
-		addMaterialPartsNeeded(partsNeeded, firstSlotWithMaterial);
-		consumePartsNeeded(partsNeeded, firstSlotWithMaterial, decorativeBlocks);
-	}
-
-	private void addMaterialPartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> firstSlotWithMaterial) {
-		ResourceLocation topInnerTrimMaterialLocation = addMaterialCostForSlotAndGetMaterial(TOP_INNER_TRIM_SLOT, null, partsNeeded, firstSlotWithMaterial);
-		ResourceLocation topTrimMaterialLocation = addMaterialCostForSlotAndGetMaterial(TOP_TRIM_SLOT, topInnerTrimMaterialLocation, partsNeeded, firstSlotWithMaterial);
-		ResourceLocation sideTrimMaterialLocation = addMaterialCostForSlotAndGetMaterial(SIDE_TRIM_SLOT, topTrimMaterialLocation, partsNeeded, firstSlotWithMaterial);
-		addMaterialCostForSlotAndGetMaterial(BOTTOM_TRIM_SLOT, sideTrimMaterialLocation, partsNeeded, firstSlotWithMaterial);
-		ResourceLocation topMaterialLocation = addMaterialCostForSlotAndGetMaterial(TOP_CORE_SLOT, topTrimMaterialLocation, partsNeeded, firstSlotWithMaterial);
-		ResourceLocation sideMaterialLocation = addMaterialCostForSlotAndGetMaterial(SIDE_CORE_SLOT, topMaterialLocation, partsNeeded, firstSlotWithMaterial);
-		addMaterialCostForSlotAndGetMaterial(BOTTOM_CORE_SLOT, sideMaterialLocation, partsNeeded, firstSlotWithMaterial);
-	}
-
 	public Map<ResourceLocation, Integer> getPartsNeeded() {
 		Map<ResourceLocation, Integer> partsNeeded = new HashMap<>();
 		ItemStack storageStack = storageBlock.getStackInSlot(0);
 		if (InventoryHelper.isEmpty(decorativeBlocks) || !(storageStack.getItem() instanceof BarrelBlockItem)) {
-			addDyePartsNeeded(storageStack, partsNeeded);
+			DecorationHelper.getDyePartsNeeded(mainColor, accentColor, StorageBlockItem.getMainColorFromStack(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromStack(storageStack).orElse(-1))
+					.forEach((tag, parts) -> partsNeeded.put(tag.location(), parts));
 		} else {
-			addMaterialPartsNeeded(partsNeeded, new HashMap<>());
+			partsNeeded.putAll(DecorationHelper.getMaterialPartsNeeded(BarrelBlockItem.getUncompactedMaterials(storageStack), getMaterialsToApply(storageStack)));
 		}
 
 		return partsNeeded;
 	}
 
-	private void consumePartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> firstSlotWithMaterial, ItemStackHandler resources) {
-		partsNeeded.forEach((material, parts) -> {
-			int remainingParts = this.remainingParts.getOrDefault(material, 0);
-			if (remainingParts >= parts) {
-				if (remainingParts == parts) {
-					this.remainingParts.remove(material);
-				} else {
-					this.remainingParts.put(material, remainingParts - parts);
-				}
-			} else {
-				if (firstSlotWithMaterial.get(material) == null) {
-					return;
-				}
-				int slotWithMaterial = firstSlotWithMaterial.get(material);
-				ItemStack stack = resources.getStackInSlot(slotWithMaterial);
-				stack.shrink(1);
-				resources.setStackInSlot(slotWithMaterial, stack);
-				this.remainingParts.put(material, remainingParts + BLOCK_TOTAL_PARTS - parts);
-			}
-		});
-	}
-
-	@Nullable
-	private ResourceLocation addMaterialCostForSlotAndGetMaterial(int slotIndex, @Nullable ResourceLocation defaultMaterialLocation, Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> firstSlotWithMaterial) {
-		boolean hasNoCost = slotIndex == TOP_TRIM_SLOT && defaultMaterialLocation != null;
-
-		ItemStack decorativeBlock = decorativeBlocks.getStackInSlot(slotIndex);
-		ResourceLocation materialLocation = getMaterialLocation(decorativeBlock).orElse(isSlotMaterialInherited(slotIndex) ? defaultMaterialLocation : null);
-		if (hasNoCost) {
-			return materialLocation;
-		}
-
-		if (materialLocation != null) {
-			int parts = DECORATIVE_SLOT_PARTS_NEEDED.get(slotIndex);
-			partsNeeded.compute(materialLocation, (key, value) -> value == null ? parts : value + parts);
-			firstSlotWithMaterial.putIfAbsent(materialLocation, slotIndex);
-		}
-		return materialLocation;
+	private Map<BarrelMaterial, ResourceLocation> getMaterialsToApply(ItemStack storageStack) {
+		Map<BarrelMaterial, ResourceLocation> materialsToApply = new EnumMap<>(BarrelMaterial.class);
+		setMaterialsFromDecorativeBlocks(materialsToApply, !STORAGES_WIHOUT_TOP_INNER_TRIM.contains(storageStack.getItem()));
+		return materialsToApply;
 	}
 
 	public int getMainColor() {
