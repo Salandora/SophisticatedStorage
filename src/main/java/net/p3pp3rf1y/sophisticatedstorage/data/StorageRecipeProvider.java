@@ -80,6 +80,15 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('B', ModItems.UPGRADE_BASE.get())
 				.unlockedBy("has_upgrade_base", has(ModItems.UPGRADE_BASE.get()))
 				.save(recipeOutput);
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PAINTBRUSH.get())
+				.pattern(" W ")
+				.pattern(" SW")
+				.pattern("S  ")
+				.define('S', Items.STICK)
+				.define('W', ItemTags.WOOL)
+				.unlockedBy("has_base_tier_wooden_storage", has(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG))
+				.save(recipeOutput);
 	}
 
 	private void addBackpackUpgradeConversionRecipes(RecipeOutput recipeOutput) {
@@ -262,7 +271,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ConventionalItemTags.STONES)
 				.define('C', Items.COMPARATOR)
 				.define('P', ItemTags.PLANKS)
-				.define('B', BaseTierWoodenStorageIngredient.INSTANCE.toVanilla())
+				.define('B', new BaseTierWoodenStorageIngredient().toVanilla())
 				.unlockedBy(HAS_BASE_TIER_WOODEN_STORAGE_CRITERION_NAME, has(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG))
 				.save(recipeOutput);
 
@@ -301,7 +310,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('P', ItemTags.PLANKS)
 				.define('R', Items.REPEATER)
 				.define('G', ConventionalItemTags.GOLD_INGOTS)
-				.define('B',  BaseTierWoodenStorageIngredient.INSTANCE.toVanilla())
+				.define('B', new BaseTierWoodenStorageIngredient().toVanilla())
 				.unlockedBy(HAS_BASE_TIER_WOODEN_STORAGE_CRITERION_NAME, has(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG))
 				.save(recipeOutput);
 
@@ -313,7 +322,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('P', ItemTags.PLANKS)
 				.define('R', Items.REPEATER)
 				.define('G', ConventionalItemTags.GOLD_INGOTS)
-				.define('B',  BaseTierWoodenStorageIngredient.INSTANCE.toVanilla())
+				.define('B', new BaseTierWoodenStorageIngredient().toVanilla())
 				.unlockedBy(HAS_BASE_TIER_WOODEN_STORAGE_CRITERION_NAME, has(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG))
 				.save(recipeOutput);
 
@@ -325,7 +334,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('P', ItemTags.PLANKS)
 				.define('R', Items.REPEATER)
 				.define('G', ConventionalItemTags.GOLD_INGOTS)
-				.define('B',  BaseTierWoodenStorageIngredient.INSTANCE.toVanilla())
+				.define('B', new BaseTierWoodenStorageIngredient().toVanilla())
 				.unlockedBy(HAS_BASE_TIER_WOODEN_STORAGE_CRITERION_NAME, has(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG))
 				.save(recipeOutput);
 

@@ -362,6 +362,14 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		return getStorageWrapper();
 	}
 
+	@Nullable
+	public ChestBlockEntity getMainChestBlockEntity() {
+		if (doubleMainPos != null) {
+			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).orElse(null);
+		}
+		return this;
+	}
+
 	@Override
 	public boolean canBeLinked() {
 		return isMainChest() && super.canBeLinked();

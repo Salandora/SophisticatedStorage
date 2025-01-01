@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
@@ -54,6 +55,8 @@ import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadL
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
+import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.PaintbrushOverlay;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.ToolInfoOverlay;
@@ -66,6 +69,7 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.PaintbrushItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedstorage.network.RequestPlayerSettingsPayload;
 import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPayload;
@@ -73,6 +77,7 @@ import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolPayload;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -106,7 +111,7 @@ public class ClientEventHandler {
 		PreparableModelLoadingPlugin.register(((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager)), (resourceManager, context) -> onRegisterAdditionalModels(resourceManager, context::addModels));
 		ClientEventHandler.onRegisterReloadListeners();
 		ClientEventHandler.registerStorageClientExtensions();
-		
+
 		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
 		if (!FabricLoader.getInstance().isModLoaded(ModCompat.MKB)) {
 			ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
@@ -128,11 +133,12 @@ public class ClientEventHandler {
 	private static boolean onRenderHighlight(WorldRenderContext context, @Nullable HitResult hitResult) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		if (player == null) {
+		if (player == null || minecraft.screen != null) {
 			return true;
 		}
 
-		if (player.getMainHandItem().getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(player.getMainHandItem())) {
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(stack)) {
 			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
 			BlockPos otherPos = blockHitResult.getBlockPos().relative(player.getDirection().getClockWise());
 			Level level = player.level();
@@ -142,6 +148,29 @@ public class ClientEventHandler {
 				Vec3 cameraPos = context.camera().getPosition();
 				LevelRenderer.renderShape(context.matrixStack(), vertexConsumer, blockState.getShape(level, otherPos, CollisionContext.of(context.camera().getEntity())),
 						otherPos.getX() - cameraPos.x, otherPos.getY() - cameraPos.y, otherPos.getZ() - cameraPos.z, 0.0F, 0.0F, 0.0F, 0.4F);
+			}
+		}
+
+		if (stack.getItem() instanceof PaintbrushItem) {
+			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+			Level level = player.level();
+			BlockPos pos = blockHitResult.getBlockPos();
+			BlockState blockState = level.getBlockState(pos);
+
+			if (blockState.getBlock() instanceof StorageBlockBase || blockState.getBlock() == ModBlocks.CONTROLLER.get()) {
+				AtomicBoolean canceled = new AtomicBoolean(false);
+				PaintbrushOverlay.getItemRequirementsFor(stack, player, level, pos).ifPresent(itemRequirements -> {
+					float red = !itemRequirements.itemsMissing().isEmpty() ? 1 : 0;
+					float green = itemRequirements.itemsMissing().isEmpty() ? 1 : 0;
+					VertexConsumer vertexConsumer = context.consumers().getBuffer(RenderType.lines());
+					Vec3 cameraPos = context.camera().getPosition();
+					PoseStack poseStack = context.matrixStack();
+					LevelRenderer.renderShape(poseStack, vertexConsumer, blockState.getShape(level, pos, CollisionContext.of(context.camera().getEntity())),
+							pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z, red, green, 0.0F, 1);
+					canceled.set(true);
+				});
+				// If the item requirements are missing, we want to render the block outline
+				return !canceled.get();
 			}
 		}
 
@@ -265,6 +294,10 @@ public class ClientEventHandler {
 	}
 
 	private static void registerOverlay() {
+//		event.registerAbove(VanillaGuiLayers.HOTBAR, ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "paintbrush_info"), PaintbrushOverlay.HUD_PAINTBRUSH_INFO);
+//		event.registerAbove(VanillaGuiLayers.HOTBAR, ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "storage_tool_info"), ToolInfoOverlay.HUD_TOOL_INFO);
+
+		HudRenderCallback.EVENT.register(PaintbrushOverlay.HUD_PAINTBRUSH_INFO);
 		HudRenderCallback.EVENT.register(ToolInfoOverlay.HUD_TOOL_INFO);
 	}
 

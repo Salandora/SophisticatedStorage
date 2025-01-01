@@ -14,7 +14,6 @@ import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 public class BarrelBlockItem extends WoodStorageBlockItem {
@@ -55,7 +54,7 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getMaterials(ItemStack barrel) {
-		return new HashMap<>(barrel.sophisticatedCore_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of()));
+		return barrel.sophisticatedCore_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of());
 	}
 
 	public static void removeMaterials(ItemStack stack) {
@@ -118,6 +117,13 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 				}
 			}
 		}
+	}
+
+	public static Map<BarrelMaterial, ResourceLocation> getUncompactedMaterials(ItemStack storageStack) {
+		Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
+		materials.putAll(getMaterials(storageStack));
+		uncompactMaterials(materials);
+		return materials;
 	}
 
 	@Override

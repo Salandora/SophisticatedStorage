@@ -96,7 +96,8 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	private static final ItemTransforms ITEM_TRANSFORMS = createItemTransforms();
 	private static final List<BarrelMaterial> PARTICLE_ICON_MATERIAL_PRIORITY = List.of(BarrelMaterial.ALL, BarrelMaterial.ALL_BUT_TRIM, BarrelMaterial.TOP_ALL, BarrelMaterial.TOP);
 
-	@SuppressWarnings("java:S4738") //ItemTransforms require Guava ImmutableMap to be passed in so no way to change that to java Map
+	@SuppressWarnings("java:S4738")
+	//ItemTransforms require Guava ImmutableMap to be passed in so no way to change that to java Map
 	private static ItemTransforms createItemTransforms() {
 		return new ItemTransforms(
 				new ItemTransform(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f / 16f, 0), new Vector3f(0.375f, 0.375f, 0.375f)),
@@ -104,7 +105,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 				new ItemTransform(new Vector3f(0, 225, 0), new Vector3f(0, 0, 0), new Vector3f(0.4f, 0.4f, 0.4f)),
 				new ItemTransform(new Vector3f(0, 45, 0), new Vector3f(0, 0, 0), new Vector3f(0.4f, 0.4f, 0.4f)),
 				new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 14.25f / 16f, 0), new Vector3f(1, 1, 1)),
-				new ItemTransform(new Vector3f(30, 45, 0), new Vector3f(0, 0, 0), new Vector3f(0.625f, 0.625f, 0.625f)),
+				new ItemTransform(new Vector3f(30, 225, 0), new Vector3f(0, 0, 0), new Vector3f(0.625f, 0.625f, 0.625f)),
 				new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 3 / 16f, 0), new Vector3f(0.25f, 0.25f, 0.25f)),
 				new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f))
 		);
@@ -325,7 +326,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	}
 
 	private List<BakedModel> bakeAndAddDynamicQuads(@Nullable Direction spriteSide, RandomSource rand, @Nullable String woodName,
-			Map<BarrelMaterial, ResourceLocation> barrelMaterials, boolean rendersUsingSplitModel, boolean renderCore, boolean renderTrim) {
+													Map<BarrelMaterial, ResourceLocation> barrelMaterials, boolean rendersUsingSplitModel, boolean renderCore, boolean renderTrim) {
 
 		Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData> bakingData = woodDynamicBakingData.get(woodName != null ? woodName : WoodType.ACACIA.name());
 
@@ -357,7 +358,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	}
 
 	private BakedModel getDynamicModel(@Nullable String woodName, Map<DynamicBarrelBakingData.DynamicPart, DynamicBarrelBakingData> bakingData,
-			Map<String, Either<Material, String>> materials, DynamicBarrelBakingData.DynamicPart dynamicPart) {
+									   Map<String, Either<Material, String>> materials, DynamicBarrelBakingData.DynamicPart dynamicPart) {
 		int hash = Objects.hash(woodName, materials, dynamicPart.name());
 		BakedModel bakedModel = dynamicBakedModelCache.getIfPresent(hash);
 		if (bakedModel == null) {
@@ -524,7 +525,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	}
 
 	private void addInaccessibleSlotsQuads(BlockState state, RandomSource rand, List<BakedQuad> ret, ModelData data, BarrelBlock barrelBlock,
-			@Nullable List<RenderInfo.DisplayItem> displayItems, Minecraft minecraft) {
+										   @Nullable List<RenderInfo.DisplayItem> displayItems, Minecraft minecraft) {
 		List<Integer> inaccessibleSlots = data.get(INACCESSIBLE_SLOTS);
 		if (displayItems != null && inaccessibleSlots != null) {
 			ItemStack inaccessibleSlotStack = new ItemStack(ModItems.INACCESSIBLE_SLOT.get());
@@ -542,7 +543,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 	@SuppressWarnings({"deprecation", "java:S107"})
 	private void addRenderedItemSide(BlockState state, RandomSource rand, List<BakedQuad> ret, ItemStack displayItem, BakedModel model, int rotation,
-			@Nullable Direction dir, int displayItemIndex, int displayItemCount) {
+									 @Nullable Direction dir, int displayItemIndex, int displayItemCount) {
 		List<BakedQuad> quads = model.getQuads(null, dir, rand);
 		quads = QuadTransformers.process(MOVE_TO_CORNER, quads);
 		quads = QuadTransformers.process(QuadTransformers.applying(toTransformation(model.getTransforms().getTransform(ItemDisplayContext.FIXED))), quads);
@@ -637,7 +638,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	}
 
 	private void addTintableModelQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, List<BakedQuad> ret, boolean hasMainColor,
-			boolean hasAccentColor, Map<BarrelModelPart, BakedModel> modelParts, @Nullable RenderType renderType) {
+									   boolean hasAccentColor, Map<BarrelModelPart, BakedModel> modelParts, @Nullable RenderType renderType) {
 		if (renderType != null && renderType != RenderType.cutout()) {
 			return;
 		}
@@ -658,7 +659,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 	protected abstract boolean rendersOpen();
 
 	private void addPartQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, List<BakedQuad> ret,
-			Map<BarrelModelPart, BakedModel> modelParts, BarrelModelPart part, @Nullable RenderType renderType) {
+							  Map<BarrelModelPart, BakedModel> modelParts, BarrelModelPart part, @Nullable RenderType renderType) {
 		if (renderType != null && renderType != RenderType.cutout()) {
 			return;
 		}
