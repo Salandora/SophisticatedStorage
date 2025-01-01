@@ -30,7 +30,9 @@ public class BarrelRenderer<T extends BarrelBlockEntity> extends StorageRenderer
 			return;
 		}
 
-		packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos().relative(storageBlock.getFacing(blockState)));
+		if (blockEntity.getLevel() != null) {
+			packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos().relative(storageBlock.getFacing(blockState)));
+		}
 
 		renderFrontFace(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, flatTop, blockState);
 		renderHiddenTier(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);

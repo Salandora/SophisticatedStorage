@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.gui;
 
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -11,8 +12,11 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Dimension;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TextureBlitData;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.UV;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
+
+import java.util.function.IntFunction;
 
 public class LimitedBarrelScreen extends StorageScreen {
 	public static final ResourceLocation GUI_BACKGROUNDS = SophisticatedStorage.getRL("textures/gui/limited_barrels.png");
@@ -42,22 +46,27 @@ public class LimitedBarrelScreen extends StorageScreen {
 	@Override
 	protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 		super.renderLabels(guiGraphics, mouseX, mouseY);
-		switch (getMenu().getNumberOfStorageInventorySlots()) {
-			case 1 -> renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6, getMenu().getSlotFillPercentage(0), LARGE_BAR_FILL, false);
+		renderBars(font, imageWidth, getMenu(), guiGraphics, getMenu()::getSlotFillPercentage);
+	}
+
+	public static void renderBars(Font font, int imageWidth, StorageContainerMenuBase<?> menu, GuiGraphics guiGraphics, IntFunction<Float> getSlotFillPercentage) {
+		switch (menu.getNumberOfStorageInventorySlots()) {
+			case 1 ->
+					renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6, getSlotFillPercentage.apply(0), LARGE_BAR_FILL, false);
 			case 2 -> {
-				renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6, getMenu().getSlotFillPercentage(0), SMALL_BAR_FILL, false);
-				renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6 + 40, getMenu().getSlotFillPercentage(1), SMALL_BAR_FILL, false);
+				renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6, getSlotFillPercentage.apply(0), SMALL_BAR_FILL, false);
+				renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6 + 40, getSlotFillPercentage.apply(1), SMALL_BAR_FILL, false);
 			}
 			case 3 -> {
-				renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6, getMenu().getSlotFillPercentage(0), SMALL_BAR_FILL, false);
-				renderBar(guiGraphics, imageWidth / 2 - 37 - 5, 18 + 6 + 40, getMenu().getSlotFillPercentage(1), SMALL_BAR_FILL, true);
-				renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6 + 40, getMenu().getSlotFillPercentage(2), SMALL_BAR_FILL, false);
+				renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6, getSlotFillPercentage.apply(0), SMALL_BAR_FILL, false);
+				renderBar(font, guiGraphics, imageWidth / 2 - 37 - 5, 18 + 6 + 40, getSlotFillPercentage.apply(1), SMALL_BAR_FILL, true);
+				renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6 + 40, getSlotFillPercentage.apply(2), SMALL_BAR_FILL, false);
 			}
 			case 4 -> {
-				renderBar(guiGraphics, imageWidth / 2 - 37 - 5, 18 + 6, getMenu().getSlotFillPercentage(0), SMALL_BAR_FILL, true);
-				renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6, getMenu().getSlotFillPercentage(1), SMALL_BAR_FILL, false);
-				renderBar(guiGraphics, imageWidth / 2 - 37 - 5, 18 + 6 + 40, getMenu().getSlotFillPercentage(2), SMALL_BAR_FILL, true);
-				renderBar(guiGraphics, imageWidth / 2 + 37, 18 + 6 + 40, getMenu().getSlotFillPercentage(3), SMALL_BAR_FILL, false);
+				renderBar(font, guiGraphics, imageWidth / 2 - 37 - 5, 18 + 6, getSlotFillPercentage.apply(0), SMALL_BAR_FILL, true);
+				renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6, getSlotFillPercentage.apply(1), SMALL_BAR_FILL, false);
+				renderBar(font, guiGraphics, imageWidth / 2 - 37 - 5, 18 + 6 + 40, getSlotFillPercentage.apply(2), SMALL_BAR_FILL, true);
+				renderBar(font, guiGraphics, imageWidth / 2 + 37, 18 + 6 + 40, getSlotFillPercentage.apply(3), SMALL_BAR_FILL, false);
 			}
 		}
 	}
@@ -127,7 +136,7 @@ public class LimitedBarrelScreen extends StorageScreen {
 		}
 	}
 
-	private void renderBar(GuiGraphics guiGraphics, int x, int y, float percentage, TextureBlitData barTexture, boolean left) {
+	private static void renderBar(Font font, GuiGraphics guiGraphics, int x, int y, float percentage, TextureBlitData barTexture, boolean left) {
 		int barHeight = (int) (barTexture.getHeight() * percentage);
 		int yOffset = barTexture.getHeight() - barHeight;
 
@@ -136,7 +145,7 @@ public class LimitedBarrelScreen extends StorageScreen {
 		String text = (int) (percentage * 100) + "%";
 		int percentageX = x;
 		if (left) {
-			percentageX -= 2 + minecraft.font.width(text);
+			percentageX -= 2 + font.width(text);
 		} else {
 			percentageX += 6;
 		}

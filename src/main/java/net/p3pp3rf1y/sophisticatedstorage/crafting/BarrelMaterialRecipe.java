@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
@@ -50,7 +52,7 @@ public class BarrelMaterialRecipe extends CustomRecipe {
 					} else {
 						return false;
 					}
-				} else if (item.getItem() instanceof BlockItem) {
+				} else if (item.getItem() instanceof BlockItem blockItem && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO))) {
 					boolean isBottomMiddleAndBottomLeftHasBlock = barrelCol == col && barrelRow < row && rowCounts.getOrDefault(row, 0) > 0;
 					if (isBottomMiddleAndBottomLeftHasBlock) {
 						return false;

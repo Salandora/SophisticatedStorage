@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
+import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedMutableDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
@@ -76,7 +77,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 
     @Override
     public void setMainColor(ItemStack storageStack, int mainColor) {
-        if (StorageBlockItem.getAccentColorFromStack(storageStack).isPresent()) {
+        if (StorageBlockItem.getAccentColorFromComponentHolder(storageStack).isPresent()) {
             removeWoodType(storageStack);
         }
         super.setMainColor(storageStack, mainColor);
@@ -84,7 +85,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 
     @Override
     public void setAccentColor(ItemStack storageStack, int accentColor) {
-        if (StorageBlockItem.getMainColorFromStack(storageStack).isPresent()) {
+        if (StorageBlockItem.getMainColorFromComponentHolder(storageStack).isPresent()) {
             removeWoodType(storageStack);
         }
         super.setAccentColor(storageStack, accentColor);
@@ -94,8 +95,8 @@ public class WoodStorageBlockItem extends StorageBlockItem {
         storageStack.sophisticatedCore_remove(ModDataComponents.WOOD_TYPE);
     }
 
-    public static Optional<WoodType> getWoodType(ItemStack storageStack) {
-        return Optional.ofNullable(storageStack.sophisticatedCore_get(ModDataComponents.WOOD_TYPE));
+    public static Optional<WoodType> getWoodType(SophisticatedMutableDataComponentHolder componentHolder) {
+        return Optional.ofNullable(componentHolder.sophisticatedCore_get(ModDataComponents.WOOD_TYPE));
     }
 
     public static ItemStack setWoodType(ItemStack storageStack, WoodType woodType) {

@@ -10,16 +10,16 @@ import java.util.StringJoiner;
 public class WoodStorageSubtypeInterpreter extends PropertyBasedSubtypeInterpreter {
 	public WoodStorageSubtypeInterpreter() {
 		addOptionalProperty(WoodStorageBlockItem::getWoodType);
-		addOptionalProperty(StorageBlockItem::getMainColorFromStack);
-		addOptionalProperty(StorageBlockItem::getAccentColorFromStack);
+		addOptionalProperty(StorageBlockItem::getMainColorFromComponentHolder);
+		addOptionalProperty(StorageBlockItem::getAccentColorFromComponentHolder);
 	}
 
 	@Override
 	public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext context) {
 		StringJoiner result = new StringJoiner(",");
 		WoodStorageBlockItem.getWoodType(itemStack).ifPresent(woodName -> result.add("woodName:" + woodName));
-		StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
-		StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
+		StorageBlockItem.getMainColorFromComponentHolder(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
+		StorageBlockItem.getAccentColorFromComponentHolder(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
 		return "{" + result + "}";
 	}
 }

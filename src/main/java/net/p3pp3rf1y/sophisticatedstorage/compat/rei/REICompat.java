@@ -33,16 +33,16 @@ public class REICompat implements REIServerPlugin {
 		EntryComparator<ItemStack> woodStorageNbtInterpreter = (context, stack) -> {
 			var builder = DataComponentMap.builder();
 			WoodStorageBlockItem.getWoodType(stack).ifPresent(woodType -> builder.set(ModDataComponents.WOOD_TYPE.get(), woodType));
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
+			StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
+			StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
             return componentHasher.hash(context, new PatchedDataComponentMap(builder.build()));
         };
 
 		EntryComparator<ItemStack> barrelNbtInterpreter = (context, stack) -> {
 			var builder = DataComponentMap.builder();
 			WoodStorageBlockItem.getWoodType(stack).ifPresent(woodType -> builder.set(ModDataComponents.WOOD_TYPE.get(), woodType));
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
+			StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
+			StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
 			builder.set(ModDataComponents.FLAT_TOP.get(), BarrelBlockItem.isFlatTop(stack));
 			return componentHasher.hash(context, new PatchedDataComponentMap(builder.build()));
 		};
@@ -52,8 +52,8 @@ public class REICompat implements REIServerPlugin {
 
 		EntryComparator<ItemStack> shulkerBoxNbtInterpreter = (context, stack) -> {
 			var builder = DataComponentMap.builder();
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
+			StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(mainColor -> builder.set(ModCoreDataComponents.MAIN_COLOR.get(), mainColor));
+			StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(accentColor -> builder.set(ModCoreDataComponents.ACCENT_COLOR.get(), accentColor));
 			return componentHasher.hash(context, new PatchedDataComponentMap(builder.build()));
 		};
 
@@ -62,7 +62,9 @@ public class REICompat implements REIServerPlugin {
 
     @Override
     public void registerMenuInfo(MenuInfoRegistry registry) {
-        registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::new));
-		//registry.register(BuiltinPlugin.STONE_CUTTING, StorageScreen.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::new));
+        registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::crafting));
+		// TODO: Fix this
+		//registry.register(BuiltinPlugin.STONE_CUTTING, StorageScreen.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::stonecutting));
+		//registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::smithing));
     }
 }

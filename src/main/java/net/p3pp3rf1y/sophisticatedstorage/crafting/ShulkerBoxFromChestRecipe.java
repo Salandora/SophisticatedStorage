@@ -53,8 +53,8 @@ public class ShulkerBoxFromChestRecipe extends ShapedRecipe implements IWrapperR
 				shulker.sophisticatedCore_set(DataComponents.CUSTOM_NAME, chest.getHoverName());
 			}
 			if (shulker.getItem() instanceof StorageBlockItem storageBlockItem) {
-				StorageBlockItem.getMainColorFromStack(chest).ifPresent(mc -> storageBlockItem.setMainColor(shulker, mc));
-				StorageBlockItem.getAccentColorFromStack(chest).ifPresent(ac -> storageBlockItem.setAccentColor(shulker, ac));
+				StorageBlockItem.getMainColorFromComponentHolder(chest).ifPresent(mc -> storageBlockItem.setMainColor(shulker, mc));
+				StorageBlockItem.getAccentColorFromComponentHolder(chest).ifPresent(ac -> storageBlockItem.setAccentColor(shulker, ac));
 			}
 		});
 		return shulker;

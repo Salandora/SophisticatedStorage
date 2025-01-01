@@ -54,6 +54,8 @@ public class ModBlocks {
 	}
 
 	public static final TagKey<Item> BASE_TIER_WOODEN_STORAGE_TAG = TagKey.create(Registries.ITEM, SophisticatedStorage.getRL("base_tier_wooden_storage"));
+	public static final TagKey<Item> ALL_STORAGE_TAG = TagKey.create(Registries.ITEM, SophisticatedStorage.getRL("all_storage"));
+
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, SophisticatedStorage.MOD_ID);
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, SophisticatedStorage.MOD_ID);
 	private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, SophisticatedStorage.MOD_ID);

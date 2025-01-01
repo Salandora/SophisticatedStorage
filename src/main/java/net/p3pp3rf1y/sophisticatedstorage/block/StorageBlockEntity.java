@@ -277,7 +277,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	private void loadStorageWrapper(CompoundTag tag, HolderLookup.Provider registries) {
-		NBTHelper.getCompound(tag, STORAGE_WRAPPER_TAG).ifPresent(wrapperTag -> storageWrapper.load(registries, wrapperTag));
+		NBTHelper.getCompound(tag, STORAGE_WRAPPER_TAG).ifPresent(storageWrapper::load);
 	}
 
 	@Override
@@ -327,7 +327,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	/*@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
 		CompoundTag tag = pkt.getTag();
-		if (tag == null) {
+		if (tag.isEmpty()) {
 			return;
 		}
 

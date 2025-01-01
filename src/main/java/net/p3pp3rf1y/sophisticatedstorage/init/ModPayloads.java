@@ -14,7 +14,7 @@ public class ModPayloads {
 	private ModPayloads() {
 	}
 
-	public static void registerPackets() {
+	public static void registerPayloads() {
 		registerC2S(OpenStorageInventoryPayload.TYPE, OpenStorageInventoryPayload.STREAM_CODEC, OpenStorageInventoryPayload::handlePayload);
 		registerC2S(RequestStorageContentsPayload.TYPE, RequestStorageContentsPayload.STREAM_CODEC, RequestStorageContentsPayload::handlePayload);
 		registerC2S(ScrolledToolPayload.TYPE, ScrolledToolPayload.STREAM_CODEC, ScrolledToolPayload::handlePayload);

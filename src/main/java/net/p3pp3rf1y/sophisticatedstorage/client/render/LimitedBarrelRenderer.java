@@ -44,9 +44,11 @@ public class LimitedBarrelRenderer extends BarrelRenderer<LimitedBarrelBlockEnti
 		boolean flatTop = blockState.getValue(BarrelBlock.FLAT_TOP);
 
 		Direction horizontalFacing = blockState.getValue(LimitedBarrelBlock.HORIZONTAL_FACING);
-		renderItemCounts(blockEntity, poseStack, bufferSource, flatTop, horizontalFacing, blockState.getValue(LimitedBarrelBlock.VERTICAL_FACING));
+		renderItemCounts(blockEntity, poseStack, bufferSource, flatTop, horizontalFacing, blockState.getValue(LimitedBarrelBlock.VERTICAL_FACING), packedLight);
 
-		packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos().relative(storageBlock.getFacing(blockState)));
+		if (blockEntity.getLevel() != null) {
+			packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos().relative(storageBlock.getFacing(blockState)));
+		}
 
 		renderFrontFace(blockEntity, poseStack, bufferSource, packedLight, packedOverlay, blockState, flatTop, horizontalFacing);
 		renderHiddenTier(blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
@@ -94,7 +96,10 @@ public class LimitedBarrelRenderer extends BarrelRenderer<LimitedBarrelBlockEnti
 		poseStack.pushPose();
 		poseStack.translate(0, 0, -0.001);
 
-		List<Float> slotFillLevels = blockEntity.getSlotFillLevels();
+		List<Float> slotFillLevels = blockEntity.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getSlotFillRatios();
+		if (slotFillLevels.isEmpty()) {
+			slotFillLevels = blockEntity.getSlotFillLevels();
+		}
 		int slots = slotFillLevels.size();
 
 		boolean translucentRender = !blockEntity.shouldShowFillLevels() && holdsToolInToggleFillLevelDisplay();
@@ -128,12 +133,14 @@ public class LimitedBarrelRenderer extends BarrelRenderer<LimitedBarrelBlockEnti
 		}
 	}
 
-	private void renderItemCounts(LimitedBarrelBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource bufferSource, boolean flatTop, Direction horizontalFacing, VerticalFacing verticalFacing) {
+	private void renderItemCounts(LimitedBarrelBlockEntity blockEntity, PoseStack poseStack, MultiBufferSource bufferSource, boolean flatTop, Direction horizontalFacing, VerticalFacing verticalFacing, int packedLight) {
 		if (!blockEntity.shouldShowCounts()) {
 			return;
 		}
 
-		int packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos().relative(verticalFacing != VerticalFacing.NO ? verticalFacing.getDirection() : horizontalFacing));
+		if (blockEntity.getLevel() != null) {
+			packedLight = LevelRenderer.getLightColor(blockEntity.getLevel(), blockEntity.getBlockPos().relative(verticalFacing != VerticalFacing.NO ? verticalFacing.getDirection() : horizontalFacing));
+		}
 
 		poseStack.pushPose();
 
@@ -144,7 +151,10 @@ public class LimitedBarrelRenderer extends BarrelRenderer<LimitedBarrelBlockEnti
 		}
 		poseStack.translate(0.5, -0.5, 0.5);
 
-		List<Integer> slotCounts = blockEntity.getSlotCounts();
+		List<Integer> slotCounts = blockEntity.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getSlotCounts();
+		if (slotCounts.isEmpty()) {
+			slotCounts = blockEntity.getSlotCounts();
+		}
 		float countDisplayYOffset = -(slotCounts.size() == 1 ? 0.25f : 0.11f);
 		for (int displayItemIndex = 0; displayItemIndex < slotCounts.size(); displayItemIndex++) {
 			int count = slotCounts.get(displayItemIndex);

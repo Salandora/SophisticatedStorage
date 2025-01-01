@@ -29,7 +29,7 @@ public class StackStorageWrapper extends StorageWrapper {
 		UUID uuid = stack.sophisticatedCore_get(ModCoreDataComponents.STORAGE_UUID);
 		if (uuid != null) {
 			CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
-			stackStorageWrapper.load(registries, compoundtag);
+			stackStorageWrapper.load(compoundtag);
 			stackStorageWrapper.setContentsUuid(uuid); //setting here because client side the uuid isn't in contentsnbt before this data is synced from server and it would create a new one otherwise
 		}
 

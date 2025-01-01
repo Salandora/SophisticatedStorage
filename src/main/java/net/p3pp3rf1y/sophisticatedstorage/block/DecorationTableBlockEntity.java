@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
@@ -52,7 +53,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		@Override
 		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return resource.getItem() instanceof BlockItem && !(resource.getItem() instanceof StorageBlockItem);
+			return resource.getItem() instanceof BlockItem blockItem && !(resource.getItem() instanceof StorageBlockItem) && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO));
 		}
 	};
 
@@ -201,7 +202,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	}
 
 	private boolean isTintedStorage(ItemStack storage) {
-		return StorageBlockItem.getMainColorFromStack(storage).isPresent() || StorageBlockItem.getAccentColorFromStack(storage).isPresent();
+		return StorageBlockItem.getMainColorFromComponentHolder(storage).isPresent() || StorageBlockItem.getAccentColorFromComponentHolder(storage).isPresent();
 	}
 
 	private boolean allMaterialsMatch(Map<BarrelMaterial, ResourceLocation> newMaterials, Map<BarrelMaterial, ResourceLocation> currentMaterials) {
@@ -226,7 +227,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		Map<ResourceLocation, Integer> partsNeeded =
 				DecorationHelper.getDyePartsNeeded(mainColor, accentColor,
-								StorageBlockItem.getMainColorFromStack(storage).orElse(-1), StorageBlockItem.getAccentColorFromStack(storage).orElse(-1))
+								StorageBlockItem.getMainColorFromComponentHolder(storage).orElse(-1), StorageBlockItem.getAccentColorFromComponentHolder(storage).orElse(-1))
 						.entrySet().stream().map(entry -> Map.entry(entry.getKey().location(), entry.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 		for (Map.Entry<ResourceLocation, Integer> entry : partsNeeded.entrySet()) {
@@ -246,7 +247,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	}
 
 	private boolean colorsTransparentOrSameAs(ItemStack storage) {
-		return (mainColor == -1 || mainColor == StorageBlockItem.getMainColorFromStack(storage).orElse(-1)) && (accentColor == -1 || accentColor == StorageBlockItem.getAccentColorFromStack(storage).orElse(-1));
+		return (mainColor == -1 || mainColor == StorageBlockItem.getMainColorFromComponentHolder(storage).orElse(-1)) && (accentColor == -1 || accentColor == StorageBlockItem.getAccentColorFromComponentHolder(storage).orElse(-1));
 	}
 
 	private void setMaterialsFromDecorativeBlocks(Map<BarrelMaterial, ResourceLocation> materials, boolean supportsInnerTrim) {
@@ -427,7 +428,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		}
 		ItemStack storageStack = storageBlock.getStackInSlot(0);
 		if (InventoryHelper.isEmpty(decorativeBlocks)) {
-			DecorationHelper.consumeDyes(mainColor, accentColor, this.remainingParts, List.of(dyes), StorageBlockItem.getMainColorFromStack(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromStack(storageStack).orElse(-1), false);
+			DecorationHelper.consumeDyes(mainColor, accentColor, this.remainingParts, List.of(dyes), StorageBlockItem.getMainColorFromComponentHolder(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromComponentHolder(storageStack).orElse(-1), false);
 		} else {
 			Map<BarrelMaterial, ResourceLocation> originalMaterials = BarrelBlockItem.getUncompactedMaterials(storageStack);
 			DecorationHelper.consumeMaterials(this.remainingParts, List.of(decorativeBlocks), originalMaterials, getMaterialsToApply(storageStack), false);
@@ -441,7 +442,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		Map<ResourceLocation, Integer> partsNeeded = new HashMap<>();
 		ItemStack storageStack = storageBlock.getStackInSlot(0);
 		if (InventoryHelper.isEmpty(decorativeBlocks) || !(storageStack.getItem() instanceof BarrelBlockItem)) {
-			DecorationHelper.getDyePartsNeeded(mainColor, accentColor, StorageBlockItem.getMainColorFromStack(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromStack(storageStack).orElse(-1))
+			DecorationHelper.getDyePartsNeeded(mainColor, accentColor, StorageBlockItem.getMainColorFromComponentHolder(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromComponentHolder(storageStack).orElse(-1))
 					.forEach((tag, parts) -> partsNeeded.put(tag.location(), parts));
 		} else {
 			partsNeeded.putAll(DecorationHelper.getMaterialPartsNeeded(BarrelBlockItem.getUncompactedMaterials(storageStack), getMaterialsToApply(storageStack)));

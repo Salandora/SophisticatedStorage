@@ -73,6 +73,10 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 		});
 	}
 
+	public void setDynamicRenderTracker(IDynamicRenderTracker dynamicRenderTracker) {
+		this.dynamicRenderTracker = dynamicRenderTracker;
+	}
+
 	public BarrelBlockEntity(BlockPos pos, BlockState state) {
 		this(pos, state, ModBlocks.BARREL_BLOCK_ENTITY_TYPE.get());
 	}
@@ -125,31 +129,5 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 
 	public Map<BarrelMaterial, ResourceLocation> getMaterials() {
 		return materials;
-	}
-
-	@Override
-	public @Nullable Object getRenderData() {
-		ModelData.Builder builder = ModelData.builder();
-		boolean hasMainColor = this.getStorageWrapper().hasMainColor();
-		builder.with(HAS_MAIN_COLOR, hasMainColor);
-		boolean hasAccentColor = this.getStorageWrapper().hasAccentColor();
-		builder.with(HAS_ACCENT_COLOR, hasAccentColor);
-		if (!this.hasFullyDynamicRenderer()) {
-			builder.with(DISPLAY_ITEMS, this.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getDisplayItems());
-			builder.with(INACCESSIBLE_SLOTS, this.getStorageWrapper().getRenderInfo().getItemDisplayRenderInfo().getInaccessibleSlots());
-		}
-		builder.with(IS_PACKED, this.isPacked());
-		builder.with(SHOWS_LOCK, this.isLocked() && this.shouldShowLock());
-		builder.with(SHOWS_TIER, this.shouldShowTier());
-		Optional<WoodType> woodType = this.getWoodType();
-		if (woodType.isPresent() || !(hasMainColor && hasAccentColor)) {
-			builder.with(WOOD_NAME, woodType.orElse(WoodType.ACACIA).name());
-		}
-
-		Map<BarrelMaterial, ResourceLocation> materials = this.getMaterials();
-		if (!materials.isEmpty()) {
-			builder.with(MATERIALS, materials);
-		}
-		return builder.build();
 	}
 }

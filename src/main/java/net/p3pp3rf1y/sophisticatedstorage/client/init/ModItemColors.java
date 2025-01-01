@@ -16,9 +16,9 @@ public class ModItemColors {
 						return -1;
 					}
 					if (tintIndex == 1000) {
-						return StorageBlockItem.getMainColorFromStack(stack).orElse(-1);
+						return StorageBlockItem.getMainColorFromComponentHolder(stack).orElse(-1);
 					} else {
-						return StorageBlockItem.getAccentColorFromStack(stack).orElse(-1);
+						return StorageBlockItem.getAccentColorFromComponentHolder(stack).orElse(-1);
 					}
 				},
 				ModBlocks.ALL_BARREL_ITEMS.stream().map(Supplier::get).toArray(BlockItem[]::new));

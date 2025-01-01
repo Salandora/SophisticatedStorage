@@ -100,7 +100,6 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
 		return RenderShape.ENTITYBLOCK_ANIMATED;
@@ -193,8 +192,8 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		Direction direction = context.getHorizontalDirection().getOpposite();
 		StackStorageWrapper wrapper = StackStorageWrapper.fromStack(context.getLevel().registryAccess(), chestBeingPlaced);
 		return getStateForPlacement(context, direction, fluidstate,
-				StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
-				StorageBlockItem.getAccentColorFromStack(chestBeingPlaced).orElse(-1),
+				StorageBlockItem.getMainColorFromComponentHolder(chestBeingPlaced).orElse(-1),
+				StorageBlockItem.getAccentColorFromComponentHolder(chestBeingPlaced).orElse(-1),
 				WoodStorageBlockItem.getWoodType(chestBeingPlaced).orElse(WoodType.ACACIA),
 				wrapper.hasContents() && InventoryHelper.isEmpty(wrapper.getUpgradeHandler()));
 	}
@@ -359,12 +358,12 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 					BlockPos otherPartPos = pos.relative(getConnectedDirection(state));
 					level.getBlockEntity(otherPartPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get())
 							.ifPresent(mainBe -> {
-								be.getStorageWrapper().load(level.registryAccess(), mainBe.getStorageWrapper().save(new CompoundTag()));
+								be.getStorageWrapper().load(mainBe.getStorageWrapper().save(new CompoundTag()));
 
 								//remove main chest contents
 								CompoundTag contentsTag = new CompoundTag();
 								contentsTag.put(StorageWrapper.CONTENTS_TAG, new CompoundTag());
-								mainBe.getStorageWrapper().load(level.registryAccess(), contentsTag);
+								mainBe.getStorageWrapper().load(contentsTag);
 							});
 				}
 			});

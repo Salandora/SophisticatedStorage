@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICountDisplay, IFillLevelDisplay {
 	private static final String SLOT_COUNTS_TAG = "slotCounts";
 	private static final String SLOT_FILL_LEVELS_TAG = "slotFillLevels";
-	private static final Consumer<VoidUpgradeWrapper> VOID_UPGRADE_VOIDING_OVERFLOW_OF_EVERYTHING_BY_DEFAULT = voidUpgrade -> {
+	public static final Consumer<VoidUpgradeWrapper> VOID_UPGRADE_VOIDING_OVERFLOW_OF_EVERYTHING_BY_DEFAULT = voidUpgrade -> {
 		voidUpgrade.getFilterLogic().setAllowByDefault(false);
 		voidUpgrade.setShouldVoidOverflowDefaultOrLoadFromNbt(true);
 	};
@@ -180,14 +180,14 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean depositFromAllOfPlayersInventory(Player player, int slot, InventoryHandler invHandler, ItemStack stackInSlot, MemorySettingsCategory memorySettings) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		Predicate<ItemStack> memoryItemMatches = itemStack -> memorySettings.isSlotSelected(slot) && memorySettings.matchesFilter(slot, itemStack);
-		CapabilityHelper.runOnItemHandler(player, playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
+		CapabilityHelper.runOnItemHandler(player, inventoryHandler -> InventoryHelper.iterate(inventoryHandler, (playerSlot, playerStack) -> {
 			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameComponents(stackInSlot, playerStack)))) {
 
 				ItemStack result = invHandler.insertItemOnlyToSlot(slot, playerStack, true);
 				if (result.getCount() < playerStack.getCount()) {
-					ItemStack extracted = playerInventory.extractItem(playerSlot, playerStack.getCount() - result.getCount(), true);
+					ItemStack extracted = inventoryHandler.extractItem(playerSlot, playerStack.getCount() - result.getCount(), true);
 					if (!extracted.isEmpty()) {
-						invHandler.insertItemOnlyToSlot(slot, playerInventory.extractItem(playerSlot, extracted.getCount(), false), false);
+						invHandler.insertItemOnlyToSlot(slot, inventoryHandler.extractItem(playerSlot, extracted.getCount(), false), false);
 						success.set(true);
 					}
 				}
