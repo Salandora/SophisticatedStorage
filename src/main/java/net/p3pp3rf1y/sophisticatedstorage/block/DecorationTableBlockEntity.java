@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.api.Tags;
@@ -53,7 +54,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		@Override
 		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return resource.getItem() instanceof BlockItem && !(resource.getItem() instanceof StorageBlockItem);
+			return resource.getItem() instanceof BlockItem blockItem && !(resource.getItem() instanceof StorageBlockItem) && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO));
 		}
 	};
 

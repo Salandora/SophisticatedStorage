@@ -122,7 +122,9 @@ public class EmiCompat implements EmiPlugin {
 			registry.setDefaultComparison(item, shulkerBoxNbtInterpreter);
 		}
 
-		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, new EmiGridMenuInfo<>());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, EmiGridMenuInfo.crafting());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, EmiGridMenuInfo.stonecutting());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE, EmiGridMenuInfo.smithing());
 
 		registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(ModItems.CRAFTING_UPGRADE));
 		registry.addWorkstation(VanillaEmiRecipeCategories.STONECUTTING, EmiStack.of(ModItems.STONECUTTER_UPGRADE));
