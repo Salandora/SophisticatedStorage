@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedMutableDataComponentHolder;
+import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
@@ -22,7 +22,7 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 		super(block, properties);
 	}
 
-	public static Optional<CompoundTag> getEntityWrapperTagFromStack(SophisticatedMutableDataComponentHolder componentHolder) {
+	public static Optional<CompoundTag> getEntityWrapperTagFromStack(SophisticatedDataComponentHolder componentHolder) {
 		CustomData customData = componentHolder.sophisticatedCore_get(() -> DataComponents.BLOCK_ENTITY_DATA);
 		if (customData == null) {
 			return Optional.empty();
@@ -30,13 +30,13 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 		return Optional.of(customData.copyTag().getCompound(STORAGE_WRAPPER_TAG));
 	}
 
-	public static Optional<Integer> getMainColorFromComponentHolder(SophisticatedMutableDataComponentHolder componentHolder) {
+	public static Optional<Integer> getMainColorFromComponentHolder(SophisticatedDataComponentHolder componentHolder) {
 		return getEntityWrapperTagFromStack(componentHolder)
 				.flatMap(tag -> tag.contains(StorageWrapper.MAIN_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.MAIN_COLOR_TAG)) : Optional.empty())
 				.or(() -> Optional.ofNullable(componentHolder.sophisticatedCore_get(ModCoreDataComponents.MAIN_COLOR)));
 	}
 
-	public static Optional<Integer> getAccentColorFromComponentHolder(SophisticatedMutableDataComponentHolder componentHolder) {
+	public static Optional<Integer> getAccentColorFromComponentHolder(SophisticatedDataComponentHolder componentHolder) {
 		return getEntityWrapperTagFromStack(componentHolder)
 				.flatMap(tag -> tag.contains(StorageWrapper.ACCENT_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.ACCENT_COLOR_TAG)) : Optional.empty())
 				.or(() -> Optional.ofNullable(componentHolder.sophisticatedCore_get(ModCoreDataComponents.ACCENT_COLOR)));

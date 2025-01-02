@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedMutableDataComponentHolder;
+import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
@@ -46,7 +46,7 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 		}
 	}
 
-	public static boolean isFlatTop(SophisticatedMutableDataComponentHolder componentHolder) {
+	public static boolean isFlatTop(SophisticatedDataComponentHolder componentHolder) {
 		return componentHolder.sophisticatedCore_getOrDefault(ModDataComponents.FLAT_TOP, false);
 	}
 

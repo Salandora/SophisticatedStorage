@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.HolderLookup;
@@ -12,10 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
-import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedMutableDataComponentHolder;
+import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
@@ -95,7 +95,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
         storageStack.sophisticatedCore_remove(ModDataComponents.WOOD_TYPE);
     }
 
-    public static Optional<WoodType> getWoodType(SophisticatedMutableDataComponentHolder componentHolder) {
+    public static Optional<WoodType> getWoodType(SophisticatedDataComponentHolder componentHolder) {
         return Optional.ofNullable(componentHolder.sophisticatedCore_get(ModDataComponents.WOOD_TYPE));
     }
 
