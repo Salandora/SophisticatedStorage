@@ -191,6 +191,10 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return false;
 	}
 
+	public void setModelData(ModelData data) {
+		this.modelData = data;
+	}
+
 	@Override
 	public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		modelData = getModelData(blockView, pos, state, ModelData.EMPTY);
@@ -199,7 +203,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
-		modelData = ModelData.EMPTY;
+		modelData = null;
 		if (this.barrelItemOverrides != null) {
 			// need this here because of REI's fast entry rendering feature
 			// it is doing batched rendering and this collides with how item overrides are implemented here
