@@ -133,13 +133,12 @@ public class ClientEventHandler {
 	private static boolean onRenderHighlight(WorldRenderContext context, @Nullable HitResult hitResult) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		if (player == null || minecraft.screen != null) {
+		if (player == null || minecraft.screen != null || !(hitResult instanceof BlockHitResult blockHitResult)) {
 			return true;
 		}
 
 		ItemStack stack = player.getMainHandItem();
 		if (stack.getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(stack)) {
-			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
 			BlockPos otherPos = blockHitResult.getBlockPos().relative(player.getDirection().getClockWise());
 			Level level = player.level();
 			BlockState blockState = level.getBlockState(otherPos);
@@ -152,7 +151,6 @@ public class ClientEventHandler {
 		}
 
 		if (stack.getItem() instanceof PaintbrushItem) {
-			BlockHitResult blockHitResult = (BlockHitResult) hitResult;
 			Level level = player.level();
 			BlockPos pos = blockHitResult.getBlockPos();
 			BlockState blockState = level.getBlockState(pos);
