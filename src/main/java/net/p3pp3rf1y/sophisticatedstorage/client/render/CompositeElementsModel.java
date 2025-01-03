@@ -33,7 +33,7 @@ public class CompositeElementsModel extends BlockModel {
 			return new BuiltInModel(getTransforms(), getOverrides(modelBaker, owner, spriteGetter), particleSprite, getGuiLight().lightLikeBlock());
 		}
 
-		var elementsModel = new ElementsModel(getElements());
+		var elementsModel = new SSElementsModel(getElements());
 		return elementsModel.bake(port_lib$getCustomData(), modelBaker, spriteGetter, modelState, getOverrides(modelBaker, owner, spriteGetter));
 	}
 
