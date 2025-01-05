@@ -98,9 +98,11 @@ public class BarrelRenderer<T extends BarrelBlockEntity> extends StorageRenderer
 		poseStack.translate(-0.005, -0.005, -0.005);
 		poseStack.scale(1.01f, 1.01f, 1.01f);
 
-		if (blockEntity.getLevel() != null && blockModel instanceof BarrelBakedModelBase barrelBakedModel) {
+		RandomSource random = blockEntity.getLevel() != null ? blockEntity.getLevel().random : Minecraft.getInstance().level.random;
+
+		if (blockModel instanceof BarrelBakedModelBase barrelBakedModel) {
 			VertexConsumer vertexConsumer = TranslucentVertexConsumer.getVertexConsumer(bufferSource, 128);
-			getQuads.apply(barrelBakedModel, state, blockEntity.getLevel().random, woodName, RenderType.cutout()).forEach(quad -> vertexConsumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, packedLight, packedOverlay));
+			getQuads.apply(barrelBakedModel, state, random, woodName, RenderType.cutout()).forEach(quad -> vertexConsumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, packedLight, packedOverlay));
 		}
 		poseStack.popPose();
 	}

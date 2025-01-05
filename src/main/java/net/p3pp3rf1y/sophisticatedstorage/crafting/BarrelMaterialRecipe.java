@@ -10,6 +10,7 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
@@ -52,7 +53,7 @@ public class BarrelMaterialRecipe extends CustomRecipe {
 					} else {
 						return false;
 					}
-				} else if (item.getItem() instanceof BlockItem blockItem && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO))) {
+				} else if (item.getItem() instanceof BlockItem blockItem && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))) {
 					boolean isBottomMiddleAndBottomLeftHasBlock = barrelCol == col && barrelRow < row && rowCounts.getOrDefault(row, 0) > 0;
 					if (isBottomMiddleAndBottomLeftHasBlock) {
 						return false;
