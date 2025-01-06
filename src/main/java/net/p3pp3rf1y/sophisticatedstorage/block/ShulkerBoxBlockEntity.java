@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ShulkerBoxBlockEntity extends StorageBlockEntity {
@@ -58,12 +59,12 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 		super(pos, state, ModBlocks.SHULKER_BOX_BLOCK_ENTITY_TYPE);
 	}
 
-	public static void tick(Level level, BlockPos pos, BlockState state, ShulkerBoxBlockEntity blockEntity) {
+	public static void tick(@Nullable Level level, BlockPos pos, BlockState state, ShulkerBoxBlockEntity blockEntity) {
 		blockEntity.updateAnimation(level, pos, state);
 	}
 
 	@SuppressWarnings("java:S1121")
-	private void updateAnimation(Level level, BlockPos pos, BlockState state) {
+	private void updateAnimation(@Nullable Level level, BlockPos pos, BlockState state) {
 		progressOld = progress;
 		switch (animationStatus) {
 			case CLOSED -> progress = 0.0F;
@@ -72,16 +73,22 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 				if (progress >= 1.0F) {
 					animationStatus = AnimationStatus.OPENED;
 					progress = 1.0F;
-					doNeighborUpdates(level, pos, state);
+					if (level != null) {
+						doNeighborUpdates(level, pos, state);
+					}
 				}
-				moveCollidedEntities(level, pos, state);
+				if (level != null) {
+					moveCollidedEntities(level, pos, state);
+				}
 			}
 			case CLOSING -> {
 				progress -= 0.1F;
 				if (progress <= 0.0F) {
 					animationStatus = AnimationStatus.CLOSED;
 					progress = 0.0F;
-					doNeighborUpdates(level, pos, state);
+					if (level != null) {
+						doNeighborUpdates(level, pos, state);
+					}
 				}
 			}
 			case OPENED -> progress = 1.0F;
@@ -137,6 +144,10 @@ public class ShulkerBoxBlockEntity extends StorageBlockEntity {
 
 	public boolean isClosed() {
 		return animationStatus == AnimationStatus.CLOSED;
+	}
+
+	public void setAnimationStatus(AnimationStatus animationStatus) {
+		this.animationStatus = animationStatus;
 	}
 
 	@Override
