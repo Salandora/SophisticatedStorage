@@ -36,10 +36,11 @@ import java.util.function.BiConsumer;
 public class ChestBlockEntity extends WoodStorageBlockEntity {
 	public static final String STORAGE_TYPE = "chest";
 	public static final String DOUBLE_CHEST_MAIN_POS_TAG = "doubleMainPos";
+
 	private final ChestLidController chestLidController = new ChestLidController();
+
 	@Nullable
 	private BlockPos doubleMainPos = null;
-
 	private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
 		protected void onOpen(Level level, BlockPos pos, BlockState state) {
 			if (state.getValue(ChestBlock.TYPE) != ChestType.LEFT) {
@@ -81,14 +82,18 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			}
 		}
 	};
-	private boolean isDestroyedByPlayer = false;
 
+	private boolean isDestroyedByPlayer = false;
 	public void joinWithChest(ChestBlockEntity mainBE) {
 		setMainPos(mainBE.getBlockPos());
 		expandAndMoveItemsAndSettings(mainBE);
 		removeFromController();
 		setNotLinked();
 		tryToAddToController();
+	}
+
+	public ChestLidController getChestLidController() {
+		return chestLidController;
 	}
 
 	public void setMainPos(BlockPos doubleMainPos) {
