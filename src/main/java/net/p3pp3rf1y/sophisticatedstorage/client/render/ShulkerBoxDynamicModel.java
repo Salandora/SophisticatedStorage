@@ -24,7 +24,9 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperty;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 
@@ -32,10 +34,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
-
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
 
 public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynamicModel> {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";
@@ -48,6 +47,8 @@ public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynami
 	}
 
 	private static class ShulkerBoxBakedModel implements BakedModel, CustomParticleIcon {
+		private static final ModelProperty<Boolean> HAS_MAIN_COLOR = new ModelProperty<>();
+
 		@Override
 		public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
 			return Collections.emptyList();
@@ -87,14 +88,12 @@ public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynami
 
 		@Nonnull
 		public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
-			return Optional.of(level.getBlockEntityRenderData(pos) instanceof ModelData data ? data : ModelData.EMPTY).orElse(ModelData.EMPTY);
-			/// Moved to {@link StorageBlockEntity#getRenderData()}
-			/*return WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class)
+			return WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class)
 					.map(be -> {
 						ModelData.Builder builder = ModelData.builder();
 						builder.with(HAS_MAIN_COLOR, be.getStorageWrapper().getMainColor() != -1);
 						return builder.build();
-					}).orElse(ModelData.EMPTY);*/
+					}).orElse(ModelData.EMPTY);
 		}
 
 		@Override

@@ -24,7 +24,9 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperty;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockEntity;
@@ -33,9 +35,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
-
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.WOOD_NAME;
 
 public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";
@@ -52,6 +51,9 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 	}
 
 	private static class ChestBakedModel implements BakedModel, CustomParticleIcon {
+		private static final ModelProperty<String> WOOD_NAME = new ModelProperty<>();
+		private static final ModelProperty<Boolean> HAS_MAIN_COLOR = new ModelProperty<>();
+
 		@Override
 		public ItemTransforms getTransforms() {
 			return ItemTransforms.NO_TRANSFORMS;
@@ -92,15 +94,13 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 
 		@Nonnull
 		public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
-			return Optional.of(level.getBlockEntityRenderData(pos) instanceof ModelData data ? data : ModelData.EMPTY).orElse(ModelData.EMPTY);
-			/// Moved to {@link WoodStorageBlockEntity#getRenderData()}
-			/*return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class)
+			return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class)
 					.map(be -> {
 						ModelData.Builder builder = ModelData.builder();
-						builder.with(HAS_MAIN_COLOR, be.getStorageWrapper().getMainColor() > -1);
+						builder.with(HAS_MAIN_COLOR, be.getStorageWrapper().getMainColor() != -1);
 						be.getWoodType().ifPresent(n -> builder.with(WOOD_NAME, n.name()));
 						return builder.build();
-					}).orElse(ModelData.EMPTY);*/
+					}).orElse(ModelData.EMPTY);
 		}
 
 		@Override

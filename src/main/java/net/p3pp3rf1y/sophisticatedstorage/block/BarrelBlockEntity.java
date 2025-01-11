@@ -11,19 +11,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.WoodType;
-import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static net.p3pp3rf1y.sophisticatedstorage.util.model.ModelProperties.*;
 
 public class BarrelBlockEntity extends WoodStorageBlockEntity {
 	private static final String MATERIALS_TAG = "materials";

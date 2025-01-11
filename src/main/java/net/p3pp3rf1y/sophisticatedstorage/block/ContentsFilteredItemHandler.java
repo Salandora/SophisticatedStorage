@@ -8,16 +8,12 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.ISlotTracker;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
-import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
 
 public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler {
 
