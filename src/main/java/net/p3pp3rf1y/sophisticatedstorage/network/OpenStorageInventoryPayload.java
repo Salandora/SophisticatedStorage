@@ -10,13 +10,14 @@ import net.minecraft.world.entity.player.Player;
 import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SophisticatedMenuProvider;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 
 public record OpenStorageInventoryPayload(BlockPos pos) implements CustomPacketPayload {
-	public static final Type<OpenStorageInventoryPayload> TYPE = new Type<>(SophisticatedCore.getRL("open_storage_inventory"));
+	public static final Type<OpenStorageInventoryPayload> TYPE = new Type<>(SophisticatedStorage.getRL("open_storage_inventory"));
 	public static final StreamCodec<ByteBuf, OpenStorageInventoryPayload> STREAM_CODEC = StreamCodec.composite(
 			BlockPos.STREAM_CODEC,
 			OpenStorageInventoryPayload::pos,

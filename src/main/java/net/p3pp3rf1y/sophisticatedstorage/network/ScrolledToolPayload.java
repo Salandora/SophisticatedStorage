@@ -6,12 +6,12 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
+import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
 
 public record ScrolledToolPayload(boolean next) implements CustomPacketPayload {
-	public static final Type<ScrolledToolPayload> TYPE = new Type<>(SophisticatedCore.getRL("scrolled_tool"));
+	public static final Type<ScrolledToolPayload> TYPE = new Type<>(SophisticatedStorage.getRL("scrolled_tool"));
 	public static final StreamCodec<ByteBuf, ScrolledToolPayload> STREAM_CODEC = StreamCodec.composite(
 			ByteBufCodecs.BOOL,
 			ScrolledToolPayload::next,

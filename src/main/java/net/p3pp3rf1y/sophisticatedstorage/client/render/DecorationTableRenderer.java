@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 
 public class DecorationTableRenderer implements BlockEntityRenderer<DecorationTableBlockEntity> {
 	private final ItemRenderer itemRenderer;
@@ -19,7 +20,7 @@ public class DecorationTableRenderer implements BlockEntityRenderer<DecorationTa
 
 	@Override
 	public void render(DecorationTableBlockEntity table, float v, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-		if (table.getResult().isEmpty()) {
+		if (table.getResult().isEmpty() || table.getResult().getItem() == ModItems.PAINTBRUSH.get()) {
 			return;
 		}
 

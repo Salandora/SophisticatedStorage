@@ -80,8 +80,8 @@ public class EmiCompat implements EmiPlugin {
 			CompoundTag tag = new CompoundTag();
 			ItemStack stack = emiStack.getItemStack();
 			WoodStorageBlockItem.getWoodType(stack).ifPresent(woodName -> tag.putString("woodName", woodName.name()));
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> tag.putInt("mainColor", mainColor));
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
+			StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(mainColor -> tag.putInt("mainColor", mainColor));
+			StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
 			return tag;
 		});
 
@@ -89,8 +89,8 @@ public class EmiCompat implements EmiPlugin {
 			CompoundTag tag = new CompoundTag();
 			ItemStack stack = emiStack.getItemStack();
 			WoodStorageBlockItem.getWoodType(stack).ifPresent(woodName -> tag.putString("woodName", woodName.name()));
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> tag.putInt("mainColor", mainColor));
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
+			StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(mainColor -> tag.putInt("mainColor", mainColor));
+			StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
 			tag.putBoolean("flatTop", BarrelBlockItem.isFlatTop(stack));
 			return tag;
 		});
@@ -105,15 +105,16 @@ public class EmiCompat implements EmiPlugin {
 		Comparison shulkerBoxNbtInterpreter = Comparison.compareData(emiStack -> {
 			CompoundTag tag = new CompoundTag();
 			ItemStack stack = emiStack.getItemStack();
-			StorageBlockItem.getMainColorFromStack(stack).ifPresent(mainColor -> tag.putInt("mainColor", mainColor));
-			StorageBlockItem.getAccentColorFromStack(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
+			StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(mainColor -> tag.putInt("mainColor", mainColor));
+			StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(accentColor -> tag.putInt("accentColor", accentColor));
 			return tag;
 		});
 		for (Supplier<BlockItem> item : ModBlocks.SHULKER_BOX_ITEMS) {
 			registry.setDefaultComparison(item, shulkerBoxNbtInterpreter);
 		}
 
-		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE.get(), new EmiGridMenuInfo<>());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE.get(), EmiGridMenuInfo.crafting());
+		registry.addRecipeHandler(ModBlocks.STORAGE_CONTAINER_TYPE.get(), EmiGridMenuInfo.stonecutting());
 
 		registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(ModItems.CRAFTING_UPGRADE.get()));
 		registry.addWorkstation(VanillaEmiRecipeCategories.STONECUTTING, EmiStack.of(ModItems.STONECUTTER_UPGRADE.get()));

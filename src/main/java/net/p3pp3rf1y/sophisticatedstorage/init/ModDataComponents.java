@@ -17,6 +17,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.CodecHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.PaintbrushItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
@@ -41,6 +42,9 @@ public class ModDataComponents {
 
     public static final Supplier<DataComponentType<Map<BarrelMaterial, ResourceLocation>>> BARREL_MATERIALS = DATA_COMPONENT_TYPES.register("barrel_materials",
             () -> new DataComponentType.Builder<Map<BarrelMaterial, ResourceLocation>>().persistent(BarrelBlockItem.MATERIALS_CODEC).networkSynchronized(BarrelBlockItem.MATERIALS_STREAM_CODEC).build());
+
+	public static final Supplier<DataComponentType<Map<ResourceLocation, Integer>>> REMAINING_PARTS = DATA_COMPONENT_TYPES.register("remaining_parts",
+			() -> new DataComponentType.Builder<Map<ResourceLocation, Integer>>().persistent(PaintbrushItem.REMAINING_PARTS_CODEC).networkSynchronized(PaintbrushItem.REMAINING_PARTS_STREAM_CODEC).build());
 
     public static final Supplier<DataComponentType<Boolean>> DOUBLE_CHEST = DATA_COMPONENT_TYPES.register("double_chest",
             () -> new DataComponentType.Builder<Boolean>().persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL).build());

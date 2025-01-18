@@ -42,6 +42,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	public static final String CONTENTS_TAG = "contents";
 	public static final String NUMBER_OF_INVENTORY_SLOTS_TAG = "numberOfInventorySlots";
 	public static final String NUMBER_OF_UPGRADE_SLOTS_TAG = "numberOfUpgradeSlots";
+	public static final String SETTINGS_TAG = "settings";
+	public static final String RENDER_INFO_TAG = "renderInfo";
 	private final Supplier<Runnable> getSaveHandler;
 
 	@Nullable
@@ -54,20 +56,21 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private CompoundTag settingsNbt = new CompoundTag();
 	private final SettingsHandler settingsHandler;
 	private final RenderInfo renderInfo;
+
 	private CompoundTag renderInfoNbt = new CompoundTag();
 
 	@Nullable
 	protected UUID contentsUuid = null;
 
 	private int openTabId = -1;
-	protected int numberOfInventorySlots = 0;
 
+	protected int numberOfInventorySlots = 0;
 	protected int numberOfUpgradeSlots = -1;
+
 	private SortBy sortBy = SortBy.NAME;
 	private int columnsTaken = 0;
 	private int mainColor = -1;
 	private int accentColor = -1;
-
 	private Runnable upgradeCachesInvalidatedHandler = () -> {
 	};
 
@@ -162,10 +165,10 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	CompoundTag saveData(CompoundTag tag) {
 		if (!settingsNbt.isEmpty()) {
-			tag.put("settings", settingsNbt);
+			tag.put(SETTINGS_TAG, settingsNbt);
 		}
 		if (!renderInfoNbt.isEmpty()) {
-			tag.put("renderInfo", renderInfoNbt);
+			tag.put(RENDER_INFO_TAG, renderInfoNbt);
 		}
 		if (contentsUuid != null) {
 			tag.put(UUID_TAG, NbtUtils.createUUID(contentsUuid));
@@ -192,9 +195,9 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		return tag;
 	}
 
-	public void load(HolderLookup.Provider registries, CompoundTag tag) {
+	public void load(CompoundTag tag) {
 		loadContents(tag);
-		loadData(registries, tag);
+		loadData(tag);
 
 		initInventoryHandler();
 		getUpgradeHandler().refreshUpgradeWrappers();
@@ -203,11 +206,11 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		}
 	}
 
-	private void loadData(HolderLookup.Provider registries, CompoundTag tag) {
-		settingsNbt = tag.getCompound("settings");
+	private void loadData(CompoundTag tag) {
+		settingsNbt = tag.getCompound(SETTINGS_TAG);
 		settingsHandler.reloadFrom(settingsNbt);
-		renderInfoNbt = tag.getCompound("renderInfo");
-		renderInfo.deserializeFrom(registries, renderInfoNbt);
+		renderInfoNbt = tag.getCompound(RENDER_INFO_TAG);
+		renderInfo.deserializeFrom(renderInfoNbt);
 		contentsUuid = NBTHelper.getTagValue(tag, UUID_TAG, CompoundTag::get).map(NbtUtils::loadUUID).orElse(null);
 		openTabId = NBTHelper.getInt(tag, OPEN_TAB_ID_TAG).orElse(-1);
 		sortBy = NBTHelper.getString(tag, "sortBy").map(SortBy::fromName).orElse(SortBy.NAME);
@@ -230,7 +233,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	@Override
-	public void setSaveHandler(Runnable saveHandler) {
+	public void setContentsChangeHandler(Runnable contentsChangeHandler) {
 		//noop
 	}
 
@@ -321,6 +324,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	public void setMainColor(int mainColor) {
 		this.mainColor = mainColor;
+		save();
 	}
 
 	@Override
@@ -334,6 +338,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	public void setAccentColor(int accentColor) {
 		this.accentColor = accentColor;
+		save();
 	}
 
 	@Override

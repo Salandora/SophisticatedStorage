@@ -306,8 +306,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 					extractFromInternal(slot, toExtract);
 				} else {
 					slotStack.shrink(toExtract);
-					parent.setSlotStack(slot, slotStack);
 					calculatedStacks.put(slot, slotStack.copy());
+					parent.setSlotStack(slot, slotStack);
 				}
 				removeDefinitionsIfEmpty(slot);
 			}
@@ -576,6 +576,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		updateInternalStacksWithCounts(toUpdate);
 
 		calculatedAdditions.forEach(this::addToCalculatedStack);
+		toUpdate.keySet().forEach(parent::triggerOnChangeListeners);
 	}
 
 	private void addToCalculatedStack(int slot, int countToAdd) {

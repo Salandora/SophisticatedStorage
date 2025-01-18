@@ -11,16 +11,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
-
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.WOOD_NAME;
 
 public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	private static final String PACKED_TAG = "packed";
@@ -118,13 +114,5 @@ public abstract class WoodStorageBlockEntity extends StorageBlockEntity {
 	@Override
 	protected boolean canRefreshUpgrades() {
 		return super.canRefreshUpgrades() && !packed;
-	}
-
-	@Override
-	public @Nullable Object getRenderData() {
-		ModelData.Builder builder = ModelData.builder();
-		builder.with(HAS_MAIN_COLOR, this.getStorageWrapper().getMainColor() > -1);
-		this.getWoodType().ifPresent(n -> builder.with(WOOD_NAME, n.name()));
-		return builder.build();
 	}
 }

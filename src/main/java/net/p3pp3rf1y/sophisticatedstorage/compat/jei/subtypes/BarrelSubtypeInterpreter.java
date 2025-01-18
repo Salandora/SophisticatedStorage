@@ -11,8 +11,8 @@ import java.util.StringJoiner;
 public class BarrelSubtypeInterpreter extends PropertyBasedSubtypeInterpreter {
 	public BarrelSubtypeInterpreter() {
 		addOptionalProperty(WoodStorageBlockItem::getWoodType);
-		addOptionalProperty(StorageBlockItem::getMainColorFromStack);
-		addOptionalProperty(StorageBlockItem::getAccentColorFromStack);
+		addOptionalProperty(StorageBlockItem::getMainColorFromComponentHolder);
+		addOptionalProperty(StorageBlockItem::getAccentColorFromComponentHolder);
 		addProperty(BarrelBlockItem::isFlatTop);
 	}
 
@@ -20,8 +20,8 @@ public class BarrelSubtypeInterpreter extends PropertyBasedSubtypeInterpreter {
 	public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext context) {
 		StringJoiner result = new StringJoiner(",");
 		WoodStorageBlockItem.getWoodType(itemStack).ifPresent(woodName -> result.add("woodName:" + woodName));
-		StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
-		StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
+		StorageBlockItem.getMainColorFromComponentHolder(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
+		StorageBlockItem.getAccentColorFromComponentHolder(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
 		result.add("flatTop:" + BarrelBlockItem.isFlatTop(itemStack));
 		return "{" + result + "}";
 	}

@@ -3,6 +3,7 @@ package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
@@ -58,6 +59,11 @@ public class StorageContainerMenu extends StorageContainerMenuBase<IStorageWrapp
 	@Override
 	public Optional<BlockPos> getBlockPosition() {
 		return Optional.of(storageBlockEntity.getBlockPos());
+	}
+
+	@Override
+	public Optional<Entity> getEntity() {
+		return Optional.empty();
 	}
 
 	@Override

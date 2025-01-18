@@ -8,13 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 public class BarrelBlockItem extends WoodStorageBlockItem {
@@ -46,8 +46,8 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 		}
 	}
 
-	public static boolean isFlatTop(ItemStack stack) {
-		return stack.sophisticatedCore_getOrDefault(ModDataComponents.FLAT_TOP, false);
+	public static boolean isFlatTop(SophisticatedDataComponentHolder componentHolder) {
+		return componentHolder.sophisticatedCore_getOrDefault(ModDataComponents.FLAT_TOP, false);
 	}
 
 	public static void setMaterials(ItemStack barrel, Map<BarrelMaterial, ResourceLocation> materials) {
@@ -55,7 +55,7 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getMaterials(ItemStack barrel) {
-		return new HashMap<>(barrel.sophisticatedCore_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of()));
+		return barrel.sophisticatedCore_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of());
 	}
 
 	public static void removeMaterials(ItemStack stack) {
@@ -118,6 +118,13 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 				}
 			}
 		}
+	}
+
+	public static Map<BarrelMaterial, ResourceLocation> getUncompactedMaterials(ItemStack storageStack) {
+		Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
+		materials.putAll(getMaterials(storageStack));
+		uncompactMaterials(materials);
+		return materials;
 	}
 
 	@Override

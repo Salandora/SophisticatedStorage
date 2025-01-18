@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsHandler;
 import net.p3pp3rf1y.sophisticatedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
@@ -255,13 +256,14 @@ public class LimitedBarrelBlock extends BarrelBlock {
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(level, pos, state, placer, stack);
 
-		WorldHelper.getBlockEntity(level, pos, LimitedBarrelBlockEntity.class).ifPresent(be -> {
-			StorageWrapper storageWrapper = be.getStorageWrapper();
-			SettingsHandler settingsHandler = storageWrapper.getSettingsHandler();
-			settingsHandler.getTypeCategory(ItemDisplaySettingsCategory.class).selectSlots(0, storageWrapper.getNumberOfInventorySlots());
-			settingsHandler.getTypeCategory(NoSortSettingsCategory.class).selectSlots(0, storageWrapper.getNumberOfInventorySlots());
-			settingsHandler.getTypeCategory(MemorySettingsCategory.class).setIgnoreNbt(false);
-		});
+		WorldHelper.getBlockEntity(level, pos, LimitedBarrelBlockEntity.class).ifPresent(be -> setupDefaultSettings(be.getStorageWrapper(), be.getStorageWrapper().getNumberOfInventorySlots()));
+	}
+
+	public static void setupDefaultSettings(IStorageWrapper storageWrapper, int numberOfInventorySlots) {
+		SettingsHandler settingsHandler = storageWrapper.getSettingsHandler();
+		settingsHandler.getTypeCategory(ItemDisplaySettingsCategory.class).selectSlots(0, numberOfInventorySlots);
+		settingsHandler.getTypeCategory(NoSortSettingsCategory.class).selectSlots(0, numberOfInventorySlots);
+		settingsHandler.getTypeCategory(MemorySettingsCategory.class).setIgnoreNbt(false);
 	}
 
 	@Override

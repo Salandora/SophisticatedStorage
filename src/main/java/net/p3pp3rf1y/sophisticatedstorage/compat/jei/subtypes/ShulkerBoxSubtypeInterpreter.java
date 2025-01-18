@@ -8,15 +8,15 @@ import java.util.StringJoiner;
 
 public class ShulkerBoxSubtypeInterpreter extends PropertyBasedSubtypeInterpreter {
 	public ShulkerBoxSubtypeInterpreter() {
-		addOptionalProperty(StorageBlockItem::getMainColorFromStack);
-		addOptionalProperty(StorageBlockItem::getAccentColorFromStack);
+		addOptionalProperty(StorageBlockItem::getMainColorFromComponentHolder);
+		addOptionalProperty(StorageBlockItem::getAccentColorFromComponentHolder);
 	}
 
 	@Override
 	public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext context) {
 		StringJoiner result = new StringJoiner(",");
-		StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
-		StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
+		StorageBlockItem.getMainColorFromComponentHolder(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
+		StorageBlockItem.getAccentColorFromComponentHolder(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
 		return "{" + result + "}";
 	}
 }

@@ -31,7 +31,7 @@ public class SophisticatedStorage implements ModInitializer {
 		CompatRegistry.getRegistry(MOD_ID).initCompats();
 		ModBlocks.registerHandlers();
 		ModItems.registerHandlers();
-		ModPayloads.registerPackets();
+		ModPayloads.registerPayloads();
 		SophisticatedStorage.setup();
 		ModParticles.registerParticles();
 

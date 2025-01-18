@@ -48,6 +48,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import javax.annotation.Nullable;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -149,7 +150,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 		WorldHelper.getBlockEntity(level, pos, BarrelBlockEntity.class).ifPresent(barrel -> {
 			Map<BarrelMaterial, ResourceLocation> materials = BarrelBlockItem.getMaterials(stack);
 			if (!materials.isEmpty()) {
-				barrel.setMaterials(materials);
+				barrel.setMaterials(new EnumMap<>(materials));
 			}
 		});
 	}

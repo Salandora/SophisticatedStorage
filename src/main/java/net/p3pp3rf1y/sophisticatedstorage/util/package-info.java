@@ -1,9 +1,7 @@
+// Auto generated package-info by MCP
 
-/**
- * Implementation code for SophisticatedStorage.
- */
 @ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
-package net.p3pp3rf1y.sophisticatedstorage.util.model;
+package net.p3pp3rf1y.sophisticatedstorage.util;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 

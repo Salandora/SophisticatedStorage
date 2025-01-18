@@ -131,7 +131,7 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 			poseStack.scale(1.01f, 1.01f, 1.01f);
 			subRenderer.renderBottomAndLid(poseStack, bufferSource, lidAngle, packedLight, packedOverlay, StorageTextureManager.ChestMaterial.PACKED);
 			poseStack.popPose();
-		} else if (shouldRenderFrontFace(chestEntity.getBlockPos())) {
+		} else if (chestEntity.getBlockPos() == BlockPos.ZERO || shouldRenderFrontFace(chestEntity.getBlockPos())) { //special condition for chests that are not in the world
 			poseStack.pushPose();
 			poseStack.translate(0.5, 0.5, 0.5);
 			poseStack.mulPose(Axis.YP.rotationDegrees(180));
