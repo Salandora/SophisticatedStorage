@@ -75,6 +75,7 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.DropPackedDisabledCondition;
 import net.p3pp3rf1y.sophisticatedstorage.data.CopyStorageDataFunction;
+import net.p3pp3rf1y.sophisticatedstorage.item.PaintbrushItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageTierUpgradeItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
@@ -210,6 +211,7 @@ public class ModItems {
 	});
 	public static final ItemBase STORAGE_TOOL = register("storage_tool", StorageToolItem::new);
 	public static final ItemBase DEBUG_TOOL = register("debug_tool", () -> new ItemBase(new Item.Properties().stacksTo(1)));
+	public static final ItemBase PAINTBRUSH = register("paintbrush", PaintbrushItem::new);
 	public static final Item INACCESSIBLE_SLOT = register("inaccessible_slot", () -> new Item(new Item.Properties().stacksTo(1)));
 	public static final LootItemFunctionType COPY_STORAGE_DATA = registerLootFunction("copy_storage_data", () -> new LootItemFunctionType(new CopyStorageDataFunction.Serializer()));
 

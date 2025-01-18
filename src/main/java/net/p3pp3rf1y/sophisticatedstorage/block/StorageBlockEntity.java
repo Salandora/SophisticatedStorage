@@ -32,9 +32,7 @@ import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllableStorage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
-import net.p3pp3rf1y.sophisticatedcore.inventory.ISlotTracker;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
-import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
@@ -43,18 +41,10 @@ import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrade;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
+import java.util.*;
 
-public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay, RenderAttachmentBlockEntity {
+public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay {
 	public static final String STORAGE_WRAPPER_TAG = "storageWrapper";
 	private final StorageWrapper storageWrapper;
 	@Nullable
@@ -399,8 +389,6 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		setChanged();
 	}
 
-	@SuppressWarnings("unused")
-	@NotNull
 	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
 		if (cap == ItemStorage.SIDED) {
 			if (opt == null) {
@@ -638,104 +626,5 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	@SuppressWarnings("unused") //parameter used in override
 	public float getSlotFillPercentage(int slot) {
 		return 0; //only used in limited barrels
-	}
-
-	private static class ContentsFilteredItemHandler implements ITrackedContentsItemHandler {
-
-		private final Supplier<ITrackedContentsItemHandler> itemHandlerGetter;
-		private final Supplier<ISlotTracker> slotTrackerGetter;
-		private final Supplier<MemorySettingsCategory> memorySettingsGetter;
-
-		private ContentsFilteredItemHandler(Supplier<ITrackedContentsItemHandler> itemHandlerGetter, Supplier<ISlotTracker> slotTrackerGetter, Supplier<MemorySettingsCategory> memorySettingsGetter) {
-			this.itemHandlerGetter = itemHandlerGetter;
-			this.slotTrackerGetter = slotTrackerGetter;
-			this.memorySettingsGetter = memorySettingsGetter;
-		}
-
-		@Override
-		public int getSlotCount() {
-			return itemHandlerGetter.get().getSlotCount();
-		}
-
-		@Nonnull
-		@Override
-		public ItemStack getStackInSlot(int slot) {
-			return itemHandlerGetter.get().getStackInSlot(slot);
-		}
-
-		@Override
-		public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-			return itemHandlerGetter.get().getSlot(slot);
-		}
-
-		@Override
-		public long insertSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			if (matchesContents(resource.toStack((int) maxAmount))) {
-				return itemHandlerGetter.get().insertSlot(slot, resource, maxAmount, ctx);
-			}
-			return 0;
-		}
-
-		@Override
-		public long extractSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return itemHandlerGetter.get().extractSlot(slot, resource, maxAmount, ctx);
-		}
-
-		@Override
-		public int getSlotLimit(int slot) {
-			return itemHandlerGetter.get().getSlotLimit(slot);
-		}
-
-		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return matchesContents(resource.toStack(count)) && itemHandlerGetter.get().isItemValid(slot, resource, count);
-		}
-
-		private boolean matchesContents(ItemStack stack) {
-			return slotTrackerGetter.get().getItems().contains(stack.getItem()) || memorySettingsGetter.get().matchesFilter(stack);
-		}
-
-		@Override
-		public long insert(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			if (matchesContents(resource.toStack((int) maxAmount))) {
-				return itemHandlerGetter.get().insert(resource, maxAmount, ctx);
-			}
-			return 0;
-		}
-
-		@Override
-		public long extract(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return itemHandlerGetter.get().extract(resource, maxAmount, ctx);
-		}
-
-		@Override
-		public Set<ItemStackKey> getTrackedStacks() {
-			return itemHandlerGetter.get().getTrackedStacks();
-		}
-
-		@Override
-		public void registerTrackingListeners(Consumer<ItemStackKey> onAddStackKey, Consumer<ItemStackKey> onRemoveStackKey, Runnable onAddFirstEmptySlot, Runnable onRemoveLastEmptySlot) {
-			itemHandlerGetter.get().registerTrackingListeners(onAddStackKey, onRemoveStackKey, onAddFirstEmptySlot, onRemoveLastEmptySlot);
-		}
-
-		@Override
-		public void unregisterStackKeyListeners() {
-			itemHandlerGetter.get().unregisterStackKeyListeners();
-		}
-
-		@Override
-		public boolean hasEmptySlots() {
-			return itemHandlerGetter.get().hasEmptySlots();
-		}
-
-		@Override
-		public int getInternalSlotLimit(int slot) {
-			return itemHandlerGetter.get().getInternalSlotLimit(slot);
-		}
-
-		@Override
-		public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
-			itemHandlerGetter.get().setStackInSlot(slot, stack);
-		}
 	}
 }

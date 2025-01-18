@@ -112,6 +112,13 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 		}
 	}
 
+	public static Map<BarrelMaterial, ResourceLocation> getUncompactedMaterials(ItemStack storageStack) {
+		Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
+		materials.putAll(getMaterials(storageStack));
+		uncompactMaterials(materials);
+		return materials;
+	}
+
 	@Override
 	public Component getName(ItemStack stack) {
 		Component name;

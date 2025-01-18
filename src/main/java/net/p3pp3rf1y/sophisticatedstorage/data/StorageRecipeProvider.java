@@ -83,6 +83,15 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('B', ModItems.UPGRADE_BASE)
 				.unlockedBy("has_upgrade_base", has(ModItems.UPGRADE_BASE))
 				.save(consumer);
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PAINTBRUSH)
+				.pattern(" W ")
+				.pattern(" SW")
+				.pattern("S  ")
+				.define('S', Items.STICK)
+				.define('W', ItemTags.WOOL)
+				.unlockedBy("has_base_tier_wooden_storage", has(ModBlocks.BASE_TIER_WOODEN_STORAGE_TAG))
+				.save(consumer);
 	}
 
 	private void addBackpackUpgradeConversionRecipes(Consumer<FinishedRecipe> consumer) {

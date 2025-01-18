@@ -66,6 +66,7 @@ public class ModBlocks {
 	}
 
 	public static final TagKey<Item> BASE_TIER_WOODEN_STORAGE_TAG = TagKey.create(Registries.ITEM, SophisticatedStorage.getRL("base_tier_wooden_storage"));
+	public static final TagKey<Item> ALL_STORAGE_TAG = TagKey.create(Registries.ITEM, SophisticatedStorage.getRL("all_storage"));
 
 	public static Collection<Block> getBlocksByPredicate(BiPredicate<ResourceLocation, Block> matches) {
 		List<Block> blocks = new ArrayList<>();

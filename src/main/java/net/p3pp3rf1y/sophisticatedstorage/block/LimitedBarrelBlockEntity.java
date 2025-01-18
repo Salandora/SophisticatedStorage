@@ -37,7 +37,7 @@ import java.util.function.Predicate;
 public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICountDisplay, IFillLevelDisplay {
 	private static final String SLOT_COUNTS_TAG = "slotCounts";
 	private static final String SLOT_FILL_LEVELS_TAG = "slotFillLevels";
-	private static final Consumer<VoidUpgradeWrapper> VOID_UPGRADE_VOIDING_OVERFLOW_OF_EVERYTHING_BY_DEFAULT = voidUpgrade -> {
+	public static final Consumer<VoidUpgradeWrapper> VOID_UPGRADE_VOIDING_OVERFLOW_OF_EVERYTHING_BY_DEFAULT = voidUpgrade -> {
 		voidUpgrade.getFilterLogic().setAllowByDefault(false);
 		voidUpgrade.setShouldVoidOverflowDefaultOrLoadFromNbt(true);
 	};

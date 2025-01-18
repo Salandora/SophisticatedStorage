@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.ReiGridMenuInfo;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
@@ -58,7 +59,9 @@ public class REICompat implements REIServerPlugin {
 
     @Override
     public void registerMenuInfo(MenuInfoRegistry registry) {
-        registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::new));
-		//registry.register(BuiltinPlugin.STONE_CUTTING, StorageScreen.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::new));
-    }
+        registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::crafting));
+		// TODO: Fix this
+		// registry.register(BuiltinPlugin.STONE_CUTTING, StorageScreen.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::stonecutting));
+		// registry.register(BuiltinPlugin.SMITHING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::smithing));
+	}
 }
