@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
 import com.google.common.collect.MapMaker;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,15 +21,10 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
+import java.util.*;
 
 public class WoodStorageBlockItem extends StorageBlockItem {
 	public static final String WOOD_TYPE_TAG = "woodType";
@@ -115,28 +109,12 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 				if (stack.getCount() == 1) {
 					return LazyOptional.of(() -> wrapperMap.computeIfAbsent(stack, this::initWrapper)).cast();
 				}
-
 				return LazyOptional.empty();
 			}
 
 			private StackStorageWrapper initWrapper(ItemStack stack) {
-				UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
-				StackStorageWrapper storageWrapper = new StackStorageWrapper(stack) {
-					@Override
-					public String getStorageType() {
-						return "wood_storage"; //isn't really relevant because wooden storage can't have its gui open when in item form
-					}
-
-					@Override
-					public Component getDisplayName() {
-						return Component.empty(); //isn't really relevant because wooden storage can't have its gui open when in item form
-					}
-
-					@Override
-					protected boolean isAllowedInStorage(ItemStack stack) {
-						return false;
-					}
-				};
+				UUID uuid = getContentsUuid(stack).orElse(null);
+				StackStorageWrapper storageWrapper = new StackStorageWrapper(stack);
 				if (uuid != null) {
 					CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
 					storageWrapper.load(compoundtag);
@@ -162,13 +140,5 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 			return Component.translatable(descriptionId, "", "");
 		}
 		return Component.translatable(descriptionId, Component.translatable("wood_name.sophisticatedstorage." + woodType.name().toLowerCase(Locale.ROOT)), " ");
-	}
-
-	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-		NBTHelper.putInt(storageStack.getOrCreateTag(), "numberOfInventorySlots", numberOfInventorySlots);
-	}
-
-	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-		NBTHelper.putInt(storageStack.getOrCreateTag(), "numberOfUpgradeSlots", numberOfUpgradeSlots);
 	}
 }

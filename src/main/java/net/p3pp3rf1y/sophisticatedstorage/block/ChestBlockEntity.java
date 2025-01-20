@@ -42,6 +42,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 	@Nullable
 	private BlockPos doubleMainPos = null;
+	public boolean showUpgradesOnTop = false;
 	private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
 		protected void onOpen(Level level, BlockPos pos, BlockState state) {
 			if (state.getValue(ChestBlock.TYPE) != ChestType.LEFT) {

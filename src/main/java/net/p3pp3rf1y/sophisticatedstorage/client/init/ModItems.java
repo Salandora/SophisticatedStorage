@@ -21,6 +21,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeTab;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeTab;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeTab;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeTab;
@@ -39,32 +40,7 @@ import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageButtonDefinitions;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeTab;
 
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_COMPACTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_FEEDING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_HOPPER_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_PUMP_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.ADVANCED_VOID_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.AUTO_BLASTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.AUTO_SMELTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.AUTO_SMOKING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.BATTERY_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.BLASTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.COMPACTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.CRAFTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.FEEDING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.HOPPER_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.JUKEBOX_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.MAGNET_ADVANCED_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.MAGNET_BASIC_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.PICKUP_ADVANCED_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.PICKUP_BASIC_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.PUMP_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.SMELTING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.SMOKING_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.STONECUTTER_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.TANK_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.VOID_TYPE;
-import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.XP_PUMP_TYPE;
+import static net.p3pp3rf1y.sophisticatedstorage.init.ModItems.*;
 
 public class ModItems {
 
@@ -106,7 +82,8 @@ public class ModItems {
 				new CraftingUpgradeTab(uc, p, s, StorageButtonDefinitions.SHIFT_CLICK_TARGET));
 		UpgradeGuiManager.registerTab(STONECUTTER_TYPE, (StonecutterUpgradeContainer upgradeContainer, Position position, StorageScreenBase<?> screen) ->
 				new StonecutterUpgradeTab(upgradeContainer, position, screen, StorageButtonDefinitions.SHIFT_CLICK_TARGET));
-		UpgradeGuiManager.registerTab(JUKEBOX_TYPE, JukeboxUpgradeTab::new);
+		UpgradeGuiManager.registerTab(JUKEBOX_TYPE, JukeboxUpgradeTab.Basic::new);
+		UpgradeGuiManager.registerTab(ADVANCED_JUKEBOX_TYPE, (JukeboxUpgradeContainer uc, Position p, StorageScreenBase<?> s) -> new JukeboxUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedJukeboxUpgrade.slotsInRow.get()));
 		UpgradeGuiManager.registerTab(TANK_TYPE, TankUpgradeTab::new);
 		UpgradeGuiManager.registerTab(BATTERY_TYPE, BatteryUpgradeTab::new);
 		UpgradeGuiManager.registerInventoryPart(TANK_TYPE, TankInventoryPart::new);

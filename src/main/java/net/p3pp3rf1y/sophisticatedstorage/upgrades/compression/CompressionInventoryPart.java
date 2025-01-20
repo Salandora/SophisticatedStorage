@@ -296,7 +296,9 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 	// TODO: ItemVariant can be null
 	@Override
 	public long extractItem(int slot, ItemVariant resource, long amount, @Nullable TransactionContext ctx) {
-		return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
+		//return extractItem(slot, resource, amount, ctx, ItemStack::getMaxStackSize);
+		//return extractItem(slot, amount, simulate, s -> Integer.MAX_VALUE); //!!! DON'T MERGE THIS TO ANY OTHER VERSION This limitation to max int is a bug introduced so that RS doesn't duplicate !!!
+		return extractItem(slot, resource, amount, ctx, s -> Integer.MAX_VALUE); //!!! DON'T MERGE THIS TO ANY OTHER VERSION This limitation to max int is a bug introduced so that RS doesn't duplicate !!!
 	}
 
 	// TODO: remove ItemVariant

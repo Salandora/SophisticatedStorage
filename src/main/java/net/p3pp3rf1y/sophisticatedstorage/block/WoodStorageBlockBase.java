@@ -18,6 +18,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.BlockHitResult;
+import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeHandler;
 import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
@@ -71,8 +73,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				}
 				WoodStorageBlockItem.setPacked(stack, true);
 				StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
-				WoodStorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlotCount());
-				WoodStorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlotCount());
+				StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlotCount());
+				StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlotCount());
 			}
 		}
 	}
@@ -149,6 +151,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				be.setBeingUpgraded(true);
 				be.load(itemContentsStorage.getOrCreateStorageContents(uuid));
 				itemContentsStorage.removeStorageContents(uuid);
+
+				setNewSize(stack, be);
 			});
 
 			if (stack.hasCustomHoverName()) {
@@ -166,10 +170,17 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 		});
 	}
 
+	private void setNewSize(ItemStack stack, WoodStorageBlockEntity be) {
+		StorageWrapper storageWrapper = be.getStorageWrapper();
+		InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
+		UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
+		storageWrapper.changeSize(StorageBlockItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlotCount(),
+				StorageBlockItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlotCount());
+	}
+
 	protected void setRenderBlockRenderProperties(ItemStack stack, WoodStorageBlockEntity be) {
 		WoodStorageBlockItem.getWoodType(stack).ifPresent(be::setWoodType);
-		StorageBlockItem.getMainColorFromStack(stack).ifPresent(be.getStorageWrapper()::setMainColor);
-		StorageBlockItem.getAccentColorFromStack(stack).ifPresent(be.getStorageWrapper()::setAccentColor);
+		be.getStorageWrapper().setColors(StorageBlockItem.getMainColorFromStack(stack).orElse(-1), StorageBlockItem.getAccentColorFromStack(stack).orElse(-1));
 	}
 
 	@Override

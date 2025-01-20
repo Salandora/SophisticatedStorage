@@ -121,6 +121,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 		addStorageUpgradeFromBackpackUpgradeRecipe(consumer, ModItems.AUTO_BLASTING_UPGRADE, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.AUTO_BLASTING_UPGRADE);
 		addStorageUpgradeFromBackpackUpgradeRecipe(consumer, ModItems.STONECUTTER_UPGRADE, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STONECUTTER_UPGRADE);
 		addStorageUpgradeFromBackpackUpgradeRecipe(consumer, ModItems.JUKEBOX_UPGRADE, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.JUKEBOX_UPGRADE);
+		addStorageUpgradeFromBackpackUpgradeRecipe(consumer, ModItems.ADVANCED_JUKEBOX_UPGRADE, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_JUKEBOX_UPGRADE);
 
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(consumer, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_STARTER_TIER, ModItems.STACK_UPGRADE_TIER_1_PLUS);
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(consumer, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_1, ModItems.STACK_UPGRADE_TIER_2);
@@ -148,6 +149,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 		addBackpackUpgradeFromStorageUpgradeRecipe(consumer, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.AUTO_BLASTING_UPGRADE, ModItems.AUTO_BLASTING_UPGRADE);
 		addBackpackUpgradeFromStorageUpgradeRecipe(consumer, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STONECUTTER_UPGRADE, ModItems.STONECUTTER_UPGRADE);
 		addBackpackUpgradeFromStorageUpgradeRecipe(consumer, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.JUKEBOX_UPGRADE, ModItems.JUKEBOX_UPGRADE);
+		addBackpackUpgradeFromStorageUpgradeRecipe(consumer, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_JUKEBOX_UPGRADE, ModItems.ADVANCED_JUKEBOX_UPGRADE);
 
 	}
 
@@ -854,6 +856,17 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('I', ConventionalItemTags.IRON_INGOTS)
 				.define('J', Items.JUKEBOX)
 				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE))
+				.save(consumer);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_JUKEBOX_UPGRADE)
+				.pattern(" D ")
+				.pattern("GJG")
+				.pattern("RRR")
+				.define('D', ConventionalItemTags.DIAMONDS)
+				.define('G', ConventionalItemTags.GOLD_INGOTS)
+				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
+				.define('J', ModItems.JUKEBOX_UPGRADE)
+				.unlockedBy("has_jukebox_upgrade", has(ModItems.JUKEBOX_UPGRADE))
 				.save(consumer);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_FEEDING_UPGRADE, ModRecipes.UPGRADE_NEXT_TIER_SERIALIZER)

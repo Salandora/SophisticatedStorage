@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
+import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
@@ -21,15 +21,25 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		super(ModBlocks.STORAGE_OUTPUT_BLOCK_ENTITY_TYPE, pos, state);
 	}
 
+	@Nullable
 	@Override
-	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt, ControllerBlockEntity c) {
+	protected <T> Direction getAdjustedCapabilitySide(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
 		if (cap == ItemStorage.SIDED) {
-				return c.getCapability(ItemStorage.SIDED, null) //passing null side to not get the cache failed handler
-						.map(itemHandler -> LazyOptional.of(() -> itemHandler instanceof SlottedStackStorage simpleInserter ? new OutputOnlyItemHandlerWrapper(simpleInserter) : itemHandler))
-						.orElseGet(LazyOptional::empty).cast();
+			return null; //passing null side to not get the cache failed handler from controller
 		}
 
-		return super.getControllerCapability(cap, opt, c);
+		return super.getAdjustedCapabilitySide(cap, side);
+	}
+
+	@Override
+	protected <T> T wrapCapability(BlockApiLookup<T, Direction> cap, T capability) {
+		if (cap == ItemStorage.SIDED) {
+			if (capability instanceof IItemHandlerSimpleInserter) {
+				return (T) new OutputOnlyItemHandlerWrapper((IItemHandlerSimpleInserter) capability);
+			}
+		}
+
+		return super.wrapCapability(cap, capability);
 	}
 
 	private static class OutputOnlyItemHandlerWrapper implements SlottedStackStorage {
