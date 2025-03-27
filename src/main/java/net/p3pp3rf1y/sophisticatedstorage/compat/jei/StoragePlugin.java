@@ -31,6 +31,7 @@ import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromVanillaShapeles
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
@@ -54,11 +55,12 @@ public class StoragePlugin implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		IIngredientSubtypeInterpreter<ItemStack> woodStorageNbtInterpreter = (itemStack, context) -> {
+		IIngredientSubtypeInterpreter<ItemStack> chestNbtInterpreter = (itemStack, context) -> {
 			StringJoiner result = new StringJoiner(",");
 			WoodStorageBlockItem.getWoodType(itemStack).ifPresent(woodName -> result.add("woodName:" + woodName));
 			StorageBlockItem.getMainColorFromStack(itemStack).ifPresent(mainColor -> result.add("mainColor:" + mainColor));
 			StorageBlockItem.getAccentColorFromStack(itemStack).ifPresent(accentColor -> result.add("accentColor:" + accentColor));
+			result.add("doubleChest:" + ChestBlockItem.isDoubleChest(itemStack));
 			return "{" + result + "}";
 		};
 		IIngredientSubtypeInterpreter<ItemStack> barrelNbtInterpreter = (itemStack, context) -> {
@@ -74,7 +76,7 @@ public class StoragePlugin implements IModPlugin {
 			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, barrelNbtInterpreter);
 		}
 		for (BlockItem item : ModBlocks.CHEST_ITEMS) {
-			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, woodStorageNbtInterpreter);
+			registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, item, chestNbtInterpreter);
 		}
 
 		IIngredientSubtypeInterpreter<ItemStack> shulkerBoxNbtInterpreter = (itemStack, context) -> {

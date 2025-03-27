@@ -3,14 +3,14 @@ package net.p3pp3rf1y.sophisticatedstorage.crafting;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
-import net.p3pp3rf1y.sophisticatedstorage.block.IStorageBlock;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ShapedRecipeAccessor;
@@ -35,6 +35,11 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 	}
 
 	@Override
+	public boolean matches(CraftingContainer inv, Level level) {
+		return super.matches(inv, level) && getOriginalStorage(inv).isPresent();
+	}
+
+	@Override
 	public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
 		ItemStack upgradedStorage = super.assemble(inv, registryAccess);
 		getOriginalStorage(inv).ifPresent(originalStorage -> upgradedStorage.setTag(originalStorage.getTag()));
@@ -54,7 +59,8 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 	private Optional<ItemStack> getOriginalStorage(CraftingContainer inv) {
 		for (int slot = 0; slot < inv.getContainerSize(); slot++) {
 			ItemStack slotStack = inv.getItem(slot);
-			if (slotStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof IStorageBlock) {
+			if (slotStack.getItem() instanceof StorageBlockItem
+					&& (!(slotStack.getItem() instanceof ChestBlockItem) || !ChestBlockItem.isDoubleChest(slotStack))) {
 				return Optional.of(slotStack);
 			}
 		}

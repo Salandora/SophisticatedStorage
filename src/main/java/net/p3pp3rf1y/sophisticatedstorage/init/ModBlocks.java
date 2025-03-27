@@ -372,7 +372,9 @@ public class ModBlocks {
 
 	public static final SimpleCraftingRecipeSerializer<?> STORAGE_DYE_RECIPE_SERIALIZER = registerRecipeSerializer("storage_dye", () -> new SimpleCraftingRecipeSerializer<>(StorageDyeRecipe::new));
 	public static final RecipeSerializer<?> STORAGE_TIER_UPGRADE_RECIPE_SERIALIZER = registerRecipeSerializer("storage_tier_upgrade", StorageTierUpgradeRecipe.Serializer::new);
+	public static final RecipeSerializer<?> DOUBLE_CHEST_TIER_UPGRADE_RECIPE_SERIALIZER = registerRecipeSerializer("double_chest_tier_upgrade", DoubleChestTierUpgradeRecipe.Serializer::new);
 	public static final RecipeSerializer<?> STORAGE_TIER_UPGRADE_SHAPELESS_RECIPE_SERIALIZER = registerRecipeSerializer("storage_tier_upgrade_shapeless", StorageTierUpgradeShapelessRecipe.Serializer::new);
+	public static final RecipeSerializer<?> DOUBLE_CHEST_TIER_UPGRADE_SHAPELESS_RECIPE_SERIALIZER = registerRecipeSerializer("double_chest_tier_upgrade_shapeless", DoubleChestTierUpgradeShapelessRecipe.Serializer::new);
 	public static final RecipeSerializer<?> SHULKER_BOX_FROM_VANILLA_SHAPELESS_RECIPE_SERIALIZER = registerRecipeSerializer("shulker_box_from_vanilla_shapeless", ShulkerBoxFromVanillaShapelessRecipe.Serializer::new);
 	public static final RecipeSerializer<?> SHULKER_BOX_FROM_CHEST_RECIPE_SERIALIZER = registerRecipeSerializer("shulker_box_from_chest", ShulkerBoxFromChestRecipe.Serializer::new);
 	public static final SimpleCraftingRecipeSerializer<?> FLAT_TOP_BARREL_TOGGLE_RECIPE_SERIALIZER = registerRecipeSerializer("flat_top_barrel_toggle", () -> new SimpleCraftingRecipeSerializer<>(FlatTopBarrelToggleRecipe::new));

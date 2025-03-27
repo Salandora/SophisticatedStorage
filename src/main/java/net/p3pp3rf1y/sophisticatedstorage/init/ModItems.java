@@ -37,6 +37,8 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeTab;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeWrapper;
@@ -150,6 +152,14 @@ public class ModItems {
 			new StackUpgradeItem(16, Config.SERVER.maxUpgradesPerStorage));
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_5 = register("stack_upgrade_tier_5", () ->
 			new StackUpgradeItem(32, Config.SERVER.maxUpgradesPerStorage));
+	public static final StackUpgradeItem STACK_DOWNGRADE_TIER_1 = register("stack_downgrade_tier_1", () ->
+			new StackUpgradeItem(0.125, Config.SERVER.maxUpgradesPerStorage));
+	public static final StackUpgradeItem STACK_DOWNGRADE_TIER_2 = register("stack_downgrade_tier_2", () ->
+			new StackUpgradeItem(0.0625, Config.SERVER.maxUpgradesPerStorage));
+	public static final StackUpgradeItem STACK_DOWNGRADE_TIER_3 = register("stack_downgrade_tier_3", () ->
+			new StackUpgradeItem(0.03125, Config.SERVER.maxUpgradesPerStorage));
+	public static final StackUpgradeItem STACK_UPGRADE_OMEGA_TIER = register("stack_upgrade_omega_tier", () ->
+			new StackUpgradeItem(Integer.MAX_VALUE, Config.SERVER.maxUpgradesPerStorage));
 	public static final JukeboxUpgradeItem JUKEBOX_UPGRADE = register("jukebox_upgrade", () -> new JukeboxUpgradeItem(Config.SERVER.maxUpgradesPerStorage, () -> 1, () -> 1));
 	public static final JukeboxUpgradeItem ADVANCED_JUKEBOX_UPGRADE = register("advanced_jukebox_upgrade", () -> new JukeboxUpgradeItem(Config.SERVER.maxUpgradesPerStorage, Config.SERVER.advancedJukeboxUpgrade.numberOfSlots::get, Config.SERVER.advancedJukeboxUpgrade.slotsInRow::get));
 	public static final PumpUpgradeItem PUMP_UPGRADE = register("pump_upgrade", () -> new PumpUpgradeItem(false, false, Config.SERVER.pumpUpgrade, Config.SERVER.maxUpgradesPerStorage));
@@ -160,6 +170,9 @@ public class ModItems {
 			new HopperUpgradeItem(Config.SERVER.hopperUpgrade.inputFilterSlots::get, Config.SERVER.hopperUpgrade.outputFilterSlots::get, Config.SERVER.hopperUpgrade.transferSpeedTicks::get, Config.SERVER.hopperUpgrade.maxTransferStackSize::get));
 	public static final HopperUpgradeItem ADVANCED_HOPPER_UPGRADE = register("advanced_hopper_upgrade", () ->
 			new HopperUpgradeItem(Config.SERVER.advancedHopperUpgrade.inputFilterSlots::get, Config.SERVER.advancedHopperUpgrade.outputFilterSlots::get, Config.SERVER.advancedHopperUpgrade.transferSpeedTicks::get, Config.SERVER.advancedHopperUpgrade.maxTransferStackSize::get));
+    public static final InfinityUpgradeItem INFINITY_UPGRADE = register("infinity_upgrade", () -> new InfinityUpgradeItem(Config.SERVER.maxUpgradesPerStorage, true));
+    public static final InfinityUpgradeItem SURVIVAL_INFINITY_UPGRADE = register("survival_infinity_upgrade", () -> new InfinityUpgradeItem(Config.SERVER.maxUpgradesPerStorage, false));
+
 	public static final StorageTierUpgradeItem BASIC_TIER_UPGRADE = register("basic_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC, true));
 	public static final StorageTierUpgradeItem BASIC_TO_COPPER_TIER_UPGRADE = register("basic_to_copper_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_COPPER));
 	public static final StorageTierUpgradeItem BASIC_TO_IRON_TIER_UPGRADE = register("basic_to_iron_tier_upgrade", () -> new StorageTierUpgradeItem(StorageTierUpgradeItem.TierUpgrade.BASIC_TO_IRON));

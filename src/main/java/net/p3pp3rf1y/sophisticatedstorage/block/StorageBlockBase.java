@@ -1,8 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.mojang.math.Axis;
-import org.joml.Vector3f;
-
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.Minecraft;
@@ -37,14 +35,16 @@ import net.p3pp3rf1y.sophisticatedcore.util.BlockBase;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
+import org.joml.Vector3f;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public abstract class StorageBlockBase extends BlockBase implements IStorageBlock, ISneakItemInteractionBlock, EntityBlock {
 	public static final BooleanProperty TICKING = BooleanProperty.create("ticking");
@@ -219,7 +219,6 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
 		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(be -> be.onNeighborChange(neighborPos));
@@ -242,8 +241,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 	}
 
 	public static boolean tryAddSingleUpgrade(Player player, InteractionHand hand, ItemStack itemInHand, IStorageWrapper storageWrapper) {
-		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem
-				&& RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
+		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem && itemInHand.is(ModItems.STORAGE_UPGRADE_TAG)) {
 			UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
 			ItemVariant resource = ItemVariant.of(itemInHand);
 			if (upgradeItem.canAddUpgradeTo(storageWrapper, itemInHand, true, player.level().isClientSide()).isSuccessful()
