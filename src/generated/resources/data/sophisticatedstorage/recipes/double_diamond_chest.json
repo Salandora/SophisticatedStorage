@@ -1,17 +1,17 @@
 {
-  "type": "sophisticatedstorage:double_chest_tier_upgrade",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "sophisticatedcore:item_enabled",
+      "condition": "sophisticatedcore:item_enabled",
       "itemRegistryName": "sophisticatedstorage:diamond_chest"
     }
   ],
+  "type": "sophisticatedstorage:double_chest_tier_upgrade",
   "key": {
     "B": {
-      "tag": "forge:storage_blocks/diamond"
+      "tag": "c:diamond_blocks"
     },
     "D": {
-      "tag": "forge:gems/diamond"
+      "tag": "c:diamonds"
     },
     "S": {
       "item": "sophisticatedstorage:gold_chest"

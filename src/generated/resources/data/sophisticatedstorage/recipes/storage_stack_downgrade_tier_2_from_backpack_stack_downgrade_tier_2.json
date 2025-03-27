@@ -1,15 +1,17 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:mod_loaded",
-      "modid": "sophisticatedbackpacks"
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "sophisticatedbackpacks"
+      ]
     },
     {
-      "type": "sophisticatedcore:item_enabled",
+      "condition": "sophisticatedcore:item_enabled",
       "itemRegistryName": "sophisticatedstorage:stack_downgrade_tier_2"
     }
   ],
+  "type": "minecraft:crafting_shaped",
   "key": {
     "P": {
       "tag": "minecraft:planks"
