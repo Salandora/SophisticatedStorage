@@ -12,6 +12,8 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeGroup;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoCookingUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.CookingUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.ICookingUpgrade;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeConfig;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeConfig;
@@ -22,7 +24,6 @@ import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeConfig;
 import org.apache.commons.lang3.tuple.Pair;
@@ -159,6 +160,7 @@ public class Config {
 		public final CompressionUpgradeConfig compressionUpgrade;
 		public final HopperUpgradeConfig hopperUpgrade;
 		public final HopperUpgradeConfig advancedHopperUpgrade;
+		public final JukeboxUpgradeConfig advancedJukeboxUpgrade;
 
 		public final ModConfigSpec.IntValue tooManyItemEntityDrops;
 		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
@@ -259,26 +261,27 @@ public class Config {
 			compressionUpgrade = new CompressionUpgradeConfig(builder);
 			hopperUpgrade = new HopperUpgradeConfig(builder, "Hopper Upgrade", "hopperUpgrade", 2, 2, 2, 2, 8, 1);
 			advancedHopperUpgrade = new HopperUpgradeConfig(builder, "Advanced Hopper Upgrade", "advancedHopperUpgrade", 4, 4, 4, 4, 2, 4);
+			advancedJukeboxUpgrade = new JukeboxUpgradeConfig(builder, "Advanced Jukebox Upgrade", "advancedJukeboxUpgrade", 12);
 
 			maxUpgradesPerStorage = new MaxUgradesPerStorageConfig(builder, Map.of(
 					ChestBlockEntity.STORAGE_TYPE, Map.of(
 							StackUpgradeItem.UPGRADE_GROUP.name(), 2,
 							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
-							ModItems.JUKEBOX_UPGRADE_NAME, 1
+							JukeboxUpgradeItem.UPGRADE_GROUP.name(), 1
 					),
 					BarrelBlockEntity.STORAGE_TYPE, Map.of(
 							StackUpgradeItem.UPGRADE_GROUP.name(), 2,
 							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
-							ModItems.JUKEBOX_UPGRADE_NAME, 1
+							JukeboxUpgradeItem.UPGRADE_GROUP.name(), 1
 					),
 					ShulkerBoxBlockEntity.STORAGE_TYPE, Map.of(
 							StackUpgradeItem.UPGRADE_GROUP.name(), 2,
 							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
-							ModItems.JUKEBOX_UPGRADE_NAME, 1
+							JukeboxUpgradeItem.UPGRADE_GROUP.name(), 1
 					),
 					LimitedBarrelBlockEntity.STORAGE_TYPE, Map.of(
 							ICookingUpgrade.UPGRADE_GROUP.name(), 1,
-							ModItems.JUKEBOX_UPGRADE_NAME, 1
+							JukeboxUpgradeItem.UPGRADE_GROUP.name(), 1
 					)
 			));
 

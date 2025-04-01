@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.SlotAccess;
@@ -37,9 +38,9 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-		super.appendHoverText(stack, context, tooltip, flagIn);
-		if (flagIn == TooltipFlag.ADVANCED) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
+		super.appendHoverText(stack, context, tooltip, tooltipFlag);
+		if (tooltipFlag.isAdvanced()) {
 			HolderLookup.Provider registries = context.registries();
 			if (registries != null) {
 				StackStorageWrapper.fromStack(registries, stack).getContentsUuid().ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
@@ -105,10 +106,6 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		return StashResult.SPACE;
 	}
 
-	public void setNumberOfInventorySlots(ItemStack shulkerBoxStack, int numberOfInventorySlots) {
-		shulkerBoxStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
-	}
-
 	public int getNumberOfInventorySlots(HolderLookup.Provider registries, ItemStack shulkerBoxStack) {
 		int defaultNumberOfInventorySlots = StackStorageWrapper.fromStack(registries, shulkerBoxStack).getDefaultNumberOfInventorySlots();
 		return Math.max(shulkerBoxStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, defaultNumberOfInventorySlots), defaultNumberOfInventorySlots);
@@ -119,13 +116,9 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		return Math.max(shulkerBoxStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, defaultNumberOfUpgradeSlots), defaultNumberOfUpgradeSlots);
 	}
 
-	public void setNumberOfUpgradeSlots(ItemStack shulkerBoxStack, int numberOfUpgradeSlots) {
-		shulkerBoxStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
-	}
-
 	@Override
 	public boolean overrideStackedOnOther(ItemStack storageStack, Slot slot, ClickAction action, Player player) {
-		if (storageStack.getCount() > 1 || !slot.mayPickup(player) || slot.getItem().isEmpty() || action != ClickAction.SECONDARY) {
+		if (hasCreativeScreenContainerOpen(player) || storageStack.getCount() > 1 || !slot.mayPickup(player) || slot.getItem().isEmpty() || action != ClickAction.SECONDARY) {
 			return super.overrideStackedOnOther(storageStack, slot, action, player);
 		}
 
@@ -143,7 +136,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 
 	@Override
 	public boolean overrideOtherStackedOnMe(ItemStack storageStack, ItemStack otherStack, Slot slot, ClickAction action, Player player, SlotAccess carriedAccess) {
-		if (storageStack.getCount() > 1 || !slot.mayPlace(storageStack) || action != ClickAction.SECONDARY) {
+		if (hasCreativeScreenContainerOpen(player) || storageStack.getCount() > 1 || !slot.mayPlace(storageStack) || action != ClickAction.SECONDARY) {
 			return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 		}
 
@@ -157,4 +150,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 	}
 
+	private boolean hasCreativeScreenContainerOpen(Player player) {
+		return player.level().isClientSide() && player.containerMenu instanceof CreativeModeInventoryScreen.ItemPickerMenu;
+	}
 }

@@ -16,6 +16,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
@@ -29,11 +30,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
-import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
-import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.*;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
@@ -77,8 +76,8 @@ public class PaintbrushItem extends ItemBase {
 
 	private static Optional<ItemRequirements> getMaterialItemRequirements(ItemStack paintbrush, Player player, BlockEntity be, Map<BarrelMaterial, ResourceLocation> materialsToApply) {
 		Map<ResourceLocation, Integer> allPartsNeeded = new HashMap<>();
-		if (be instanceof StorageBlockEntity storageBe) {
-			allPartsNeeded = getStorageMaterialPartsNeeded(materialsToApply, storageBe);
+		if (be instanceof IMaterialHolder materialHolder) {
+			allPartsNeeded = getMaterialHolderPartsNeeded(materialsToApply, materialHolder);
 		} else if (be instanceof ControllerBlockEntity controllerBe) {
 			for (BlockPos storagePosition : controllerBe.getStoragePositions()) {
 				addStorageMaterialPartsNeeded(materialsToApply, controllerBe, storagePosition, allPartsNeeded);
@@ -88,6 +87,10 @@ public class PaintbrushItem extends ItemBase {
 		if (allPartsNeeded.isEmpty()) {
 			return Optional.empty();
 		}
+		return getItemRequirements(paintbrush, player, allPartsNeeded);
+	}
+
+	public static Optional<ItemRequirements> getItemRequirements(ItemStack paintbrush, Player player, Map<ResourceLocation, Integer> allPartsNeeded) {
 		Map<ResourceLocation, Integer> remainingParts = getRemainingParts(paintbrush);
 		DecorationHelper.ConsumptionResult result = DecorationHelper.consumeMaterialPartsNeeded(allPartsNeeded, remainingParts, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), true);
 
@@ -113,8 +116,8 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	private static void addStorageMaterialPartsNeeded(Map<BarrelMaterial, ResourceLocation> materialsToApply, ControllerBlockEntity controllerBe, BlockPos storagePosition, Map<ResourceLocation, Integer> allPartsNeeded) {
-		WorldHelper.getBlockEntity(controllerBe.getLevel(), storagePosition, StorageBlockEntity.class).ifPresent(storageBe -> {
-			Map<ResourceLocation, Integer> storagePartsNeeded = getStorageMaterialPartsNeeded(materialsToApply, storageBe);
+		WorldHelper.getBlockEntity(controllerBe.getLevel(), storagePosition, IMaterialHolder.class).ifPresent(materialHolder -> {
+			Map<ResourceLocation, Integer> storagePartsNeeded = getMaterialHolderPartsNeeded(materialsToApply, materialHolder);
 			storagePartsNeeded.forEach((part, count) -> allPartsNeeded.merge(part, count, Integer::sum));
 		});
 	}
@@ -125,7 +128,7 @@ public class PaintbrushItem extends ItemBase {
 
 		Map<TagKey<Item>, Integer> allPartsNeeded = new HashMap<>();
 		if (be instanceof StorageBlockEntity storageBe) {
-			allPartsNeeded = getStorageDyePartsNeeded(mainColorToSet, accentColorToSet, storageBe);
+			allPartsNeeded = getStorageDyePartsNeeded(mainColorToSet, accentColorToSet, storageBe.getStorageWrapper());
 		} else if (be instanceof ControllerBlockEntity controllerBe) {
 			for (BlockPos storagePosition : controllerBe.getStoragePositions()) {
 				addStorageDyePartsNeeded(mainColorToSet, accentColorToSet, controllerBe, storagePosition, allPartsNeeded);
@@ -135,6 +138,10 @@ public class PaintbrushItem extends ItemBase {
 		if (allPartsNeeded.isEmpty()) {
 			return Optional.empty();
 		}
+		return getDyeItemRequirements(paintbrush, player, allPartsNeeded);
+	}
+
+	public static @NotNull Optional<ItemRequirements> getDyeItemRequirements(ItemStack paintbrush, Player player, Map<TagKey<Item>, Integer> allPartsNeeded) {
 		Map<ResourceLocation, Integer> remainingParts = getRemainingParts(paintbrush);
 		DecorationHelper.ConsumptionResult result = DecorationHelper.consumeDyePartsNeeded(allPartsNeeded, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), remainingParts, true);
 
@@ -143,14 +150,13 @@ public class PaintbrushItem extends ItemBase {
 
 	private static void addStorageDyePartsNeeded(int mainColorToSet, int accentColorToSet, ControllerBlockEntity controllerBe, BlockPos storagePosition, Map<TagKey<Item>, Integer> allPartsNeeded) {
 		WorldHelper.getBlockEntity(controllerBe.getLevel(), storagePosition, StorageBlockEntity.class).ifPresent(storageBe -> {
-			Map<TagKey<Item>, Integer> storagePartsNeeded = getStorageDyePartsNeeded(mainColorToSet, accentColorToSet, storageBe);
+			Map<TagKey<Item>, Integer> storagePartsNeeded = getStorageDyePartsNeeded(mainColorToSet, accentColorToSet, storageBe.getStorageWrapper());
 			storagePartsNeeded.forEach((part, count) -> allPartsNeeded.merge(part, count, Integer::sum));
 		});
 	}
 
-	private static Map<TagKey<Item>, Integer> getStorageDyePartsNeeded(int mainColorToSet, int accentColorToSet, StorageBlockEntity storageBe) {
-		StorageWrapper storageWrapper = storageBe.getStorageWrapper();
-		return DecorationHelper.getDyePartsNeeded(mainColorToSet, accentColorToSet, storageWrapper.getMainColor(), storageWrapper.getAccentColor());
+	public static Map<TagKey<Item>, Integer> getStorageDyePartsNeeded(int mainColorToSet, int accentColorToSet, ITintable tintable) {
+		return DecorationHelper.getDyePartsNeeded(mainColorToSet, accentColorToSet, tintable.getMainColor(), tintable.getAccentColor());
 	}
 
 
@@ -187,13 +193,10 @@ public class PaintbrushItem extends ItemBase {
 		return Optional.of(new ItemRequirements(itemsPresent, itemsMissing));
 	}
 
-	private static Map<ResourceLocation, Integer> getStorageMaterialPartsNeeded(Map<BarrelMaterial, ResourceLocation> materialsToApply, StorageBlockEntity storageBe) {
-		if (storageBe instanceof BarrelBlockEntity barrelBe) {
-			Map<BarrelMaterial, ResourceLocation> originalMaterials = new HashMap<>(barrelBe.getMaterials());
-			BarrelBlockItem.uncompactMaterials(originalMaterials);
-			return DecorationHelper.getMaterialPartsNeeded(originalMaterials, materialsToApply);
-		}
-		return Collections.emptyMap();
+	public static Map<ResourceLocation, Integer> getMaterialHolderPartsNeeded(Map<BarrelMaterial, ResourceLocation> materialsToApply, IMaterialHolder materialHolder) {
+		Map<BarrelMaterial, ResourceLocation> originalMaterials = new HashMap<>(materialHolder.getMaterials());
+		BarrelBlockItem.uncompactMaterials(originalMaterials);
+		return DecorationHelper.getMaterialPartsNeeded(originalMaterials, materialsToApply);
 	}
 
 	@Override
@@ -233,96 +236,116 @@ public class PaintbrushItem extends ItemBase {
 		if (player == null) {
 			return;
 		}
-		List<Storage<ItemVariant>> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
-		Map<ResourceLocation, Integer> remainingParts = new HashMap<>(getRemainingParts(paintbrush));
-		if (hasBarrelMaterials(paintbrush)) {
-			if (!(storageBe instanceof BarrelBlockEntity barrelBe)) {
-				return;
-			}
+		ITintable tintable = storageBe.getStorageWrapper();
+		IMaterialHolder materialHolder = storageBe instanceof IMaterialHolder ? (IMaterialHolder) storageBe : null;
 
-			Map<BarrelMaterial, ResourceLocation> originalMaterials = new HashMap<>(barrelBe.getMaterials());
-			Map<BarrelMaterial, ResourceLocation> materialsToApply = new HashMap<>(getBarrelMaterials(paintbrush));
-			if (originalMaterials.equals(materialsToApply)) {
-				return;
-			}
+		if (storageBe instanceof ChestBlockEntity chestBe) {
+			tintable = chestBe.getMainStorageWrapper();
+			storageBe = chestBe.getMainChestBlockEntity();
+		}
 
-			BarrelBlockItem.uncompactMaterials(originalMaterials);
-
-			if (!DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, true)) {
-				return;
-			}
-
-			DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, false);
-			setRemainingParts(paintbrush, remainingParts);
-
-			barrelBe.getStorageWrapper().setMainColor(-1);
-			barrelBe.getStorageWrapper().setAccentColor(-1);
-			BarrelBlockItem.compactMaterials(materialsToApply);
-			barrelBe.setMaterials(materialsToApply);
-
-			playSoundAndParticles(player.level(), storageBe.getBlockPos(), storageBe, soundVolume);
-
-			WorldHelper.notifyBlockUpdate(storageBe);
-		} else {
-			StorageWrapper storageWrapper = storageBe.getStorageWrapper();
-			int mainColorToSet = getMainColor(paintbrush);
-			int accentColorToSet = getAccentColor(paintbrush);
-			if (storageBe instanceof ChestBlockEntity chestBe) {
-				storageWrapper = chestBe.getMainStorageWrapper();
-				storageBe = chestBe.getMainChestBlockEntity();
-			}
-
-			int originalMainColor = storageWrapper.getMainColor();
-			int originalAccentColor = storageWrapper.getAccentColor();
-
-			if (originalMainColor == mainColorToSet && originalAccentColor == accentColorToSet) {
-				return;
-			}
-
-			if (!DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, true)) {
-				return;
-			}
-
-			if (hasMainColor(paintbrush)) {
-				storageWrapper.setMainColor(mainColorToSet);
-			}
-			if (hasAccentColor(paintbrush)) {
-				storageWrapper.setAccentColor(accentColorToSet);
-			}
-
-			if (storageBe instanceof BarrelBlockEntity barrelBe) {
-				barrelBe.setMaterials(Collections.emptyMap());
-			}
-
-			DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, false);
-			setRemainingParts(paintbrush, remainingParts);
-
-			playSoundAndParticles(player.level(), storageBe.getBlockPos(), storageBe, soundVolume);
-
+		BlockState state = storageBe.getBlockState();
+		Direction effectOffsetDirection = state.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getFacing(state) : Direction.UP;
+		if (paint(player, paintbrush, soundVolume, materialHolder, tintable, Vec3.atCenterOf(storageBe.getBlockPos()), effectOffsetDirection, state.getSoundType(player.level(), storageBe.getBlockPos(), null).getPlaceSound())) {
 			WorldHelper.notifyBlockUpdate(storageBe);
 		}
 	}
 
-	private static void playSoundAndParticles(Level level, BlockPos pos, StorageBlockEntity storageBe, float soundVolume) {
-		BlockState state = storageBe.getBlockState();
-		level.playSound(null, pos, state.getSoundType().getPlaceSound(), SoundSource.BLOCKS, soundVolume, 1);
+	public static boolean paint(@NotNull Player player, ItemStack paintbrush, @Nullable IMaterialHolder materialHolder, ITintable tintable, Vec3 successEffectPos, Direction effectOffsetDirection, SoundEvent placeSound) {
+		return paint(player, paintbrush, 1f, materialHolder, tintable, successEffectPos, effectOffsetDirection, placeSound);
+	}
 
-		if (state.getBlock() instanceof StorageBlockBase storageBlock && level instanceof ServerLevel serverLevel) {
-			Direction facing = storageBlock.getFacing(state);
-			double x = pos.getX() + 0.5D + facing.getStepX() * 0.6D;
-			double y = pos.getY() + 0.5D + facing.getStepY() * 0.6D;
-			double z = pos.getZ() + 0.5D + facing.getStepZ() * 0.6D;
+	public static boolean paint(@NotNull Player player, ItemStack paintbrush, float soundVolume, @Nullable IMaterialHolder materialHolder, ITintable tintable, Vec3 successEffectPos, Direction effectOffsetDirection, SoundEvent placeSound) {
+		if (hasBarrelMaterials(paintbrush)) {
+			if (materialHolder == null || !materialHolder.canHoldMaterials()) {
+				return false;
+			}
+
+			if (applyMaterials(player, paintbrush, materialHolder, tintable)) {
+				playSoundAndParticles(player.level(), successEffectPos, soundVolume, placeSound, effectOffsetDirection);
+				return true;
+			}
+		} else {
+			if (setColors(player, paintbrush, tintable, materialHolder)) {
+				playSoundAndParticles(player.level(), successEffectPos, soundVolume, placeSound, effectOffsetDirection);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean setColors(Player player, ItemStack paintbrush, ITintable tintable, @Nullable IMaterialHolder materialHolder) {
+		Map<ResourceLocation, Integer> remainingParts = new HashMap<>(getRemainingParts(paintbrush));
+		List<Storage<ItemVariant>> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
+		int mainColorToSet = getMainColor(paintbrush);
+		int accentColorToSet = getAccentColor(paintbrush);
+
+		int originalMainColor = tintable.getMainColor();
+		int originalAccentColor = tintable.getAccentColor();
+
+		if (originalMainColor == mainColorToSet && originalAccentColor == accentColorToSet) {
+			return false;
+		}
+
+		if (!DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, true)) {
+			return false;
+		}
+
+		tintable.setColors(mainColorToSet, accentColorToSet);
+
+		if (materialHolder != null) {
+			materialHolder.setMaterials(Collections.emptyMap());
+		}
+
+		DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, false);
+		setRemainingParts(paintbrush, remainingParts);
+		return true;
+	}
+
+	private static boolean applyMaterials(Player player, ItemStack paintbrush, IMaterialHolder materialHolder, ITintable tintable) {
+		List<Storage<ItemVariant>> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
+		Map<ResourceLocation, Integer> remainingParts = new HashMap<>(getRemainingParts(paintbrush));
+
+		Map<BarrelMaterial, ResourceLocation> originalMaterials = new HashMap<>(materialHolder.getMaterials());
+		Map<BarrelMaterial, ResourceLocation> materialsToApply = new HashMap<>(getBarrelMaterials(paintbrush));
+		if (originalMaterials.equals(materialsToApply)) {
+			return false;
+		}
+
+		BarrelBlockItem.uncompactMaterials(originalMaterials);
+
+		if (!DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, true)) {
+			return false;
+		}
+
+		DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, false);
+		setRemainingParts(paintbrush, remainingParts);
+
+		tintable.setColors(-1, -1);
+
+		BarrelBlockItem.compactMaterials(materialsToApply);
+		materialHolder.setMaterials(materialsToApply);
+		return true;
+	}
+
+	private static void playSoundAndParticles(Level level, Vec3 pos, float soundVolume, SoundEvent placeSound, Direction effectOffsetDirection) {
+		level.playSound(null, pos.x(), pos.y(), pos.z(), placeSound, SoundSource.BLOCKS, soundVolume, 1);
+
+		if (level instanceof ServerLevel serverLevel) {
+			double x = pos.x() + 0.5D + effectOffsetDirection.getStepX() * 0.6D;
+			double y = pos.y() + 0.5D + effectOffsetDirection.getStepY() * 0.6D;
+			double z = pos.z() + 0.5D + effectOffsetDirection.getStepZ() * 0.6D;
 			double xOffset;
 			double yOffset;
 			double zOffset;
-			if (facing.getAxis().isVertical()) {
+			if (effectOffsetDirection.getAxis().isVertical()) {
 				xOffset = 0.4D;
 				yOffset = 0.1D;
 				zOffset = 0.4D;
 			} else {
-				xOffset = 0.1D + facing.getStepZ() * 0.3D;
+				xOffset = 0.1D + effectOffsetDirection.getStepZ() * 0.3D;
 				yOffset = 0.4D;
-				zOffset = 0.1D + facing.getStepX() * 0.3D;
+				zOffset = 0.1D + effectOffsetDirection.getStepX() * 0.3D;
 			}
 
 			serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, x, y, z, 4, xOffset, yOffset, zOffset, 1f);

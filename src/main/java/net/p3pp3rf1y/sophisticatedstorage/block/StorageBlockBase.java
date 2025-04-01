@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -33,9 +32,8 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeHandler;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockBase;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -133,13 +131,11 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 		level.setBlockAndUpdate(pos, currentState.setValue(StorageBlockBase.TICKING, ticking));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
 		return WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(be -> InventoryHelper.getAnalogOutputSignal(be.getStorageWrapper().getInventoryForInputOutput())).orElse(0);
@@ -228,10 +224,13 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 	}
 
 	public boolean tryAddSingleUpgrade(Player player, InteractionHand hand, StorageBlockEntity b, ItemStack itemInHand) {
-		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem
-				&& RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
-			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
-			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).successful()
+		return tryAddSingleUpgrade(player, hand, itemInHand, b.getStorageWrapper());
+	}
+
+	public static boolean tryAddSingleUpgrade(Player player, InteractionHand hand, ItemStack itemInHand, IStorageWrapper storageWrapper) {
+		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem && itemInHand.is(ModItems.STORAGE_UPGRADE_TAG)) {
+			UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
+			if (upgradeItem.canAddUpgradeTo(storageWrapper, itemInHand, true, player.level().isClientSide()).successful()
 					&& InventoryHelper.insertIntoInventory(itemInHand, upgradeHandler, true).getCount() != itemInHand.getCount()) {
 				InventoryHelper.insertIntoInventory(itemInHand.copyWithCount(1), upgradeHandler, false);
 				itemInHand.shrink(1);

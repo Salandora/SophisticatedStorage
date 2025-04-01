@@ -41,6 +41,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 	@Nullable
 	private BlockPos doubleMainPos = null;
+	public boolean showUpgradesOnTop = false;
 	private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
 		protected void onOpen(Level level, BlockPos pos, BlockState state) {
 			if (state.getValue(ChestBlock.TYPE) != ChestType.LEFT) {
@@ -136,7 +137,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		int thisSlots = thisInventoryHandler.getSlotCount();
 		int mainSlots = mainInventoryHandler.getSlotCount();
 		for (int slot = 0; slot < thisSlots && slot + originalNumberOfSlots < mainSlots; slot++) {
-			ItemStack slotStack = thisInventoryHandler.getStackInSlot(slot);
+			ItemStack slotStack = thisInventoryHandler.getSlotStack(slot);
 			if (!slotStack.isEmpty()) {
 				mainInventoryHandler.setStackInSlot(slot + originalNumberOfSlots, slotStack);
 			}
@@ -190,7 +191,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			int firstIndex = mainInventoryHandler.getSlotCount() / 2;
 
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
-				ItemStack slotStack = mainInventoryHandler.getStackInSlot(slot);
+				ItemStack slotStack = mainInventoryHandler.getSlotStack(slot);
 				be.getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, slotStack.split(slotStack.getMaxStackSize()));
 			}
 
@@ -209,7 +210,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			int firstIndex = mainInventoryHandler.getSlotCount() / 2;
 
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
-				getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, mainInventoryHandler.getStackInSlot(slot));
+				getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, mainInventoryHandler.getSlotStack(slot));
 				mainInventoryHandler.setSlotStack(slot, ItemStack.EMPTY);
 			}
 			int inventorySlotDiff = (mainBE.getBlockState().getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNumberOfInventorySlots() : 0) - mainInventoryHandler.getSlotCount();
@@ -386,7 +387,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		List<ItemStack> dropItems = new ArrayList<>();
 
 		for (int slot = chestBlock.getNumberOfInventorySlots(); slot < invHandler.getSlotCount(); slot++) {
-			ItemStack slotStack = invHandler.getStackInSlot(slot);
+			ItemStack slotStack = invHandler.getSlotStack(slot);
 
 			if (!slotStack.isEmpty()) {
 				dropItems.add(slotStack.copy());

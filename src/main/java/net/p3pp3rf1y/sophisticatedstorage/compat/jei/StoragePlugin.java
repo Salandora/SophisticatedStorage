@@ -5,11 +5,11 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.helpers.IStackHelper;
-import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import mezz.jei.api.registration.*;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -19,19 +19,19 @@ import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.CraftingContainerRecipeTransferHandlerBase;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.SettingsGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.StorageGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.subtypes.PropertyBasedSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.BarrelSubtypeInterpreter;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.ChestSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.ShulkerBoxSubtypeInterpreter;
-import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.WoodStorageSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromVanillaShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -39,6 +39,72 @@ import java.util.function.Consumer;
 public class StoragePlugin implements IModPlugin {
 	private static Consumer<IRecipeCatalystRegistration> additionalCatalystRegistrar = registration -> {
 	};
+	private final PropertyBasedSubtypeInterpreter chestSubtypeInterpreter = new ChestSubtypeInterpreter();
+	private final PropertyBasedSubtypeInterpreter barrelSubtypeInterpreter = new BarrelSubtypeInterpreter();
+	private final PropertyBasedSubtypeInterpreter shulkerBoxSubtypeInterpreter = new ShulkerBoxSubtypeInterpreter();
+
+	private Map<BlockItem, PropertyBasedSubtypeInterpreter> getSubtypeIntepreters() {
+		return new HashMap<>(){{
+			put(ModBlocks.BARREL_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.COPPER_BARREL_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.IRON_BARREL_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.GOLD_BARREL_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.DIAMOND_BARREL_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.NETHERITE_BARREL_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.CHEST_ITEM.get(), chestSubtypeInterpreter);
+			put(ModBlocks.COPPER_CHEST_ITEM.get(), chestSubtypeInterpreter);
+			put(ModBlocks.IRON_CHEST_ITEM.get(), chestSubtypeInterpreter);
+			put(ModBlocks.GOLD_CHEST_ITEM.get(), chestSubtypeInterpreter);
+			put(ModBlocks.DIAMOND_CHEST_ITEM.get(), chestSubtypeInterpreter);
+			put(ModBlocks.NETHERITE_CHEST_ITEM.get(), chestSubtypeInterpreter);
+
+			put(ModBlocks.LIMITED_BARREL_1_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_BARREL_2_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_BARREL_3_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_BARREL_4_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.LIMITED_COPPER_BARREL_1_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_COPPER_BARREL_2_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_COPPER_BARREL_3_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_COPPER_BARREL_4_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.LIMITED_IRON_BARREL_1_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_IRON_BARREL_2_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_IRON_BARREL_3_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_IRON_BARREL_4_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.LIMITED_GOLD_BARREL_1_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_GOLD_BARREL_2_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_GOLD_BARREL_3_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_GOLD_BARREL_4_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM.get(), barrelSubtypeInterpreter);
+			put(ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM.get(), barrelSubtypeInterpreter);
+
+			put(ModBlocks.SHULKER_BOX_ITEM.get(), shulkerBoxSubtypeInterpreter);
+			put(ModBlocks.COPPER_SHULKER_BOX_ITEM.get(), shulkerBoxSubtypeInterpreter);
+			put(ModBlocks.IRON_SHULKER_BOX_ITEM.get(), shulkerBoxSubtypeInterpreter);
+			put(ModBlocks.GOLD_SHULKER_BOX_ITEM.get(), shulkerBoxSubtypeInterpreter);
+			put(ModBlocks.DIAMOND_SHULKER_BOX_ITEM.get(), shulkerBoxSubtypeInterpreter);
+			put(ModBlocks.NETHERITE_SHULKER_BOX_ITEM.get(), shulkerBoxSubtypeInterpreter);
+		}};
+	}
+
+	private Optional<PropertyBasedSubtypeInterpreter> getSubtypeInterpreter(Map<BlockItem, PropertyBasedSubtypeInterpreter> subtypeInterpreters, ItemStack stack) {
+		if (!(stack.getItem() instanceof BlockItem blockItem)) {
+			return Optional.empty();
+		}
+
+		return Optional.ofNullable(subtypeInterpreters.get(blockItem));
+	}
 
 	public static void setAdditionalCatalystRegistrar(Consumer<IRecipeCatalystRegistration> additionalCatalystRegistrar) {
 		StoragePlugin.additionalCatalystRegistrar = additionalCatalystRegistrar;
@@ -51,54 +117,7 @@ public class StoragePlugin implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		ISubtypeInterpreter<ItemStack> woodStorageNbtInterpreter = new WoodStorageSubtypeInterpreter();
-		ISubtypeInterpreter<ItemStack> barrelNbtInterpreter = new BarrelSubtypeInterpreter();
-
-		registration.registerSubtypeInterpreter(ModBlocks.BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.COPPER_BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.IRON_BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.GOLD_BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.COPPER_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.IRON_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.GOLD_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_1_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_2_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_3_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_4_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_1_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_2_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_3_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_COPPER_BARREL_4_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_1_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_2_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_3_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_IRON_BARREL_4_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_1_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_2_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_3_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_GOLD_BARREL_4_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_2_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_3_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_2_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_3_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM.get(), barrelNbtInterpreter);
-
-		ISubtypeInterpreter<ItemStack> shulkerBoxNbtInterpreter = new ShulkerBoxSubtypeInterpreter();
-		registration.registerSubtypeInterpreter(ModBlocks.SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.COPPER_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.IRON_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.GOLD_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_SHULKER_BOX_ITEM.get(), shulkerBoxNbtInterpreter);
+		getSubtypeIntepreters().forEach(registration::registerSubtypeInterpreter);
 	}
 
 	@Override
@@ -127,10 +146,11 @@ public class StoragePlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		registration.addRecipes(RecipeTypes.CRAFTING, DyeRecipesMaker.getRecipes());
-		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapedCraftingRecipes());
-		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapelessCraftingRecipes());
-		registration.addRecipes(RecipeTypes.CRAFTING, ShulkerBoxFromChestRecipesMaker.getRecipes());
+		Map<BlockItem, PropertyBasedSubtypeInterpreter> subtypeInterpreters = getSubtypeIntepreters();
+		registration.addRecipes(RecipeTypes.CRAFTING, DyeRecipesMaker.getRecipes(stack -> getSubtypeInterpreter(subtypeInterpreters, stack)));
+		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapedCraftingRecipes(stack -> getSubtypeInterpreter(subtypeInterpreters, stack)));
+		registration.addRecipes(RecipeTypes.CRAFTING, TierUpgradeRecipesMaker.getShapelessCraftingRecipes(stack -> getSubtypeInterpreter(subtypeInterpreters, stack)));
+		registration.addRecipes(RecipeTypes.CRAFTING, ShulkerBoxFromChestRecipesMaker.getRecipes(stack -> getSubtypeInterpreter(subtypeInterpreters, stack)));
 		registration.addRecipes(RecipeTypes.CRAFTING, ClientRecipeHelper.transformAllRecipesOfType(RecipeType.CRAFTING, ShulkerBoxFromVanillaShapelessRecipe.class, ClientRecipeHelper::copyShapelessRecipe));
 		registration.addRecipes(RecipeTypes.CRAFTING, FlatBarrelRecipesMaker.getRecipes());
 	}

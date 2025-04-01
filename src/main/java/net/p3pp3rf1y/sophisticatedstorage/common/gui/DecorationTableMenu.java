@@ -26,6 +26,7 @@ import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -70,8 +71,8 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		return storageSlot;
 	}
 
-	public ItemStack decorateStack(ItemStack stack) {
-		return blockEntity.decorateStack(stack).result();
+	public List<ItemStack> getDecoratedPreviewStacks() {
+		return blockEntity.getDecoratedPreviewStacks();
 	}
 
 	private void addStorageSlots() {

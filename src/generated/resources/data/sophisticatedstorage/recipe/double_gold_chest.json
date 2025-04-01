@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:gold_chest"
+    }
+  ],
+  "type": "sophisticatedstorage:double_chest_tier_upgrade",
+  "category": "misc",
+  "key": {
+    "B": {
+      "tag": "c:storage_blocks/gold"
+    },
+    "G": {
+      "tag": "c:ingots/gold"
+    },
+    "S": {
+      "item": "sophisticatedstorage:iron_chest"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "GSG",
+    "GBG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "sophisticatedstorage:gold_chest"
+  }
+}

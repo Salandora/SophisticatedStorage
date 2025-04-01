@@ -99,6 +99,10 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_TIER_3.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_2.get());
 		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_TIER_4.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_3.get());
 		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_TIER_5.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_4.get());
+		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_OMEGA_TIER.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_OMEGA_TIER.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_DOWNGRADE_TIER_1.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_1.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_DOWNGRADE_TIER_2.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_2.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_DOWNGRADE_TIER_3.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_3.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.PICKUP_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.PICKUP_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.ADVANCED_PICKUP_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_PICKUP_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.MAGNET_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.MAGNET_UPGRADE.get());
@@ -120,12 +124,17 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.AUTO_BLASTING_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.AUTO_BLASTING_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STONECUTTER_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STONECUTTER_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.JUKEBOX_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.JUKEBOX_UPGRADE.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.ADVANCED_JUKEBOX_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_JUKEBOX_UPGRADE.get());
 
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_STARTER_TIER.get(), ModItems.STACK_UPGRADE_TIER_1_PLUS.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_1.get(), ModItems.STACK_UPGRADE_TIER_2.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_2.get(), ModItems.STACK_UPGRADE_TIER_3.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_3.get(), ModItems.STACK_UPGRADE_TIER_4.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_4.get(), ModItems.STACK_UPGRADE_TIER_5.get());
+		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_OMEGA_TIER.get(), ModItems.STACK_UPGRADE_OMEGA_TIER.get());
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_1.get(), ModItems.STACK_DOWNGRADE_TIER_1.get());
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_2.get(), ModItems.STACK_DOWNGRADE_TIER_2.get());
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_3.get(), ModItems.STACK_DOWNGRADE_TIER_3.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.PICKUP_UPGRADE.get(), ModItems.PICKUP_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_PICKUP_UPGRADE.get(), ModItems.ADVANCED_PICKUP_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.MAGNET_UPGRADE.get(), ModItems.MAGNET_UPGRADE.get());
@@ -147,7 +156,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.AUTO_BLASTING_UPGRADE.get(), ModItems.AUTO_BLASTING_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STONECUTTER_UPGRADE.get(), ModItems.STONECUTTER_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.JUKEBOX_UPGRADE.get(), ModItems.JUKEBOX_UPGRADE.get());
-
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_JUKEBOX_UPGRADE.get(), ModItems.ADVANCED_JUKEBOX_UPGRADE.get());
 	}
 
 	private void addBackpackStackUpgradeFromStorageStackUpgradeRecipe(RecipeOutput recipeOutput, StackUpgradeItem backpackStackUpgrade, StackUpgradeItem storageStackUpgrade) {
@@ -261,6 +270,64 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.requires(ConventionalItemTags.NETHERITE_INGOTS)
 				.unlockedBy("has_" + RegistryHelper.getItemKey(diamondTierItem).getPath(), has(diamondTierItem))
 				.save(recipeOutput, RegistryHelper.getItemKey(netheriteTierItem));
+	}
+
+	private void addDoubleChestTierUpgradeRecipes(RecipeOutput recipeOutput, BlockItem baseTierItem, BlockItem copperTierItem, BlockItem ironTierItem, BlockItem goldTierItem, BlockItem diamondTierItem, BlockItem netheriteTierItem) {
+		ShapeBasedRecipeBuilder.shaped(copperTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("CCC")
+				.pattern("CSC")
+				.pattern("CBC")
+				.define('C', ConventionalItemTags.COPPER_INGOTS)
+				.define('B', ConventionalItemTags.STORAGE_BLOCKS_COPPER)
+				.define('S', baseTierItem)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(baseTierItem).getPath(), has(baseTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(copperTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(ironTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("III")
+				.pattern("ISI")
+				.pattern("III")
+				.define('I', ConventionalItemTags.IRON_INGOTS)
+				.define('S', copperTierItem)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(copperTierItem).getPath(), has(copperTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(ironTierItem).getPath() + "_from_" + RegistryHelper.getItemKey(copperTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(ironTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("III")
+				.pattern("ISI")
+				.pattern("IBI")
+				.define('I', ConventionalItemTags.IRON_INGOTS)
+				.define('S', baseTierItem)
+				.define('B', ConventionalItemTags.STORAGE_BLOCKS_IRON)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(baseTierItem).getPath(), has(baseTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(ironTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(goldTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("GGG")
+				.pattern("GSG")
+				.pattern("GBG")
+				.define('G', ConventionalItemTags.GOLD_INGOTS)
+				.define('S', ironTierItem)
+				.define('B', ConventionalItemTags.STORAGE_BLOCKS_GOLD)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(ironTierItem).getPath(), has(ironTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(goldTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(diamondTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("DDD")
+				.pattern("DSD")
+				.pattern("DBD")
+				.define('D', ConventionalItemTags.DIAMOND_GEMS)
+				.define('S', goldTierItem)
+				.define('B', ConventionalItemTags.STORAGE_BLOCKS_DIAMOND)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(goldTierItem).getPath(), has(goldTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(diamondTierItem).getPath()));
+
+		ShapelessBasedRecipeBuilder.shapeless(netheriteTierItem, DoubleChestTierUpgradeShapelessRecipe::new)
+				.requires(Ingredient.of(diamondTierItem))
+				.requires(ConventionalItemTags.NETHERITE_INGOTS)
+				.requires(ConventionalItemTags.NETHERITE_INGOTS)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(diamondTierItem).getPath(), has(diamondTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(netheriteTierItem).getPath()));
 	}
 
 	private void addControllerRelatedRecipes(RecipeOutput recipeOutput) {
@@ -788,7 +855,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_1.get())
 				.define('C', ConventionalItemTags.COPPER_INGOTS)
 				.define('B', ConventionalItemTags.STORAGE_BLOCKS_COPPER)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1.get()))
+				.unlockedBy("has_stack_upgrade_tier_1", has(ModItems.STACK_UPGRADE_TIER_1.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_2.get())
@@ -798,7 +865,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_1_PLUS.get())
 				.define('I', ConventionalItemTags.IRON_INGOTS)
 				.define('B', ConventionalItemTags.STORAGE_BLOCKS_IRON)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1_PLUS.get()))
+				.unlockedBy("has_stack_upgrade_tier_1_plus", has(ModItems.STACK_UPGRADE_TIER_1_PLUS.get()))
 				.save(recipeOutput, SophisticatedStorage.getRL("stack_upgrade_tier_2_from_tier_1_plus"));
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_2.get())
@@ -808,7 +875,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_1.get())
 				.define('I', ConventionalItemTags.IRON_INGOTS)
 				.define('B', ConventionalItemTags.STORAGE_BLOCKS_IRON)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1.get()))
+				.unlockedBy("has_stack_upgrade_tier_1", has(ModItems.STACK_UPGRADE_TIER_1.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_3.get())
@@ -818,7 +885,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_2.get())
 				.define('G', ConventionalItemTags.GOLD_INGOTS)
 				.define('B', ConventionalItemTags.STORAGE_BLOCKS_GOLD)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_2.get()))
+				.unlockedBy("has_stack_upgrade_tier_2", has(ModItems.STACK_UPGRADE_TIER_2.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_4.get())
@@ -828,7 +895,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_3.get())
 				.define('D', ConventionalItemTags.DIAMOND_GEMS)
 				.define('B', ConventionalItemTags.STORAGE_BLOCKS_DIAMOND)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_3.get()))
+				.unlockedBy("has_stack_upgrade_tier_3", has(ModItems.STACK_UPGRADE_TIER_3.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_5.get())
@@ -838,7 +905,45 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_4.get())
 				.define('N', ConventionalItemTags.NETHERITE_INGOTS)
 				.define('B', ConventionalItemTags.STORAGE_BLOCKS_NETHERITE)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_4.get()))
+				.unlockedBy("has_stack_upgrade_tier_4", has(ModItems.STACK_UPGRADE_TIER_4.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_OMEGA_TIER.get())
+				.pattern("SSS")
+				.pattern("SSS")
+				.pattern("SSS")
+				.define('S', ModItems.STACK_UPGRADE_TIER_5.get())
+				.unlockedBy("has_stack_upgrade_tier_5", has(ModItems.STACK_UPGRADE_TIER_5.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_DOWNGRADE_TIER_1.get())
+				.pattern("SFS")
+				.pattern("SBS")
+				.pattern("FSF")
+				.define('S', Items.STICK)
+				.define('F', Items.FLINT)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_DOWNGRADE_TIER_2.get())
+				.pattern("FSF")
+				.pattern("SBS")
+				.pattern("FSF")
+				.define('S', Items.STICK)
+				.define('F', Items.FLINT)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_DOWNGRADE_TIER_3.get())
+				.pattern("SFS")
+				.pattern("FBF")
+				.pattern("FSF")
+				.define('S', Items.STICK)
+				.define('F', Items.FLINT)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.JUKEBOX_UPGRADE.get())
@@ -850,6 +955,17 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.define('I', ConventionalItemTags.IRON_INGOTS)
 				.define('J', Items.JUKEBOX)
 				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_JUKEBOX_UPGRADE.get())
+				.pattern(" D ")
+				.pattern("GJG")
+				.pattern("RRR")
+				.define('D', Tags.Items.GEMS_DIAMOND)
+				.define('G', Tags.Items.INGOTS_GOLD)
+				.define('R', Tags.Items.DUSTS_REDSTONE)
+				.define('J', ModItems.JUKEBOX_UPGRADE.get())
+				.unlockedBy("has_jukebox_upgrade", has(ModItems.JUKEBOX_UPGRADE.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_FEEDING_UPGRADE.get(), UpgradeNextTierRecipe::new)
@@ -1045,6 +1161,7 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.save(recipeOutput, SophisticatedStorage.getRL("oak_chest_from_vanilla_chest"));
 
 		addStorageTierUpgradeRecipes(recipeOutput, ModBlocks.CHEST_ITEM.get(), ModBlocks.COPPER_CHEST_ITEM.get(), ModBlocks.IRON_CHEST_ITEM.get(), ModBlocks.GOLD_CHEST_ITEM.get(), ModBlocks.DIAMOND_CHEST_ITEM.get(), ModBlocks.NETHERITE_CHEST_ITEM.get());
+		addDoubleChestTierUpgradeRecipes(recipeOutput, ModBlocks.CHEST_ITEM.get(), ModBlocks.COPPER_CHEST_ITEM.get(), ModBlocks.IRON_CHEST_ITEM.get(), ModBlocks.GOLD_CHEST_ITEM.get(), ModBlocks.DIAMOND_CHEST_ITEM.get(), ModBlocks.NETHERITE_CHEST_ITEM.get());
 
 		//addQuarkChestRecipes(recipeOutput); // TODO readd with quark compat
 	}

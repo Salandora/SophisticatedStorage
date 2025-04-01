@@ -17,6 +17,8 @@ import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
 public class ShulkerBoxItemRenderer {
+	/*public static final Lazy<ShulkerBoxItemRenderer> SHULKER_BOX_ITEM_RENDERER = Lazy.of(() -> new ShulkerBoxItemRenderer(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels()));
+	private final BlockEntityRenderDispatcher blockEntityRenderDispatcher;*/
 	private static final LoadingCache<BlockItem, ShulkerBoxBlockEntity> shulkerBoxBlockEntities = CacheBuilder.newBuilder().maximumSize(512L).weakKeys().build(new CacheLoader<>() {
 		@Override
 		public ShulkerBoxBlockEntity load(BlockItem blockItem) {
@@ -24,15 +26,28 @@ public class ShulkerBoxItemRenderer {
 		}
 	});
 
-	public static void render(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+	/*public static IClientItemExtensions getItemRenderProperties() {
+		return new IClientItemExtensions() {
+			@Override
+			public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+				return SHULKER_BOX_ITEM_RENDERER.get();
+			}
+		};
+	}
+
+	public ShulkerBoxItemRenderer(BlockEntityRenderDispatcher blockEntityRenderDispatcher, EntityModelSet entityModelSet) {
+		super(blockEntityRenderDispatcher, entityModelSet);
+		this.blockEntityRenderDispatcher = blockEntityRenderDispatcher;
+	}*/
+
+	public static void render(ItemStack stack, ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
 		if (!(stack.getItem() instanceof BlockItem blockItem)) {
 			return;
 		}
 
 		ShulkerBoxBlockEntity shulkerBoxBlockEntity = shulkerBoxBlockEntities.getUnchecked(blockItem);
 		if (stack.getItem() instanceof ITintableBlockItem tintableBlockItem) {
-			shulkerBoxBlockEntity.getStorageWrapper().setMainColor(tintableBlockItem.getMainColor(stack).orElse(-1));
-			shulkerBoxBlockEntity.getStorageWrapper().setAccentColor(tintableBlockItem.getAccentColor(stack).orElse(-1));
+			shulkerBoxBlockEntity.getStorageWrapper().setColors(tintableBlockItem.getMainColor(stack).orElse(-1), tintableBlockItem.getAccentColor(stack).orElse(-1));
 		}
 		if (StorageBlockItem.showsTier(stack) != shulkerBoxBlockEntity.shouldShowTier()) {
 			shulkerBoxBlockEntity.toggleTierVisiblity();
