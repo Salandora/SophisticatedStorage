@@ -40,7 +40,7 @@ public class DoubleChestTierUpgradeRecipe extends ShapedRecipe implements IWrapp
 		getDoubleChest(input).ifPresent(originalStorage -> {
 			upgradedStorage.applyComponents(originalStorage.getComponents());
 		});
-		if (upgradedStorage.has(ModCoreDataComponents.STORAGE_UUID)) {
+		if (upgradedStorage.sophisticatedCore_has(ModCoreDataComponents.STORAGE_UUID)) {
 			StackStorageWrapper storageWrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
 			StorageBlockItem.setNumberOfInventorySlots(upgradedStorage, storageWrapper.getDefaultNumberOfInventorySlots() * 2);
 			StorageBlockItem.setNumberOfUpgradeSlots(upgradedStorage, storageWrapper.getDefaultNumberOfUpgradeSlots() * 2);

@@ -180,8 +180,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 		StorageWrapper storageWrapper = be.getStorageWrapper();
 		InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
 		UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
-		storageWrapper.changeSize(StorageBlockItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlots(),
-				StorageBlockItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlots());
+		storageWrapper.changeSize(StorageBlockItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlotCount(),
+				StorageBlockItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlotCount());
 	}
 
 	protected void setRenderBlockRenderProperties(ItemStack stack, WoodStorageBlockEntity be) {

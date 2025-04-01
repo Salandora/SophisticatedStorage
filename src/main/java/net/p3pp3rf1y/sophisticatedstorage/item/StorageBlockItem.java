@@ -43,19 +43,19 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	}
 
 	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-		storageStack.set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
 	}
 
 	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-		storageStack.set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
 	}
 
 	public static int getNumberOfInventorySlots(ItemStack storageStack) {
-		return storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
+		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
 	}
 
 	public static int getNumberOfUpgradeSlots(ItemStack storageStack) {
-		return storageStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
 	}
 
 	@Override

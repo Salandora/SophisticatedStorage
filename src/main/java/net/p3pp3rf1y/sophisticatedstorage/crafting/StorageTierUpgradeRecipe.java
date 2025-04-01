@@ -40,7 +40,7 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 		getOriginalStorage(input).ifPresent(originalStorage -> {
 			upgradedStorage.applyComponents(originalStorage.getComponents());
 		});
-		if (upgradedStorage.has(ModCoreDataComponents.STORAGE_UUID)) {
+		if (upgradedStorage.sophisticatedCore_has(ModCoreDataComponents.STORAGE_UUID)) {
 			StackStorageWrapper storageWrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
 			StorageBlockItem.setNumberOfInventorySlots(upgradedStorage, storageWrapper.getDefaultNumberOfInventorySlots());
 			StorageBlockItem.setNumberOfUpgradeSlots(upgradedStorage, storageWrapper.getDefaultNumberOfUpgradeSlots());

@@ -246,7 +246,7 @@ public class PaintbrushItem extends ItemBase {
 
 		BlockState state = storageBe.getBlockState();
 		Direction effectOffsetDirection = state.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getFacing(state) : Direction.UP;
-		if (paint(player, paintbrush, soundVolume, materialHolder, tintable, Vec3.atCenterOf(storageBe.getBlockPos()), effectOffsetDirection, state.getSoundType(player.level(), storageBe.getBlockPos(), null).getPlaceSound())) {
+		if (paint(player, paintbrush, soundVolume, materialHolder, tintable, Vec3.atCenterOf(storageBe.getBlockPos()), effectOffsetDirection, state.getSoundType(/*player.level(), storageBe.getBlockPos(), null*/).getPlaceSound())) {
 			WorldHelper.notifyBlockUpdate(storageBe);
 		}
 	}

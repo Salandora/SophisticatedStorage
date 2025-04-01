@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
 import com.mojang.datafixers.util.Pair;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -12,6 +13,7 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
+import net.p3pp3rf1y.sophisticatedcore.util.TriPredicate;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import org.apache.commons.lang3.function.TriFunction;
@@ -616,13 +618,13 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 	// TODO:
 	@Override
-	public boolean isItemValid(int slot, ItemStack stack, @Nullable Player player, BiPredicate<Integer, ItemStack> isItemValidSuper) {
+	public boolean isItemValid(int slot, ItemVariant resource, int count, @Nullable Player player, TriPredicate<Integer, ItemVariant, Integer> isItemValidSuper) {
 		if (!slotDefinitions.containsKey(slot)) {
 			return true;
 		}
 
 		SlotDefinition slotDefinition = slotDefinitions.get(slot);
-		return slotDefinition.isAccessible() && ItemStack.isSameItemSameComponents(slotDefinition.item(), stack);
+		return slotDefinition.isAccessible() && ItemStack.isSameItemSameComponents(slotDefinition.item(), resource.toStack(count));
 	}
 
 	@Override

@@ -130,30 +130,30 @@ public class StackStorageWrapper extends StorageWrapper {
 
 	@Override
 	public void setColors(int mainColor, int accentColor) {
-		storageStack.set(ModCoreDataComponents.MAIN_COLOR, mainColor);
-		storageStack.set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
 		save();
 	}
 
 	@Override
 	public int getMainColor() {
-		return storageStack.getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
+		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
 	}
 
 
 	@Override
 	public boolean hasMainColor() {
-		return storageStack.has(ModCoreDataComponents.MAIN_COLOR);
+		return storageStack.sophisticatedCore_has(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	@Override
 	public int getAccentColor() {
-		return storageStack.getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
+		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
 	}
 
 	@Override
 	public boolean hasAccentColor() {
-		return storageStack.has(ModCoreDataComponents.ACCENT_COLOR);
+		return storageStack.sophisticatedCore_has(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 }

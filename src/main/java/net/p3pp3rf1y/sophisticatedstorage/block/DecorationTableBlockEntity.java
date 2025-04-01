@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import io.github.fabricators_of_create.porting_lib.core.util.Lazy;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -45,8 +46,9 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	public static final int RED_DYE_SLOT = 0;
 	public static final int GREEN_DYE_SLOT = 1;
 	public static final int BLUE_DYE_SLOT = 2;
-	public static final Set<Item> STORAGES_WIHOUT_TOP_INNER_TRIM = Set.of(ModBlocks.BARREL_ITEM.get(), ModBlocks.COPPER_BARREL_ITEM.get(), ModBlocks.IRON_BARREL_ITEM.get(), ModBlocks.GOLD_BARREL_ITEM.get(), ModBlocks.DIAMOND_BARREL_ITEM.get(), ModBlocks.NETHERITE_BARREL_ITEM.get(),
-			ModBlocks.LIMITED_BARREL_1_ITEM.get(), ModBlocks.LIMITED_COPPER_BARREL_1_ITEM.get(), ModBlocks.LIMITED_IRON_BARREL_1_ITEM.get(), ModBlocks.LIMITED_GOLD_BARREL_1_ITEM.get(), ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM.get(), ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM.get());
+	// Need to make this lazy as don't have a priority system for mod loading, therefore SophisticatedStorageInMotion can load before SophisticatedStorage is loaded
+	public static final Lazy<Set<Item>> STORAGES_WIHOUT_TOP_INNER_TRIM = Lazy.of(() -> Set.of(ModBlocks.BARREL_ITEM.get(), ModBlocks.COPPER_BARREL_ITEM.get(), ModBlocks.IRON_BARREL_ITEM.get(), ModBlocks.GOLD_BARREL_ITEM.get(), ModBlocks.DIAMOND_BARREL_ITEM.get(), ModBlocks.NETHERITE_BARREL_ITEM.get(),
+			ModBlocks.LIMITED_BARREL_1_ITEM.get(), ModBlocks.LIMITED_COPPER_BARREL_1_ITEM.get(), ModBlocks.LIMITED_IRON_BARREL_1_ITEM.get(), ModBlocks.LIMITED_GOLD_BARREL_1_ITEM.get(), ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM.get(), ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM.get()));
 
 	private static final Map<Predicate<ItemStack>, IItemDecorator> ITEM_DECORATORS = new LinkedHashMap<>();
 
@@ -394,7 +396,8 @@ public class DecorationTableBlockEntity extends BlockEntity {
 				DecorationHelper.consumeDyes(mainColor, accentColor, this.remainingParts, List.of(dyes), StorageBlockItem.getMainColorFromComponentHolder(input).orElse(-1), StorageBlockItem.getAccentColorFromComponentHolder(input).orElse(-1), false);
 			} else if (!emptyDecorativeBlocks && itemDecorator.supportsMaterials(input)) {
 				Map<BarrelMaterial, ResourceLocation> originalMaterials = BarrelBlockItem.getUncompactedMaterials(input);
-				DecorationHelper.consumeMaterials(this.remainingParts, List.of(decorativeBlocks), originalMaterials, getMaterialsToApply(!STORAGES_WIHOUT_TOP_INNER_TRIM.contains(input.getItem())), false);
+				/// See comment at {@link STORAGES_WIHOUT_TOP_INNER_TRIM}
+				DecorationHelper.consumeMaterials(this.remainingParts, List.of(decorativeBlocks), originalMaterials, getMaterialsToApply(!STORAGES_WIHOUT_TOP_INNER_TRIM.get().contains(input.getItem())), false);
 			}
 
 			setChanged();
@@ -410,7 +413,8 @@ public class DecorationTableBlockEntity extends BlockEntity {
 			DecorationHelper.getDyePartsNeeded(mainColor, accentColor, StorageBlockItem.getMainColorFromComponentHolder(storageStack).orElse(-1), StorageBlockItem.getAccentColorFromComponentHolder(storageStack).orElse(-1))
 					.forEach((tag, parts) -> partsNeeded.put(tag.location(), parts));
 		} else {
-			partsNeeded.putAll(DecorationHelper.getMaterialPartsNeeded(BarrelBlockItem.getUncompactedMaterials(storageStack), getMaterialsToApply(!STORAGES_WIHOUT_TOP_INNER_TRIM.contains(storageStack.getItem()))));
+			/// See comment at {@link STORAGES_WIHOUT_TOP_INNER_TRIM}
+			partsNeeded.putAll(DecorationHelper.getMaterialPartsNeeded(BarrelBlockItem.getUncompactedMaterials(storageStack), getMaterialsToApply(!STORAGES_WIHOUT_TOP_INNER_TRIM.get().contains(storageStack.getItem()))));
 		}
 
 		return partsNeeded;
@@ -495,7 +499,8 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		@Override
 		public boolean supportsTopInnerTrim(ItemStack input) {
-			return !STORAGES_WIHOUT_TOP_INNER_TRIM.contains(input.getItem());
+			/// See comment at {@link STORAGES_WIHOUT_TOP_INNER_TRIM}
+			return !STORAGES_WIHOUT_TOP_INNER_TRIM.get().contains(input.getItem());
 		}
 
 		@Override

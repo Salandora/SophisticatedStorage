@@ -67,11 +67,11 @@ public class REIClientCompat implements REIClientPlugin {
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        registerRecipes(registry, DyeRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
+        /*registerRecipes(registry, DyeRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, TierUpgradeRecipesMaker.getShapedCraftingRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, TierUpgradeRecipesMaker.getShapelessCraftingRecipes(), BuiltinPlugin.CRAFTING);
 		registerRecipes(registry, ShulkerBoxFromChestRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
-		registerRecipes(registry, FlatBarrelRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
+		registerRecipes(registry, FlatBarrelRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);*/
     }
 
     public static void registerRecipes(DisplayRegistry registry, Collection<?> recipes, CategoryIdentifier<?> identifier) {

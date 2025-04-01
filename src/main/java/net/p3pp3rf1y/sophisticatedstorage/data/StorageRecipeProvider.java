@@ -961,9 +961,9 @@ public class StorageRecipeProvider extends FabricRecipeProvider {
 				.pattern(" D ")
 				.pattern("GJG")
 				.pattern("RRR")
-				.define('D', Tags.Items.GEMS_DIAMOND)
-				.define('G', Tags.Items.INGOTS_GOLD)
-				.define('R', Tags.Items.DUSTS_REDSTONE)
+				.define('D', ConventionalItemTags.DIAMOND_GEMS)
+				.define('G', ConventionalItemTags.GOLD_INGOTS)
+				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
 				.define('J', ModItems.JUKEBOX_UPGRADE.get())
 				.unlockedBy("has_jukebox_upgrade", has(ModItems.JUKEBOX_UPGRADE.get()))
 				.save(recipeOutput);

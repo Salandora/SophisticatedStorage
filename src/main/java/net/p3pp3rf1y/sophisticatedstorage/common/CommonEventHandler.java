@@ -133,6 +133,8 @@ public class CommonEventHandler {
 			player.displayClientMessage(StorageTranslationHelper.INSTANCE.translStatusMessage("infinity_upgrade_only_admin_break").withStyle(ChatFormatting.RED), true);
 			return false;
 		}
+
+		return true;
 	}
 
 	private boolean handleTooManyDropsBreak(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
