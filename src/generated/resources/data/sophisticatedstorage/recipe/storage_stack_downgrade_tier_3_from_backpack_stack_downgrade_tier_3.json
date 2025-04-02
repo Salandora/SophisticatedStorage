@@ -1,12 +1,14 @@
 {
-  "neoforge:conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "neoforge:mod_loaded",
-      "modid": "sophisticatedbackpacks"
+      "condition": "sophisticatedcore:item_enabled",
+      "itemRegistryName": "sophisticatedstorage:stack_downgrade_tier_3"
     },
     {
-      "type": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:stack_downgrade_tier_3"
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "sophisticatedbackpacks"
+      ]
     }
   ],
   "type": "minecraft:crafting_shaped",
