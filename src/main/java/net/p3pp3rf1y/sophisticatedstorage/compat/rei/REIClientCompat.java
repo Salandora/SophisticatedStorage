@@ -6,6 +6,7 @@ import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.screen.ExclusionZones;
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
+import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.util.EntryStacks;
@@ -14,9 +15,11 @@ import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.SettingsGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.SophisticatedTransferHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.StorageGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
+import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.DyeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.FlatBarrelRecipesMaker;
 import net.p3pp3rf1y.sophisticatedstorage.compat.common.ShulkerBoxFromChestRecipesMaker;
@@ -47,6 +50,11 @@ public class REIClientCompat implements REIClientPlugin {
 
         zones.register(StorageSettingsScreen.class, screen -> screen.getSettingsTabControl().getTabRectangles().stream().map(r -> new Rectangle(r.getX(), r.getY(), r.getWidth(), r.getHeight())).toList());
     }
+
+	@Override
+	public void registerTransferHandlers(TransferHandlerRegistry registry) {
+		registry.register(SophisticatedTransferHandler.crafting(StorageContainerMenu.class));
+	}
 
 	@Override
 	public void registerCategories(CategoryRegistry registry) {
