@@ -33,7 +33,7 @@
             "net.p3pp3rf1y.sophisticatedstorage.compat.jei.StoragePlugin"
         ],
         "rei_common": [
-            "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REICompat"
+            "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REIServerCompat"
         ],
         "rei_client": [
             "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REIClientCompat"
