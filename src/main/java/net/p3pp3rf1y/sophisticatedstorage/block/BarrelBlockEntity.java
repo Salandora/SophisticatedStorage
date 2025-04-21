@@ -20,7 +20,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class BarrelBlockEntity extends WoodStorageBlockEntity {
+public class BarrelBlockEntity extends WoodStorageBlockEntity implements IMaterialHolder {
 	private static final String MATERIALS_TAG = "materials";
 	public static final String STORAGE_TYPE = "barrel";
 	private Map<BarrelMaterial, ResourceLocation> materials = new EnumMap<>(BarrelMaterial.class);
@@ -117,12 +117,19 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 		materials = NBTHelper.getMap(tag, MATERIALS_TAG, BarrelMaterial::fromName, (bm, t) -> Optional.of(ResourceLocation.parse(t.getAsString()))).orElse(Map.of());
 	}
 
+	@Override
 	public void setMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
 		this.materials = materials;
 		setChanged();
 	}
 
+	@Override
 	public Map<BarrelMaterial, ResourceLocation> getMaterials() {
 		return materials;
+	}
+
+	@Override
+	public boolean canHoldMaterials() {
+		return true;
 	}
 }

@@ -33,7 +33,7 @@
             "net.p3pp3rf1y.sophisticatedstorage.compat.jei.StoragePlugin"
         ],
         "rei_common": [
-            "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REICompat"
+            "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REIServerCompat"
         ],
         "rei_client": [
             "net.p3pp3rf1y.sophisticatedstorage.compat.rei.REIClientCompat"
@@ -44,9 +44,7 @@
         "fabricloader": ">=${loader_version}",
         "fabric-api": ">=${fabric_version}",
         "minecraft": "${minecraft_version}",
-        "sophisticatedcore": "${sc_version}",
-        "forgeconfigapiport": ">=${forge_config_version}",
-        "team_reborn_energy": ">=${energy_version}"
+        "sophisticatedcore": "${sc_version}"
     },
     "suggests": {
         "modmenu": "*"

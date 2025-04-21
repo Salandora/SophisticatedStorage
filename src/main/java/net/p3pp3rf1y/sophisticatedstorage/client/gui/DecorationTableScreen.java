@@ -37,9 +37,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.Easing;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.DecorationTableMenu;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
-import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.util.DecorationHelper;
 
 import javax.annotation.Nullable;
@@ -101,22 +99,7 @@ public class DecorationTableScreen extends AbstractContainerScreen<DecorationTab
 
 	private void updatePreviewStacks() {
 		if (blockPreview != null) {
-			ItemStack storageStack = getMenu().getStorageSlot().getItem();
-
-			if (storageStack.getItem() instanceof StorageBlockItem) {
-				blockPreview.setPreviewStacks(List.of(getMenu().getResultSlot().getItem()));
-			} else if (storageStack.getItem() == ModItems.PAINTBRUSH.get() && !getMenu().getResultSlot().getItem().isEmpty()) {
-				ItemStack barrelPreviewStack = getMenu().decorateStack(new ItemStack(ModBlocks.LIMITED_BARREL_3_ITEM.get()));
-				if (getMenu().hasMaterials()) {
-					blockPreview.setPreviewStacks(List.of(barrelPreviewStack));
-				} else {
-					ItemStack chestPreviewStack = getMenu().decorateStack(new ItemStack(ModBlocks.CHEST_ITEM.get()));
-					ItemStack shulkerPreviewStack = getMenu().decorateStack(new ItemStack(ModBlocks.SHULKER_BOX_ITEM.get()));
-					blockPreview.setPreviewStacks(List.of(barrelPreviewStack, chestPreviewStack, shulkerPreviewStack));
-				}
-			} else {
-				blockPreview.setPreviewStacks(Collections.emptyList());
-			}
+			blockPreview.setPreviewStacks(getMenu().getDecoratedPreviewStacks());
 		}
 	}
 
@@ -164,10 +147,10 @@ public class DecorationTableScreen extends AbstractContainerScreen<DecorationTab
 		Slot topTrimSlot = menu.getSlot(DecorationTableBlockEntity.TOP_TRIM_SLOT);
 		Slot sideTrimSlot = menu.getSlot(DecorationTableBlockEntity.SIDE_TRIM_SLOT);
 
-		ColorButton mainColorButton = new ColorButton(new Position(leftPos + greenDyeSlot.x - 1, topPos + topTrimSlot.y), new Dimension(18, 18), menu::getMainColor,
+		ColorButton mainColorButton = new ColorButton(new Position(leftPos + greenDyeSlot.x - 1, topPos + topTrimSlot.y - 1), new Dimension(18, 18), menu::getMainColor,
 				button -> openColorPicker(menu.getMainColor(), menu::setMainColor), Component.translatable(StorageTranslationHelper.INSTANCE.translButton("pick_color")));
 		addRenderableWidget(mainColorButton);
-		ColorButton accentColorButton = new ColorButton(new Position(leftPos + greenDyeSlot.x - 1, topPos + sideTrimSlot.y), new Dimension(18, 18), menu::getAccentColor,
+		ColorButton accentColorButton = new ColorButton(new Position(leftPos + greenDyeSlot.x - 1, topPos + sideTrimSlot.y - 1), new Dimension(18, 18), menu::getAccentColor,
 				button -> openColorPicker(menu.getAccentColor(), menu::setAccentColor), Component.translatable(StorageTranslationHelper.INSTANCE.translButton("pick_color")));
 		addRenderableWidget(accentColorButton);
 

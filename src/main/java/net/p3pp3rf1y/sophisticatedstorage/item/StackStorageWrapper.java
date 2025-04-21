@@ -127,4 +127,33 @@ public class StackStorageWrapper extends StorageWrapper {
 	public Component getDisplayName() {
 		return Component.empty(); //because this is only used when determining upgrade errors in gui which storage stacks can't have open
 	}
+
+	@Override
+	public void setColors(int mainColor, int accentColor) {
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		storageStack.sophisticatedCore_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
+		save();
+	}
+
+	@Override
+	public int getMainColor() {
+		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
+	}
+
+
+	@Override
+	public boolean hasMainColor() {
+		return storageStack.sophisticatedCore_has(ModCoreDataComponents.MAIN_COLOR);
+	}
+
+	@Override
+	public int getAccentColor() {
+		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
+	}
+
+	@Override
+	public boolean hasAccentColor() {
+		return storageStack.sophisticatedCore_has(ModCoreDataComponents.ACCENT_COLOR);
+	}
+
 }

@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
-import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
 import javax.annotation.Nullable;
@@ -45,10 +44,10 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, tooltip, tooltipFlag);
         if (isPacked(stack)) {
-            if (flagIn == TooltipFlag.ADVANCED) {
+            if (tooltipFlag.isAdvanced()) {
                 HolderLookup.Provider registries = context.registries();
                 if (registries != null) {
                     StackStorageWrapper.fromStack(registries, stack).getContentsUuid().ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
@@ -114,13 +113,5 @@ public class WoodStorageBlockItem extends StorageBlockItem {
             return Component.translatable(descriptionId, "", "");
         }
         return Component.translatable(descriptionId, Component.translatable("wood_name.sophisticatedstorage." + woodType.name().toLowerCase(Locale.ROOT)), " ");
-    }
-
-    public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-        storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
-    }
-
-    public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-        storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
     }
 }

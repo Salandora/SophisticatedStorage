@@ -25,7 +25,6 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.util.InventorySorter;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
-import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
 
@@ -77,12 +76,12 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private final Map<Class<? extends IUpgradeWrapper>, Consumer<? extends IUpgradeWrapper>> upgradeDefaultsHandlers = new HashMap<>();
 
 	protected StorageWrapper(Supplier<Runnable> getSaveHandler, Runnable onSerializeRenderInfo, Runnable markContentsDirty) {
-		this(getSaveHandler, onSerializeRenderInfo, markContentsDirty, 1);
+		this(getSaveHandler, onSerializeRenderInfo, markContentsDirty, 1, false);
 	}
 
-	protected StorageWrapper(Supplier<Runnable> getSaveHandler, Runnable onSerializeRenderInfo, Runnable markContentsDirty, int numberOfDisplayItems) {
+	protected StorageWrapper(Supplier<Runnable> getSaveHandler, Runnable onSerializeRenderInfo, Runnable markContentsDirty, int numberOfDisplayItems, boolean showsCountsAndFillRatios) {
 		this.getSaveHandler = getSaveHandler;
-		renderInfo = new RenderInfo(getSaveHandler) {
+		renderInfo = new RenderInfo(getSaveHandler, showsCountsAndFillRatios) {
 			@Override
 			protected void serializeRenderInfo(CompoundTag renderInfo) {
 				renderInfoNbt = renderInfo;
@@ -126,7 +125,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 			}) {
 				@Override
 				public boolean isItemValid(int slot, ItemStack stack) {
-					return super.isItemValid(slot, stack) && (stack.isEmpty() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace()) || stack.is(ModItems.STORAGE_UPGRADE_TAG));
+					return super.isItemValid(slot, stack) && (stack.isEmpty() || stack.is(ModItems.STORAGE_UPGRADE_TAG));
 				}
 
 				@Override
@@ -322,11 +321,6 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		return mainColor != -1;
 	}
 
-	public void setMainColor(int mainColor) {
-		this.mainColor = mainColor;
-		save();
-	}
-
 	@Override
 	public int getAccentColor() {
 		return accentColor;
@@ -334,11 +328,6 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	public boolean hasAccentColor() {
 		return accentColor != -1;
-	}
-
-	public void setAccentColor(int accentColor) {
-		this.accentColor = accentColor;
-		save();
 	}
 
 	@Override

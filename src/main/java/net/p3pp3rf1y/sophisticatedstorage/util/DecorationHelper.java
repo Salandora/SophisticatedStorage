@@ -55,13 +55,17 @@ public class DecorationHelper {
 	}
 
 	public static Map<TagKey<Item>, Integer> getDyePartsNeeded(int mainColorBeingSet, int accentColorBeingSet, int storageMainColor, int storageAccentColor) {
+		return getDyePartsNeeded(mainColorBeingSet, accentColorBeingSet, storageMainColor, storageAccentColor, MAIN_COLOR_PARTS, ACCENT_COLOR_PARTS);
+	}
+
+	public static Map<TagKey<Item>, Integer> getDyePartsNeeded(int mainColorBeingSet, int accentColorBeingSet, int storageMainColor, int storageAccentColor, int mainColorParts, int accentColorParts) {
 		Map<TagKey<Item>, Integer> partsNeeded = new HashMap<>();
 		if (mainColorBeingSet != -1 && mainColorBeingSet != storageMainColor) {
-			int[] rgbPartsNeeded = calculateRGBPartsNeeded(mainColorBeingSet, MAIN_COLOR_PARTS);
+			int[] rgbPartsNeeded = calculateRGBPartsNeeded(mainColorBeingSet, mainColorParts);
 			addPartsNeededIfAny(rgbPartsNeeded, partsNeeded);
 		}
 		if (accentColorBeingSet != -1 && accentColorBeingSet != storageAccentColor) {
-			int[] rgbPartsNeeded = calculateRGBPartsNeeded(accentColorBeingSet, ACCENT_COLOR_PARTS);
+			int[] rgbPartsNeeded = calculateRGBPartsNeeded(accentColorBeingSet, accentColorParts);
 			addPartsNeededIfAny(rgbPartsNeeded, partsNeeded);
 		}
 		return partsNeeded;

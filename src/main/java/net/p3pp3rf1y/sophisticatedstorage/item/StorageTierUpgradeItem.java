@@ -310,8 +310,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 			}
 
 			if (color != -1) {
-				storageWrapper.setMainColor(color);
-				storageWrapper.setAccentColor(color);
+				storageWrapper.setColors(color, color);
 			}
 		}
 	}

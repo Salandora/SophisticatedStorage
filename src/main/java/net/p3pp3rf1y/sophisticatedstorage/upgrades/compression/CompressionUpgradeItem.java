@@ -1,8 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeSlotChangeResult;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
@@ -62,32 +60,32 @@ public class CompressionUpgradeItem extends UpgradeItemBase<CompressionUpgradeIt
 
     private UpgradeSlotChangeResult canUseForCompression(IStorageWrapper storageWrapper, SlotRange slotRange) {
         boolean allRemainingSlotsMustBeEmpty = false;
-        Item nextItemToMatch = Items.AIR;
+        ItemStack nextItemToMatch = ItemStack.EMPTY;
         Set<Integer> errorSlots = new LinkedHashSet<>();
         InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
         MemorySettingsCategory memorySettingsCategory = storageWrapper.getSettingsHandler().getTypeCategory(MemorySettingsCategory.class);
         for (int slot = slotRange.firstSlot() + slotRange.numberOfSlots() - 1; slot >= slotRange.firstSlot(); slot--) {
-            Item item;
+            ItemStack stackToMatch;
             ItemStack slotStack = inventoryHandler.getSlotStack(slot);
             if (!slotStack.isEmpty()) {
-                item = slotStack.getItem();
+                stackToMatch = slotStack;
             } else {
-                item = memorySettingsCategory.getSlotFilterStack(slot, false).map(ItemStack::getItem).orElse(Items.AIR);
+                stackToMatch = memorySettingsCategory.getSlotFilterStack(slot, false).orElse(ItemStack.EMPTY);
             }
-            if (item != Items.AIR) {
+            if (!stackToMatch.isEmpty()) {
                 if (allRemainingSlotsMustBeEmpty) {
                     errorSlots.add(slot);
                 } else {
-                    if (nextItemToMatch != Items.AIR && nextItemToMatch != item) {
+                    if (!nextItemToMatch.isEmpty() && !ItemStack.isSameItemSameComponents(nextItemToMatch, stackToMatch)) {
                         errorSlots.add(slot);
                         break;
                     }
 
                     boolean hasSlotBeforeThisOne = slot - 1 >= slotRange.firstSlot();
                     if (hasSlotBeforeThisOne) {
-                        RecipeHelper.CompactingShape compactingShape = RecipeHelper.getItemCompactingShapes(item).stream().filter(RecipeHelper.CompactingShape::isUncraftable).findFirst().orElse(RecipeHelper.CompactingShape.NONE);
+                        RecipeHelper.CompactingShape compactingShape = RecipeHelper.getItemCompactingShapes(stackToMatch).stream().filter(RecipeHelper.CompactingShape::isUncraftable).findFirst().orElse(RecipeHelper.CompactingShape.NONE);
                         if (compactingShape == RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE || compactingShape == RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE) {
-                            nextItemToMatch = RecipeHelper.getCompactingResult(item, compactingShape).getResult().getItem();
+                            nextItemToMatch = RecipeHelper.getCompactingResult(stackToMatch, compactingShape).getResult();
                         } else {
                             allRemainingSlotsMustBeEmpty = true;
                         }

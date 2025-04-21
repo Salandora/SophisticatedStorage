@@ -3,16 +3,11 @@ package net.p3pp3rf1y.sophisticatedstorage.compat.rei;
 import me.shedaniel.rei.api.common.entry.comparison.EntryComparator;
 import me.shedaniel.rei.api.common.entry.comparison.ItemComparatorRegistry;
 import me.shedaniel.rei.api.common.plugins.REIServerPlugin;
-import me.shedaniel.rei.api.common.transfer.info.MenuInfoRegistry;
-import me.shedaniel.rei.api.common.transfer.info.simple.SimpleMenuInfoProvider;
-import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.p3pp3rf1y.sophisticatedcore.compat.rei.ReiGridMenuInfo;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
@@ -21,7 +16,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.function.Supplier;
 
-public class REICompat implements REIServerPlugin {
+public class REIServerCompat implements REIServerPlugin {
     @Override
     public double getPriority() {
         return 0D;
@@ -58,13 +53,5 @@ public class REICompat implements REIServerPlugin {
 		};
 
 		registry.register(shulkerBoxNbtInterpreter, ModBlocks.SHULKER_BOX_ITEMS.stream().map(Supplier::get).toArray(BlockItem[]::new));
-    }
-
-    @Override
-    public void registerMenuInfo(MenuInfoRegistry registry) {
-        registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::crafting));
-		// TODO: Fix this
-		//registry.register(BuiltinPlugin.STONE_CUTTING, StorageScreen.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::stonecutting));
-		//registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::smithing));
     }
 }

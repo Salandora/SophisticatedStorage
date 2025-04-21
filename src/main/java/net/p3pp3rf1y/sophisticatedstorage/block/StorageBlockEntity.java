@@ -68,7 +68,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		storageWrapper = new StorageWrapper(() -> this::setChanged, () -> WorldHelper.notifyBlockUpdate(this), () -> {
 			setChanged();
 			WorldHelper.notifyBlockUpdate(this);
-		}, this instanceof BarrelBlockEntity ? 4 : 1) {
+		}, this instanceof BarrelBlockEntity ? 4 : 1, this instanceof ICountDisplay || this instanceof IFillLevelDisplay) {
 
 			@Override
 			public Optional<UUID> getContentsUuid() {
@@ -414,8 +414,10 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 
 	@Override
 	public void removeControllerPos() {
-		controllerPos = null;
-		setChanged();
+		if (controllerPos != null) {
+			controllerPos = null;
+			setChanged();
+		}
 	}
 
 	@Override
