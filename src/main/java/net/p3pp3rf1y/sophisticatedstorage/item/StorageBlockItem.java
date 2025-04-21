@@ -8,6 +8,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class StorageBlockItem extends BlockItemBase implements ITintableBlockItem {
 
@@ -29,6 +30,22 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 
 	public static Optional<Integer> getAccentColorFromStack(ItemStack barrelStack) {
 		return getEntityWrapperTagFromStack(barrelStack).map(tag -> NBTHelper.getInt(tag, ACCENT_COLOR_TAG)).orElse(NBTHelper.getInt(barrelStack, ACCENT_COLOR_TAG));
+	}
+
+	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
+		NBTHelper.setInteger(storageStack, StackStorageWrapper.NUMBER_OF_INVENTORY_SLOTS_TAG, numberOfInventorySlots);
+	}
+
+	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
+		NBTHelper.setInteger(storageStack, StackStorageWrapper.NUMBER_OF_UPGRADE_SLOTS_TAG, numberOfUpgradeSlots);
+	}
+
+	public static int getNumberOfInventorySlots(ItemStack storageStack) {
+		return NBTHelper.getInt(storageStack, StackStorageWrapper.NUMBER_OF_INVENTORY_SLOTS_TAG).orElse(0);
+	}
+
+	public static int getNumberOfUpgradeSlots(ItemStack storageStack) {
+		return NBTHelper.getInt(storageStack, StackStorageWrapper.NUMBER_OF_UPGRADE_SLOTS_TAG).orElse(0);
 	}
 
 	@Override
@@ -71,5 +88,9 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 		} else {
 			stack.getOrCreateTag().putBoolean(SHOWS_TIER_TAG, false);
 		}
+	}
+
+	public static Optional<UUID> getContentsUuid(ItemStack stack) {
+		return NBTHelper.getUniqueId(stack, "uuid");
 	}
 }

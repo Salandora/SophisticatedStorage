@@ -1,19 +1,19 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
-import net.p3pp3rf1y.sophisticatedstorage.block.IStorageBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
+import net.p3pp3rf1y.sophisticatedstorage.Config;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
 
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-public abstract class StackStorageWrapper extends StorageWrapper {
+public class StackStorageWrapper extends StorageWrapper {
 	private static final String CONTENTS_TAG = "contents";
 	private final ItemStack storageStack;
 
@@ -90,4 +90,53 @@ public abstract class StackStorageWrapper extends StorageWrapper {
 	public int getDefaultNumberOfUpgradeSlots() {
 		return storageStack.getItem() instanceof BlockItemBase blockItem && blockItem.getBlock() instanceof IStorageBlock storageBlock ? storageBlock.getNumberOfUpgradeSlots() : 0;
 	}
+
+	@Override
+	public String getStorageType() {
+		return "irrelevant"; //because this is only used when determining upgrade errors in gui which storage stacks can't have open
+	}
+
+	@Override
+	public Component getDisplayName() {
+		return Component.empty(); //because this is only used when determining upgrade errors in gui which storage stacks can't have open
+	}
+
+	@Override
+	protected boolean isAllowedInStorage(ItemStack stack) {
+		if (!(storageStack.getItem() instanceof ShulkerBoxItem)) {
+			return false;
+		}
+
+		Block block = Block.byItem(stack.getItem());
+		return !(block instanceof ShulkerBoxBlock) && !(block instanceof net.minecraft.world.level.block.ShulkerBoxBlock) && !Config.SERVER.shulkerBoxDisallowedItems.isItemDisallowed(stack.getItem());
+	}
+
+	@Override
+	public void setColors(int mainColor, int accentColor) {
+		NBTHelper.setInteger(storageStack, StorageWrapper.MAIN_COLOR_TAG, mainColor);
+		NBTHelper.setInteger(storageStack, StorageWrapper.ACCENT_COLOR_TAG, accentColor);
+		save();
+	}
+
+	@Override
+	public int getMainColor() {
+		return NBTHelper.getInt(storageStack, StorageWrapper.MAIN_COLOR_TAG).orElse(-1);
+	}
+
+
+	@Override
+	public boolean hasMainColor() {
+		return NBTHelper.hasTag(storageStack, StorageWrapper.MAIN_COLOR_TAG);
+	}
+
+	@Override
+	public int getAccentColor() {
+		return NBTHelper.getInt(storageStack, StorageWrapper.ACCENT_COLOR_TAG).orElse(-1);
+	}
+
+	@Override
+	public boolean hasAccentColor() {
+		return NBTHelper.hasTag(storageStack, StorageWrapper.ACCENT_COLOR_TAG);
+	}
+
 }

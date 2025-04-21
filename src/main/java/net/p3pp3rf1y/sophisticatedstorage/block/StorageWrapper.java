@@ -80,12 +80,12 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private final Map<Class<? extends IUpgradeWrapper>, Consumer<? extends IUpgradeWrapper>> upgradeDefaultsHandlers = new HashMap<>();
 
 	protected StorageWrapper(Supplier<Runnable> getSaveHandler, Runnable onSerializeRenderInfo, Runnable markContentsDirty) {
-		this(getSaveHandler, onSerializeRenderInfo, markContentsDirty, 1);
+		this(getSaveHandler, onSerializeRenderInfo, markContentsDirty, 1, false);
 	}
 
-	protected StorageWrapper(Supplier<Runnable> getSaveHandler, Runnable onSerializeRenderInfo, Runnable markContentsDirty, int numberOfDisplayItems) {
+	protected StorageWrapper(Supplier<Runnable> getSaveHandler, Runnable onSerializeRenderInfo, Runnable markContentsDirty, int numberOfDisplayItems, boolean showsCountsAndFillRatios) {
 		this.getSaveHandler = getSaveHandler;
-		renderInfo = new RenderInfo(getSaveHandler) {
+		renderInfo = new RenderInfo(getSaveHandler, showsCountsAndFillRatios) {
 			@Override
 			protected void serializeRenderInfo(CompoundTag renderInfo) {
 				renderInfoNbt = renderInfo;
@@ -327,11 +327,6 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		return mainColor > -1;
 	}
 
-	public void setMainColor(int mainColor) {
-		this.mainColor = mainColor;
-		save();
-	}
-
 	@Override
 	public int getAccentColor() {
 		return accentColor;
@@ -339,11 +334,6 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	public boolean hasAccentColor() {
 		return accentColor > -1;
-	}
-
-	public void setAccentColor(int accentColor) {
-		this.accentColor = accentColor;
-		save();
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.SlotAccess;
@@ -30,9 +31,7 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
-import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
-import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
@@ -112,23 +111,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 
 			private StackStorageWrapper initWrapper(ItemStack stack) {
 				UUID uuid = getContentsUuid(stack).orElse(null);
-				StackStorageWrapper storageWrapper = new StackStorageWrapper(stack) {
-					@Override
-					public String getStorageType() {
-						return "shulker_box";
-					}
-
-					@Override
-					public Component getDisplayName() {
-						return Component.translatable(stack.getItem().getDescriptionId());
-					}
-
-					@Override
-					protected boolean isAllowedInStorage(ItemStack stack) {
-						Block block = Block.byItem(stack.getItem());
-						return !(block instanceof ShulkerBoxBlock) && !(block instanceof net.minecraft.world.level.block.ShulkerBoxBlock) && !Config.SERVER.shulkerBoxDisallowedItems.isItemDisallowed(stack.getItem());
-					}
-				};
+				StackStorageWrapper storageWrapper = new StackStorageWrapper(stack);
 				if (uuid != null) {
 					CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
 					storageWrapper.load(compoundtag);
@@ -137,10 +120,6 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 				return storageWrapper;
 			}
 		};
-	}
-
-	private static Optional<UUID> getContentsUuid(ItemStack stack) {
-		return NBTHelper.getUniqueId(stack, "uuid");
 	}
 
 	@Override
@@ -175,27 +154,19 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		}).orElse(StashResult.NO_SPACE);
 	}
 
-	public void setNumberOfInventorySlots(ItemStack shulkerBoxStack, int numberOfInventorySlots) {
-		NBTHelper.putInt(shulkerBoxStack.getOrCreateTag(), "numberOfInventorySlots", numberOfInventorySlots);
-	}
-
-	public int getNumberOfInventorySlots(ItemStack shulkerBoxStack) {
+	public int getNumberOfInventorySlotsOrDefault(ItemStack shulkerBoxStack) {
 		int defaultNumberOfInventorySlots = CapabilityStorageWrapper.get(shulkerBoxStack).map(StorageWrapper::getDefaultNumberOfInventorySlots).orElse(1);
 		return NBTHelper.getInt(shulkerBoxStack, "numberOfInventorySlots").map(inventorySlots -> Math.max(inventorySlots, defaultNumberOfInventorySlots)).orElse(defaultNumberOfInventorySlots);
 	}
 
-	public int getNumberOfUpgradeSlots(ItemStack shulkerBoxStack) {
+	public int getNumberOfUpgradeSlotsOrDefault(ItemStack shulkerBoxStack) {
 		int defaultNumberOfUpgradeSlots = CapabilityStorageWrapper.get(shulkerBoxStack).map(StorageWrapper::getDefaultNumberOfUpgradeSlots).orElse(1);
 		return NBTHelper.getInt(shulkerBoxStack, "numberOfUpgradeSlots").map(numberOfUpgradeSlots -> Math.max(numberOfUpgradeSlots, defaultNumberOfUpgradeSlots)).orElse(defaultNumberOfUpgradeSlots);
 	}
 
-	public void setNumberOfUpgradeSlots(ItemStack shulkerBoxStack, int numberOfUpgradeSlots) {
-		NBTHelper.putInt(shulkerBoxStack.getOrCreateTag(), "numberOfUpgradeSlots", numberOfUpgradeSlots);
-	}
-
 	@Override
 	public boolean overrideStackedOnOther(ItemStack storageStack, Slot slot, ClickAction action, Player player) {
-		if (storageStack.getCount() > 1 || !slot.mayPickup(player) || slot.getItem().isEmpty() || action != ClickAction.SECONDARY) {
+		if (hasCreativeScreenContainerOpen(player) || storageStack.getCount() > 1 || !slot.mayPickup(player) || slot.getItem().isEmpty() || action != ClickAction.SECONDARY) {
 			return super.overrideStackedOnOther(storageStack, slot, action, player);
 		}
 
@@ -217,7 +188,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 
 	@Override
 	public boolean overrideOtherStackedOnMe(ItemStack storageStack, ItemStack otherStack, Slot slot, ClickAction action, Player player, SlotAccess carriedAccess) {
-		if (storageStack.getCount() > 1 || !slot.mayPlace(storageStack) || action != ClickAction.SECONDARY) {
+		if (hasCreativeScreenContainerOpen(player) || storageStack.getCount() > 1 || !slot.mayPlace(storageStack) || action != ClickAction.SECONDARY) {
 			return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 		}
 
@@ -229,5 +200,9 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		}
 
 		return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
+	}
+
+	private boolean hasCreativeScreenContainerOpen(Player player) {
+		return player.level().isClientSide() && player.containerMenu instanceof CreativeModeInventoryScreen.ItemPickerMenu;
 	}
 }

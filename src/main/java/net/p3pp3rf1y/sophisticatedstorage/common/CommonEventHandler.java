@@ -32,6 +32,7 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsMessage;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
@@ -56,12 +57,10 @@ public class CommonEventHandler {
 		ServerPlayConnectionEvents.JOIN.register(this::onPlayerLoggedIn);
 		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register(this::onPlayerChangedDimension);
 		ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
-
-		PlayerBlockBreakEvents.BEFORE.register(this::onBlockBreak);
-
+		PlayerBlockBreakEvents.BEFORE.register(this::handleTooManyDropsBreak);
+		PlayerBlockBreakEvents.BEFORE.register(this::handleBreakStorageWithInfinityUpgrade);
 		AttackBlockCallback.EVENT.register(this::onLimitedBarrelLeftClicked);
 		UseBlockCallback.EVENT.register(this::onSneakItemBlockInteraction);
-
 		ServerTickEvents.END_SERVER_TICK.register(this::onLevelTick);
 	}
 
@@ -129,7 +128,21 @@ public class CommonEventHandler {
 		}
 	}
 
-	private boolean onBlockBreak(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+	private boolean handleBreakStorageWithInfinityUpgrade(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+		if (!(state.getBlock() instanceof StorageBlockBase)) {
+			return true;
+		}
+
+		if (WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class)
+				.map(storageBlockEntity -> storageBlockEntity.getStorageWrapper().getUpgradeHandler().getTypeWrappers(InfinityUpgradeItem.TYPE).stream().anyMatch(w -> !player.hasPermissions(w.getPermissionLevel())))
+				.orElse(false)) {
+			player.displayClientMessage(StorageTranslationHelper.INSTANCE.translStatusMessage("infinity_upgrade_only_admin_break").withStyle(ChatFormatting.RED), true);
+			return false;
+		}
+		return true;
+	}
+
+	private boolean handleTooManyDropsBreak(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
 		if (!(state.getBlock() instanceof WoodStorageBlockBase) || player.isShiftKeyDown()) {
 			return true;
 		}
@@ -157,7 +170,7 @@ public class CommonEventHandler {
 					return;
 				}
 				droppedItemEntityCount.addAndGet((int) Math.ceil(stack.getCount() / (double) Math.min(stack.getMaxStackSize(), AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT)));
-			});
+			}, () -> false, false);
 
 			if (droppedItemEntityCount.get() > Config.SERVER.tooManyItemEntityDrops.get()) {
 				cancelEvent.set(true);

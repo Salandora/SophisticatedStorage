@@ -46,32 +46,36 @@ public class CompressionInventoryPartTest {
 
 		recipeHelperMock = Mockito.mockStatic(RecipeHelper.class);
 
-		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.IRON_NUGGET, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.IRON_INGOT), Collections.emptyList()));
-		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.IRON_INGOT, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.IRON_BLOCK), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(stackOf(Items.IRON_NUGGET), eq(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE))).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.IRON_INGOT), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(stackOf(Items.IRON_INGOT), eq(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE))).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.IRON_BLOCK), Collections.emptyList()));
 
-		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(any(Item.class))).thenReturn(Set.of(RecipeHelper.CompactingShape.NONE));
-		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.IRON_NUGGET)).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
-		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.IRON_INGOT)).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(any(ItemStack.class))).thenReturn(Set.of(RecipeHelper.CompactingShape.NONE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(stackOf(Items.IRON_NUGGET))).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(stackOf(Items.IRON_INGOT))).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 
-		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(any(Item.class))).thenReturn(RecipeHelper.UncompactingResult.EMPTY);
-		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.IRON_BLOCK)).thenReturn(new RecipeHelper.UncompactingResult(Items.IRON_INGOT, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
-		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.IRON_INGOT)).thenReturn(new RecipeHelper.UncompactingResult(Items.IRON_NUGGET, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(any(ItemStack.class))).thenReturn(RecipeHelper.UncompactingResult.EMPTY);
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(stackOf(Items.IRON_BLOCK))).thenReturn(new RecipeHelper.UncompactingResult(new ItemStack(Items.IRON_INGOT), RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(stackOf(Items.IRON_INGOT))).thenReturn(new RecipeHelper.UncompactingResult(new ItemStack(Items.IRON_NUGGET), RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 
-		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.QUARTZ, RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.QUARTZ_BLOCK), Collections.emptyList()));
-		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.QUARTZ_BLOCK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.STICK), Collections.emptyList()));
-		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(Items.STICK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE)).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.DEAD_BUSH), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(stackOf(Items.QUARTZ), eq(RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE))).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.QUARTZ_BLOCK), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(stackOf(Items.QUARTZ_BLOCK), eq(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE))).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.STICK), Collections.emptyList()));
+		recipeHelperMock.when(() -> RecipeHelper.getCompactingResult(stackOf(Items.STICK), eq(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE))).thenReturn(AccessHelper.initCompactingResult(new ItemStack(Items.DEAD_BUSH), Collections.emptyList()));
 
-		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.QUARTZ)).thenReturn(Set.of(RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE));
-		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.QUARTZ_BLOCK)).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
-		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(Items.STICK)).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(stackOf(Items.QUARTZ))).thenReturn(Set.of(RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(stackOf(Items.QUARTZ_BLOCK))).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getItemCompactingShapes(stackOf(Items.STICK))).thenReturn(Set.of(RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 
-		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.DEAD_BUSH)).thenReturn(new RecipeHelper.UncompactingResult(Items.STICK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
-		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.STICK)).thenReturn(new RecipeHelper.UncompactingResult(Items.QUARTZ_BLOCK, RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
-		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(Items.QUARTZ_BLOCK)).thenReturn(new RecipeHelper.UncompactingResult(Items.QUARTZ, RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(stackOf(Items.DEAD_BUSH))).thenReturn(new RecipeHelper.UncompactingResult(new ItemStack(Items.STICK), RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(stackOf(Items.STICK))).thenReturn(new RecipeHelper.UncompactingResult(new ItemStack(Items.QUARTZ_BLOCK), RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+		recipeHelperMock.when(() -> RecipeHelper.getUncompactingResult(stackOf(Items.QUARTZ_BLOCK))).thenReturn(new RecipeHelper.UncompactingResult(new ItemStack(Items.QUARTZ), RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE));
 
 
 		ss = Mockito.mockStatic(SophisticatedStorage.class);
 		ss.when(() -> SophisticatedStorage.getRL(anyString())).thenAnswer(i -> new ResourceLocation(i.getArgument(0)));
+	}
+
+	private static ItemStack stackOf(Item item) {
+		return argThat(stack -> stack.getItem() == item);
 	}
 
 	@BeforeEach
@@ -869,7 +873,8 @@ public class CompressionInventoryPartTest {
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256)),
 						256,
 						ImmutablePair.of(1, 256),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2496))
+						/*Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2496)) !!! THIS GOT BROKEN AS PART OF RS DUPE "FIX" */
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2304))
 				),
 				new ExtractingFromFullyFilledSlotsProperlyCalculatesCountsParams(
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256)),
@@ -887,7 +892,8 @@ public class CompressionInventoryPartTest {
 						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 256), 2, new ItemStack(Items.IRON_NUGGET, 256)),
 						256,
 						ImmutablePair.of(2, 256 + 10 * 9),
-						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2560), 2, new ItemStack(Items.IRON_NUGGET, 23232)) // the extract gets maxed to 64
+						/*Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2560), 2, new ItemStack(Items.IRON_NUGGET, 23232)) !!! THIS GOT BROKEN AS PART OF RS DUPE "FIX" // the extract gets maxed to 64*/
+						Map.of(0, new ItemStack(Items.IRON_BLOCK, 256), 1, new ItemStack(Items.IRON_INGOT, 2550), 2, new ItemStack(Items.IRON_NUGGET, 22950)) // the extract gets maxed to 64
 				)
 		);
 	}

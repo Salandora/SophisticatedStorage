@@ -63,8 +63,7 @@ public class ChestItemRenderer {
 
 	private static void renderBlockEntity(ItemStack stack, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, ChestBlockEntity chestBlockEntity) {
 		if (stack.getItem() instanceof ITintableBlockItem tintableBlockItem) {
-			chestBlockEntity.getStorageWrapper().setMainColor(tintableBlockItem.getMainColor(stack).orElse(-1));
-			chestBlockEntity.getStorageWrapper().setAccentColor(tintableBlockItem.getAccentColor(stack).orElse(-1));
+			chestBlockEntity.getStorageWrapper().setColors(tintableBlockItem.getMainColor(stack).orElse(-1), tintableBlockItem.getAccentColor(stack).orElse(-1));
 		}
 		Optional<WoodType> woodType = WoodStorageBlockItem.getWoodType(stack);
 		if (woodType.isPresent() || !(chestBlockEntity.getStorageWrapper().hasAccentColor() && chestBlockEntity.getStorageWrapper().hasMainColor())) {

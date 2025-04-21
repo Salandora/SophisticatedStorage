@@ -53,6 +53,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvent;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
@@ -64,7 +66,6 @@ import net.p3pp3rf1y.sophisticatedstorage.client.init.ModBlockColors;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModItemColors;
 import net.p3pp3rf1y.sophisticatedstorage.client.init.ModParticles;
 import net.p3pp3rf1y.sophisticatedstorage.client.render.*;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModCompat;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
@@ -76,11 +77,14 @@ import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.MultiPlayerGameM
 import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolMessage;
 import net.p3pp3rf1y.sophisticatedstorage.network.StoragePacketHandler;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 public class ClientEventHandler {
 	private ClientEventHandler() {}
@@ -89,6 +93,15 @@ public class ClientEventHandler {
 	private static final int MIDDLE_BUTTON = 2;
 	public static final KeyMapping SORT_KEYBIND = new KeyMapping(StorageTranslationHelper.INSTANCE.translKeybind("sort"),
 			InputConstants.Type.MOUSE, MIDDLE_BUTTON, KEYBIND_SOPHISTICATEDSTORAGE_CATEGORY); // StorageGuiKeyConflictContext.INSTANCE
+
+	private static Set<Predicate<StorageScreenBase<?>>> SORT_SCREEN_MATCHERS = new HashSet<>();
+	static {
+		SORT_SCREEN_MATCHERS.add(screen -> screen instanceof StorageScreen);
+	}
+
+	public static void addSortScreenMatcher(Predicate<StorageScreenBase<?>> matcher) {
+		SORT_SCREEN_MATCHERS.add(matcher);
+	}
 
 	private static final ResourceLocation CHEST_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest");
 	private static final ResourceLocation CHEST_LEFT_RL = new ResourceLocation(SophisticatedStorage.MOD_ID, "chest_left");
@@ -240,7 +253,7 @@ public class ClientEventHandler {
 
 	public static boolean tryCallSort(Screen gui) {
 		Minecraft mc = Minecraft.getInstance();
-		if (mc.player != null && mc.player.containerMenu instanceof StorageContainerMenu container && gui instanceof StorageScreen screen) {
+		if (mc.player != null && mc.player.containerMenu instanceof StorageContainerMenuBase<?> container && gui instanceof StorageScreenBase<?> screen) {
 			MouseHandler mh = mc.mouseHandler;
 			double mouseX = mh.xpos() * mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth();
 			double mouseY = mh.ypos() * mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight();

@@ -3,22 +3,16 @@ package net.p3pp3rf1y.sophisticatedstorage.compat.rei;
 import me.shedaniel.rei.api.common.entry.comparison.EntryComparator;
 import me.shedaniel.rei.api.common.entry.comparison.ItemComparatorRegistry;
 import me.shedaniel.rei.api.common.plugins.REIServerPlugin;
-import me.shedaniel.rei.api.common.transfer.info.MenuInfoRegistry;
-import me.shedaniel.rei.api.common.transfer.info.simple.SimpleMenuInfoProvider;
-import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.p3pp3rf1y.sophisticatedcore.compat.rei.ReiGridMenuInfo;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
-public class REICompat implements REIServerPlugin {
+public class REIServerCompat implements REIServerPlugin {
     @Override
     public double getPriority() {
         return 0D;
@@ -56,12 +50,4 @@ public class REICompat implements REIServerPlugin {
 
 		registry.register(shulkerBoxNbtInterpreter, ModBlocks.SHULKER_BOX_ITEMS);
     }
-
-    @Override
-    public void registerMenuInfo(MenuInfoRegistry registry) {
-        registry.register(BuiltinPlugin.CRAFTING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::crafting));
-		// TODO: Fix this
-		// registry.register(BuiltinPlugin.STONE_CUTTING, StorageScreen.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::stonecutting));
-		// registry.register(BuiltinPlugin.SMITHING, StorageContainerMenu.class, SimpleMenuInfoProvider.of(ReiGridMenuInfo::smithing));
-	}
 }

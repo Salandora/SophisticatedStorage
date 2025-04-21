@@ -3,6 +3,7 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.p3pp3rf1y.sophisticatedcore.util.RecipeHelper;
@@ -59,7 +60,7 @@ public class CompressionUpgradeConfig {
 					int count = Integer.parseInt(matcher.group(2));
 					Item toItem = BuiltInRegistries.ITEM.get(new ResourceLocation(matcher.group(3)));
 					if (fromItem != null && toItem != null && (count == 4 || count == 9)) {
-						additionalDecompressibleItemsMap.put(fromItem, new RecipeHelper.UncompactingResult(toItem, count == 4 ? RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE : RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
+						additionalDecompressibleItemsMap.put(fromItem, new RecipeHelper.UncompactingResult(new ItemStack(toItem), count == 4 ? RecipeHelper.CompactingShape.TWO_BY_TWO_UNCRAFTABLE : RecipeHelper.CompactingShape.THREE_BY_THREE_UNCRAFTABLE));
 					}
 				}
 			});

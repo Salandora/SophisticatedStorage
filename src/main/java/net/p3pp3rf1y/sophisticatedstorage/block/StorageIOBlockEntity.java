@@ -96,6 +96,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 			HashMap<Direction, LazyOptional<?>> copy = new HashMap<>(map); //to prevent concurrent modification exception
 			copy.forEach((side, lazyOptional) -> lazyOptional.invalidate());
 		});
+		capabilitySideCache.clear();
 	}
 
 	@Override
@@ -157,22 +158,23 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	@SuppressWarnings("java:S1640") //can't use EnumMap because one of keys is null
-	public <T> LazyOptional<T> getCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt) {
+	public <T> LazyOptional<T> getCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
 		if (getControllerPos().isEmpty()) {
 			return LazyOptional.empty();
 		}
 
-		if (!capabilitySideCache.containsKey(cap) || !capabilitySideCache.get(cap).containsKey(opt)) {
+		if (!capabilitySideCache.containsKey(cap) || !capabilitySideCache.get(cap).containsKey(side)) {
 			LazyOptional<T> lazyOptional = getControllerPos().flatMap(p -> WorldHelper.getLoadedBlockEntity(getLevel(), p, ControllerBlockEntity.class))
-					.map(c -> getControllerCapability(cap, opt, c))
+					.map(c -> getControllerCapability(cap, side, c))
 					.orElseGet(LazyOptional::empty);
-			capabilitySideCache.computeIfAbsent(cap, k -> new HashMap<>()).put(opt, lazyOptional);
-			if (lazyOptional.isPresent()) {
+			capabilitySideCache.computeIfAbsent(cap, k -> new HashMap<>()).put(side, lazyOptional);
+			// TODO: needed?
+			/*if (lazyOptional.isPresent()) {
 				lazyOptional.addListener(l -> removeCapabilityCacheOnSide(cap, opt));
-			}
+			}*/
 		}
 
-		return capabilitySideCache.get(cap).get(opt).cast();
+		return capabilitySideCache.get(cap).get(side).cast();
 	}
 
 	private <T> void removeCapabilityCacheOnSide(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
@@ -182,9 +184,22 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		}
 	}
 
+	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction side, ControllerBlockEntity c) {
+		LazyOptional<T> controllerCap = c.getCapability(cap, getAdjustedCapabilitySide(cap, side));
+
+		return controllerCap.map(capability -> {
+			controllerCap.addListener(l -> removeCapabilityCacheOnSide(cap, side));
+			return LazyOptional.of(() -> wrapCapability(cap, capability));
+		}).orElseGet(LazyOptional::empty);
+	}
+
 	@Nullable
-	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction opt, ControllerBlockEntity c) {
-		return c.getCapability(cap, opt);
+	protected <T> Direction getAdjustedCapabilitySide(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
+		return side;
+	}
+
+	protected <T> T wrapCapability(BlockApiLookup<T, Direction> cap, T capability) {
+		return capability;
 	}
 
 	public void onChunkUnloaded() {

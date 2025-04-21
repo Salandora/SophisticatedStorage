@@ -4,11 +4,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.FloatTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -25,11 +21,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.RandHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -178,17 +170,33 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 			return depositFromAllOfPlayersInventory(player, slot, invHandler, stackInSlot, memorySettings);
 		}
 
-		try (Transaction ctx = Transaction.openOuter()) {
-			long inserted = invHandler.insertItemOnlyToSlot(slot, ItemVariant.of(stackInHand), stackInHand.getCount(), ctx);
-			if (inserted > 0) {
+		if (stackInSlot.isEmpty()) {
+			ItemVariant resource = ItemVariant.of(stackInHand);
+			if (invHandler.isItemValid(slot, resource, stackInHand.getCount(), player)) {
+				int stackLimit = invHandler.getStackLimit(slot, resource);
+				invHandler.setStackInSlot(slot, stackInHand.split(stackLimit));
 				if (isLocked()) {
 					memorySettings.selectSlot(slot);
 				}
-				player.setItemInHand(hand, stackInHand.copyWithCount(stackInHand.getCount() - (int) inserted));
-				ctx.commit();
+				if (stackInHand.isEmpty()) {
+					player.setItemInHand(hand, ItemStack.EMPTY);
+				}
 				return true;
 			}
+		} else {
+			try (Transaction ctx = Transaction.openOuter()) {
+				long inserted = invHandler.insertItemOnlyToSlot(slot, ItemVariant.of(stackInHand), stackInHand.getCount(), ctx);
+				if (inserted > 0) {
+					if (isLocked()) {
+						memorySettings.selectSlot(slot);
+					}
+					player.setItemInHand(hand, stackInHand.copyWithCount(stackInHand.getCount() - (int) inserted));
+					ctx.commit();
+					return true;
+				}
+			}
 		}
+
 		return false;
 	}
 
