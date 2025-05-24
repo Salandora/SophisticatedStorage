@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.SophisticatedMenuProvider;
 import net.p3pp3rf1y.sophisticatedcore.network.SimplePacketBase;
 import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
@@ -34,21 +36,23 @@ public class OpenStorageInventoryMessage extends SimplePacketBase {
 				return;
 			}
 
-			player.openMenu(
-					MenuProviderHelper.createMenuProvider(
-							(w, ctx, pl) -> {
-								if (pl.level().getBlockState(pos).getBlock() instanceof LimitedBarrelBlock) {
-									return new LimitedBarrelContainerMenu(w, pl, pos);
-								} else {
-									return new StorageContainerMenu(w, pl, pos);
-								}
-							},
-							buffer -> buffer.writeBlockPos(pos),
-							WorldHelper.getBlockEntity(player.level(), pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())
-					)
+			player.sophisticatedCore_openMenu(
+					new SophisticatedMenuProvider(
+							(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
+							WorldHelper.getBlockEntity(player.level(), pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty()),
+							false
+					),
+					pos
 			);
 		});
 		return true;
 	}
 
+	private static StorageContainerMenu instantiateContainerMenu(int windowId, Player player, BlockPos pos) {
+		if (player.level().getBlockState(pos).getBlock() instanceof LimitedBarrelBlock) {
+			return new LimitedBarrelContainerMenu(windowId, player, pos);
+		} else {
+			return new StorageContainerMenu(windowId, player, pos);
+		}
+	}
 }
