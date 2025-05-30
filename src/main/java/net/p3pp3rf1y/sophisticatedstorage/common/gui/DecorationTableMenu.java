@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlotItemHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
@@ -16,6 +15,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.ISyncedContainer;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.SlotItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncContainerClientDataMessage;
 import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
@@ -161,7 +161,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 	}
 
 	private int addDecorationSlot(ItemStackHandler itemHandler, int slotIndex, int xOffset, int y, int yPadding) {
-		addSlot(new SlotItemHandler(itemHandler, slotIndex, xOffset, y) {
+		addSlot(new SlotItemHandler<>(itemHandler, slotIndex, xOffset, y) {
 			@Override
 			public void setChanged() {
 				super.setChanged();
