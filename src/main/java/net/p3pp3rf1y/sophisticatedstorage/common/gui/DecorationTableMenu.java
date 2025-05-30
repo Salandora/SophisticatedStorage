@@ -1,13 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,8 +14,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.p3pp3rf1y.porting_lib.transfer.items.SlotItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.ISyncedContainer;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.SlotItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncContainerClientDataPayload;
 import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
