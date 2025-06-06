@@ -22,7 +22,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiStorageGhostDragDropHandler;
@@ -36,7 +35,9 @@ import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -70,7 +71,7 @@ public class EmiCompat implements EmiPlugin {
         });
 
         registry.addDragDropHandler(StorageScreen.class, new EmiStorageGhostDragDropHandler<>());
-        registry.addDragDropHandler(SettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
+        registry.addDragDropHandler(StorageSettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
 
 		for (Supplier<BlockItem> item : ModBlocks.WOODEN_STORAGE_INGREDIENT_ITEMS) {
 			ClientRecipeHelper.getCraftingRecipeByKey(RecipeType.CRAFTING, BuiltInRegistries.ITEM.getKey(item.get())).ifPresent(r -> registerRecipes(registry, List.of(r)));
