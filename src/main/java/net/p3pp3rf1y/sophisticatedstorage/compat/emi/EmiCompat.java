@@ -9,7 +9,6 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
-
 import dev.emi.emi.registry.EmiTags;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -23,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.compat.common.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiGridMenuInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.emi.EmiSettingsGhostDragDropHandler;
@@ -73,7 +71,7 @@ public class EmiCompat implements EmiPlugin {
         });
 
         registry.addDragDropHandler(StorageScreen.class, new EmiStorageGhostDragDropHandler<>());
-        registry.addDragDropHandler(SettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
+        registry.addDragDropHandler(StorageSettingsScreen.class, new EmiSettingsGhostDragDropHandler<>());
 
 		for (BlockItem item : ModBlocks.WOODEN_STORAGE_INGREDIENT_ITEMS) {
 			ClientRecipeHelper.getRecipeByKey(BuiltInRegistries.ITEM.getKey(item)).ifPresent(r -> registerRecipes(registry, Collections.singletonList(r)));

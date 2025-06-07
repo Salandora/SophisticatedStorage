@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -110,8 +111,8 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 			}
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_SHULKER_BOX));
-			player.openMenu(MenuProviderHelper.createMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, pos), buffer -> buffer.writeBlockPos(pos),
-					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())));
+			player.sophisticatedCore_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, pos),
+					WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())), pos);
 			PiglinAi.angerNearbyPiglins(player, true);
 			return InteractionResult.CONSUME;
 		}).orElse(InteractionResult.PASS);
