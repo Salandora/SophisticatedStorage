@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
 import com.google.common.collect.MapMaker;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.p3pp3rf1y.porting_lib.base.util.LazyOptional;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
@@ -47,8 +47,8 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		if (isPacked(stack)) {
 			if (flagIn == TooltipFlag.ADVANCED) {
-				CapabilityStorageWrapper.get(stack).flatMap(IStorageWrapper::getContentsUuid)
-						.ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
+				CapabilityStorageWrapper.get(stack)
+						.ifPresent(w -> w.getContentsUuid().ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY))));
 			}
 			if (!Screen.hasShiftDown()) {
 				tooltip.add(Component.translatable(
