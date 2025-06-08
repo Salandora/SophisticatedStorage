@@ -218,7 +218,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return getQuads(state, side, rand, modelData, null);
 	}
 
-	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData extraData, @Nullable RenderType renderType) {
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, @Nullable ModelData extraData, @Nullable RenderType renderType) {
 		if (extraData == null) {
 			extraData = ModelData.EMPTY;
 		}

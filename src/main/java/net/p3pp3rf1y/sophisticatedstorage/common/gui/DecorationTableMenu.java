@@ -46,7 +46,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 	private SlotRange playerSlotRange;
 	@Nullable
 	private Runnable slotChangedListener = null;
-	private SlotItemHandler storageSlot;
+	private SlotItemHandler<?> storageSlot;
 
 	public DecorationTableMenu(int containerId, Player player, BlockPos pos) {
 		super(ModBlocks.DECORATION_TABLE_CONTAINER_TYPE, containerId);
@@ -75,7 +75,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 
 	private void addStorageSlots() {
 		ItemStackHandler storageBlock = blockEntity.getStorageBlock();
-		storageSlot = new SlotItemHandler(storageBlock, 0, getSlot(dyeSlotRange.firstSlot()).x, getSlot(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT).y) {
+		storageSlot = new SlotItemHandler<>(storageBlock, 0, getSlot(dyeSlotRange.firstSlot()).x, getSlot(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT).y) {
 			@Override
 			public void setChanged() {
 				super.setChanged();
@@ -150,11 +150,11 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		x += 44;
 
 		ItemStackHandler dyes = blockEntity.getDyes();
-		addSlot(new SlotItemHandler(dyes, 0, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_RED_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler<>(dyes, 0, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_RED_DYE_SLOT_BACKGROUND));
 		x += 18;
-		addSlot(new SlotItemHandler(dyes, 1, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler<>(dyes, 1, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
 		x += 18;
-		addSlot(new SlotItemHandler(dyes, 2, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler<>(dyes, 2, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
 		dyeSlotRange = new SlotRange(decorationSlotRange.firstSlot() + decorationSlotRange.numberOfSlots(), dyes.getSlotCount());
 
 		return y;

@@ -41,7 +41,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticleData;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;

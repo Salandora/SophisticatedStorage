@@ -661,9 +661,9 @@ public class DecorationTableScreen extends AbstractContainerScreen<DecorationTab
 				return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
 			}
 
-			yAxisRotation += 2 * dragX;
+			yAxisRotation += (float) (2 * dragX);
 			yAxisRotation = yAxisRotation % 360;
-			xAxisRotation += 2 * dragY;
+			xAxisRotation += (float) (2 * dragY);
 			xAxisRotation = xAxisRotation % 360;
 			targetXAxisRotation = xAxisRotation;
 			targetYAxisRotation = yAxisRotation;

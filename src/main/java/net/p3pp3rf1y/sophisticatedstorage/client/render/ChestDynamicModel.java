@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.Minecraft;
@@ -35,7 +34,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
 import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.WOOD_NAME;

@@ -40,7 +40,6 @@ import net.p3pp3rf1y.sophisticatedcore.controller.IControllerBoundable;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeHandler;
 import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
@@ -52,10 +51,10 @@ import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageToolItem;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDropDataBlock {
 	public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;

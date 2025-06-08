@@ -2,8 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import org.joml.Vector3f;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -21,14 +19,10 @@ import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.util.CountAbbreviator;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
-import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
-import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlockEntity;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
-import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
+import org.joml.Vector3f;
 
 import java.util.List;
-import java.util.Locale;
 
 import static net.minecraft.client.Minecraft.UNIFORM_FONT;
 

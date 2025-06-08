@@ -31,10 +31,8 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 

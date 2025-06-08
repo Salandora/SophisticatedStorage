@@ -37,7 +37,6 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeTab;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem;

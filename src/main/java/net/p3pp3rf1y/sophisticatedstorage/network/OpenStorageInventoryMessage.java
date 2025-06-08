@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SophisticatedMenuProvider;
 import net.p3pp3rf1y.sophisticatedcore.network.SimplePacketBase;
-import net.p3pp3rf1y.sophisticatedcore.util.MenuProviderHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;

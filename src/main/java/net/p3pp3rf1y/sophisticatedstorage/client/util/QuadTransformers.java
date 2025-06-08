@@ -36,8 +36,7 @@ public class QuadTransformers {
 	public static List<BakedQuad> process(RenderContext.QuadTransform transform, List<BakedQuad> quads) {
 		List<BakedQuad> transformedQuads = new ArrayList<>();
 
-		for (int i = 0; i < quads.size(); i++) {
-			BakedQuad quad = quads.get(i);
+		for (BakedQuad quad : quads) {
 			MutableQuadView mqv = getEditorQuad(quad);
 			transform.transform(mqv);
 

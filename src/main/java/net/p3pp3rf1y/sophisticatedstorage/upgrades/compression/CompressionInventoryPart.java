@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
 import com.mojang.datafixers.util.Function4;
 import com.mojang.datafixers.util.Pair;
-
 import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -25,10 +24,12 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 
 import static net.p3pp3rf1y.sophisticatedcore.util.MathHelper.intMaxCappedAddition;
 import static net.p3pp3rf1y.sophisticatedcore.util.MathHelper.intMaxCappedMultiply;

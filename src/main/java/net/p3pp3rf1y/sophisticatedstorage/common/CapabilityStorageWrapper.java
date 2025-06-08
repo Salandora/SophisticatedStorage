@@ -14,6 +14,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 
 public class CapabilityStorageWrapper {
+	@SuppressWarnings("unchecked")
 	public static final ItemApiLookup<LazyOptional<StackStorageWrapper>, Void> STORAGE_WRAPPER_CAPABILITY = ItemApiLookup.get(SophisticatedStorage.getRL("storage_wrapper"), (Class<LazyOptional<StackStorageWrapper>>) (Class<?>) LazyOptional.class, Void.class);
 
 	public static LazyOptional<StackStorageWrapper> get(ItemStack provider) {

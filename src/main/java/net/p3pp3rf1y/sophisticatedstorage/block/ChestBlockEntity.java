@@ -131,6 +131,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	private <T extends ISettingsCategory<?>> void copyCategorySettings(ISettingsCategory<T> category, ISettingsCategory<?> mainCategory, int startFromSlot, int slotOffset) {
+		//noinspection unchecked
 		category.copyTo((T) mainCategory, startFromSlot, slotOffset);
 	}
 
