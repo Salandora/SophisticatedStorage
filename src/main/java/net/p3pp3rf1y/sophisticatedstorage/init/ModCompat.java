@@ -8,7 +8,6 @@ import net.p3pp3rf1y.sophisticatedcore.compat.ICompat;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.compat.chipped.ChippedCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.sb.SBCompat;
-import net.p3pp3rf1y.sophisticatedstorage.compat.litematica.LitematicaCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.mkb.ModernKeyBindingCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.sodium.SodiumCompat;
 
@@ -35,7 +34,6 @@ public class ModCompat {
 		compatFactories.put(new CompatInfo(SODIUM, fromSpec(">=0.4.9 <0.5")), () -> SodiumCompat::new);
 		compatFactories.put(new CompatInfo(SB_MOD_ID, null), () -> SBCompat::new);
 		compatFactories.put(new CompatInfo(MKB, null), () -> ModernKeyBindingCompat::new);
-		compatFactories.put(new CompatInfo(CompatModIds.LITEMATICA, null), () -> LitematicaCompat::new);
 	}
 
 	public static void compatsSetup() {
