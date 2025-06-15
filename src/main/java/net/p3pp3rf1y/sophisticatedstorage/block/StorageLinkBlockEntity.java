@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
+import net.p3pp3rf1y.sophisticatedcore.extensions.block.entity.SophisticatedBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
 import javax.annotation.Nullable;
@@ -17,7 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
+public class StorageLinkBlockEntity extends BlockEntity implements ILinkable, SophisticatedBlockEntity {
 	@Nullable
 	private BlockPos controllerPos = null;
 
@@ -103,7 +104,7 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
 
 	@Override
 	public void sophisticatedCore_onChunkUnloaded() {
-		super.sophisticatedCore_onChunkUnloaded();
+		// super.sophisticatedCore_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

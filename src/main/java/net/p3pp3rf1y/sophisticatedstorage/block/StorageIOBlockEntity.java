@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllerBoundable;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
+import net.p3pp3rf1y.sophisticatedcore.extensions.block.entity.SophisticatedBlockEntity;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
@@ -25,7 +26,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public class StorageIOBlockEntity extends BlockEntity implements IControllerBoundable, ILinkable {
+public class StorageIOBlockEntity extends BlockEntity implements IControllerBoundable, ILinkable, SophisticatedBlockEntity {
 	@Nullable
 	private BlockPos controllerPos = null;
 	private boolean isLinkedToController = false;
@@ -182,7 +183,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 
 	@Override
 	public void sophisticatedCore_onChunkUnloaded() {
-		super.sophisticatedCore_onChunkUnloaded();
+		// super.sophisticatedCore_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

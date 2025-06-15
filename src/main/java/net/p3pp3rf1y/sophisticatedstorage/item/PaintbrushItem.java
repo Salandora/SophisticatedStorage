@@ -200,7 +200,7 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult onItemUseFirst(ItemStack paintbrush, UseOnContext context) {
+	public InteractionResult sophisticatedCore_onItemUseFirst(ItemStack paintbrush, UseOnContext context) {
 		if (!hasMainColor(paintbrush) && !hasAccentColor(paintbrush) && !hasBarrelMaterials(paintbrush)) {
 			return InteractionResult.PASS;
 		}

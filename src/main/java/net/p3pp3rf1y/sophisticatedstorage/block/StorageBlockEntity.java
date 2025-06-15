@@ -23,6 +23,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllableStorage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
+import net.p3pp3rf1y.sophisticatedcore.extensions.block.entity.SophisticatedBlockEntity;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
@@ -36,7 +37,7 @@ import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrad
 import javax.annotation.Nullable;
 import java.util.*;
 
-public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay {
+public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay, SophisticatedBlockEntity {
 	public static final String STORAGE_WRAPPER_TAG = "storageWrapper";
 	private final StorageWrapper storageWrapper;
 	@Nullable
@@ -270,7 +271,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 
 	@Override
 	public void sophisticatedCore_onLoad() {
-		super.sophisticatedCore_onLoad();
+		// super.sophisticatedCore_onLoad();
 		storageWrapper.onInit();
 		registerWithControllerOnLoad();
 	}
@@ -292,7 +293,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 
 	@Override
 	public void sophisticatedCore_onChunkUnloaded() {
-		super.sophisticatedCore_onChunkUnloaded();
+		// super.sophisticatedCore_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 
