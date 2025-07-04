@@ -7,15 +7,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
+import net.p3pp3rf1y.sophisticatedcore.client.model.BlockModelWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuaternionHelper;
@@ -25,7 +26,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>> implements IUnbakedGeometry<T> {
+public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>> implements IUnbakedGeometry {
 	private static final Map<Integer, BakedModel> BAKED_PART_MODELS = new HashMap<>();
 	private static final String REFERENCE_PREFIX = "reference/";
 
@@ -284,7 +285,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 			return false;
 		}
 
-		if (!(parentBlockModel.port_lib$getCustomData().getCustomGeometry() instanceof BarrelDynamicModelBase<?> parentModel)) {
+		if (!(parentBlockModel instanceof BlockModelWrapper blockModelWrapper) || !(blockModelWrapper.getWrapper() instanceof BarrelDynamicModelBase<?> parentModel)) {
 			SophisticatedStorage.LOGGER.warn("Parent '{}' doesn't hold a barrel model of 'BarrelDynamicModelBase' while loading '{}'", parentBlockModel, currentModel);
 			return false;
 		}
@@ -302,7 +303,7 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 
 	public abstract static class Loader<T extends BarrelDynamicModelBase<T>> implements IGeometryLoader<T> {
 		@Override
-		public T read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
+		public T read(JsonObject modelContents) {
 			ResourceLocation parentLocation = null;
 			if (modelContents.has("parent")) {
 				parentLocation = ResourceLocation.parse(modelContents.get("parent").getAsString());

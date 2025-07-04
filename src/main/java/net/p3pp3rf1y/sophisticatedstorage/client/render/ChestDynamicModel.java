@@ -2,9 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -23,6 +20,9 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
+public class ChestDynamicModel implements IUnbakedGeometry {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";
 	private static final Map<String, ResourceLocation> WOOD_BREAK_TEXTURES = new HashMap<>();
 	public static final ResourceLocation TINTABLE_BREAK_TEXTURE = SophisticatedStorage.getRL(BLOCK_BREAK_FOLDER + "tintable_chest");
@@ -122,7 +122,7 @@ public class ChestDynamicModel implements IUnbakedGeometry<ChestDynamicModel> {
 		public static final Loader INSTANCE = new Loader();
 
 		@Override
-		public ChestDynamicModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
+		public ChestDynamicModel read(JsonObject modelContents) {
 			return new ChestDynamicModel();
 		}
 	}

@@ -1,16 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.util.Either;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
-import io.github.fabricators_of_create.porting_lib.models.geometry.SimpleModelState;
+import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.renderer.block.model.*;
@@ -23,6 +18,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
+import net.p3pp3rf1y.sophisticatedcore.client.model.BlockModelWrapper;
+import net.p3pp3rf1y.sophisticatedcore.client.model.SimpleModelState;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -30,8 +30,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeModel> {
-
+public class SimpleCompositeModel implements IUnbakedGeometry {
 	private static final String PARTICLE_MATERIAL = "particle";
 	private final ImmutableMap<String, BlockModel> children;
 
@@ -45,24 +44,23 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		TextureAtlasSprite particle = spriteGetter.apply(particleLocation);
 
 		var rootTransform = context.getRootTransform();
-		if (!rootTransform.isIdentity()) {
+		if (!rootTransform.equals(Transformation.identity())) {
 			modelState = new SimpleModelState(modelState.getRotation().compose(rootTransform), modelState.isUvLocked());
 		}
 
 		var bakedPartsBuilder = ImmutableMap.<String, BakedModel>builder();
 		for (var entry : children.entrySet()) {
 			var name = entry.getKey();
-			if (!context.isComponentVisible(name, true)) {
+			// TODO: Component Visible
+			/*if (!context.isComponentVisible(name, true)) {
 				continue;
-			}
+			}*/
 			var model = entry.getValue();
-			bakedPartsBuilder.put(name, model.bake(baker, model, spriteGetter, modelState, true));
+ 			bakedPartsBuilder.put(name, model.bake(baker, model, spriteGetter, modelState, true));
 		}
 		var bakedParts = bakedPartsBuilder.build();
 
-		var itemPassesBuilder = ImmutableList.<BakedModel>builder();
-
-		return new Baked(context.isGui3d(), context.useBlockLight(), context.useAmbientOcclusion(), particle, context.getTransforms(), overrides, bakedParts, itemPassesBuilder.build());
+		return new Baked(context.isGui3d(), context.useBlockLight(), context.useAmbientOcclusion(), particle, context.getTransforms(), overrides, bakedParts);
 	}
 
 	@SuppressWarnings("java:S5803") //need to access textureMap here to get textures
@@ -70,7 +68,7 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		HashMap<String, Either<Material, String>> textures = new HashMap<>();
 		children.values().forEach(childModel -> {
 			childModel.textureMap.forEach(textures::putIfAbsent);
-			if (childModel.port_lib$getCustomData().hasCustomGeometry() && childModel.port_lib$getCustomData().getCustomGeometry() instanceof SimpleCompositeModel compositeModel) {
+			if (childModel instanceof BlockModelWrapper wrapper && wrapper.getWrapper() instanceof SimpleCompositeModel compositeModel) {
 				compositeModel.getTextures().forEach(textures::putIfAbsent);
 			} else if (childModel.parent != null) {
 				childModel.parent.textureMap.forEach(textures::putIfAbsent);
@@ -90,9 +88,8 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		List<BlockElement> elements = new ArrayList<>();
 
 		children.forEach((name, model) -> {
-			//noinspection deprecation
 			elements.addAll(model.getElements());
-			if (model.port_lib$getCustomData().hasCustomGeometry() && model.port_lib$getCustomData().getCustomGeometry() instanceof SimpleCompositeModel compositeModel) {
+			if (model instanceof BlockModelWrapper wrapper && wrapper.getWrapper() instanceof SimpleCompositeModel compositeModel) {
 				elements.addAll(compositeModel.getElements());
 			}
 		});
@@ -100,10 +97,10 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		return elements;
 	}
 
-	@Override
+	/*@Override
 	public Set<String> getConfigurableComponentNames() {
 		return children.keySet();
-	}
+	}*/
 
 	public static class Baked implements BakedModel, FabricBakedModel {
 		private final boolean isAmbientOcclusion;
@@ -113,9 +110,8 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		private final ItemOverrides overrides;
 		private final ItemTransforms transforms;
 		private final ImmutableMap<String, BakedModel> children;
-		private final ImmutableList<BakedModel> itemPasses;
 
-		public Baked(boolean isGui3d, boolean isSideLit, boolean isAmbientOcclusion, TextureAtlasSprite particle, ItemTransforms transforms, ItemOverrides overrides, ImmutableMap<String, BakedModel> children, ImmutableList<BakedModel> itemPasses) {
+		public Baked(boolean isGui3d, boolean isSideLit, boolean isAmbientOcclusion, TextureAtlasSprite particle, ItemTransforms transforms, ItemOverrides overrides, ImmutableMap<String, BakedModel> children) {
 			this.children = children;
 			this.isAmbientOcclusion = isAmbientOcclusion;
 			this.isGui3d = isGui3d;
@@ -123,7 +119,6 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 			this.particle = particle;
 			this.overrides = overrides;
 			this.transforms = transforms;
-			this.itemPasses = itemPasses;
 		}
 
 		@Override
@@ -154,11 +149,6 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 			}
 			return Collections.unmodifiableList(quadLists);
 		}
-
-		/*@Override
-		public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
-			return ModelData.EMPTY;
-		}*/
 
 		@Override
 		public boolean useAmbientOcclusion() {
@@ -196,20 +186,6 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		public ItemTransforms getTransforms() {
 			return transforms;
 		}
-
-		/*@Override
-		public List<BakedModel> getRenderPasses(ItemStack itemStack, boolean fabulous) {
-			return itemPasses;
-		}*/
-
-		/*@Override
-		public ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
-			var sets = new ArrayList<ChunkRenderTypeSet>();
-			for (Map.Entry<String, BakedModel> entry : children.entrySet()) {
-				sets.add(entry.getValue().getRenderTypes(state, rand, ModelData.EMPTY));
-			}
-			return ChunkRenderTypeSet.union(sets);
-		}*/
 	}
 
 	@SuppressWarnings("java:S6548") // singleton implementation is good here
@@ -220,10 +196,10 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 		}
 
 		@Override
-		public SimpleCompositeModel read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) {
+		public SimpleCompositeModel read(JsonObject jsonObject) {
 
 			ImmutableMap.Builder<String, BlockModel> childrenBuilder = ImmutableMap.builder();
-			readChildren(jsonObject, deserializationContext, childrenBuilder);
+			readChildren(jsonObject, childrenBuilder);
 
 			var children = childrenBuilder.build();
 			if (children.isEmpty()) {
@@ -233,13 +209,14 @@ public class SimpleCompositeModel implements IUnbakedGeometry<SimpleCompositeMod
 			return new SimpleCompositeModel(children);
 		}
 
-		private void readChildren(JsonObject jsonObject, JsonDeserializationContext deserializationContext, ImmutableMap.Builder<String, BlockModel> children) {
+		private void readChildren(JsonObject jsonObject, ImmutableMap.Builder<String, BlockModel> children) {
 			if (!jsonObject.has("parts")) {
 				return;
 			}
 			var childrenJsonObject = jsonObject.getAsJsonObject("parts");
 			for (Map.Entry<String, JsonElement> entry : childrenJsonObject.entrySet()) {
-				children.put(entry.getKey(), deserializationContext.deserialize(entry.getValue(), BlockModel.class));
+				// TODO: Can we do this better?
+				children.put(entry.getKey(), new BlockModelWrapper(BlockModel.fromString(entry.getValue().toString())));
 			}
 		}
 	}

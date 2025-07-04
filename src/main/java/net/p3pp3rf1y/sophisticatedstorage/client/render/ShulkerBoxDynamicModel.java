@@ -1,10 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -23,6 +19,9 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
@@ -36,7 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynamicModel> {
+public class ShulkerBoxDynamicModel implements IUnbakedGeometry {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";
 	public static final ResourceLocation TINTABLE_BREAK_TEXTURE = SophisticatedStorage.getRL(BLOCK_BREAK_FOLDER + "tintable_shulker_box");
 	public static final ResourceLocation MAIN_BREAK_TEXTURE = SophisticatedStorage.getRL(BLOCK_BREAK_FOLDER + "shulker_box");
@@ -115,7 +114,7 @@ public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynami
 		public static final Loader INSTANCE = new Loader();
 
 		@Override
-		public ShulkerBoxDynamicModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
+		public ShulkerBoxDynamicModel read(JsonObject modelContents) {
 			return new ShulkerBoxDynamicModel();
 		}
 	}

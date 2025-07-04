@@ -3,8 +3,6 @@ package net.p3pp3rf1y.sophisticatedstorage.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
@@ -48,6 +46,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
+import net.p3pp3rf1y.sophisticatedcore.client.model.RegisterGeometryLoadersCallback;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
@@ -128,7 +128,7 @@ public class ClientEventHandler {
 	public static final ModelLayerLocation CHEST_RIGHT_LAYER = new ModelLayerLocation(CHEST_RIGHT_RL, "main");
 
 	public static void registerHandlers() {
-		RegisterGeometryLoadersCallback.EVENT.register(ClientEventHandler::onModelRegistry);
+		RegisterGeometryLoadersCallback.register(ClientEventHandler::onModelRegistry);
 		ClientEventHandler.registerLayer();
 		ClientEventHandler.registerTooltipComponent();
 		ClientEventHandler.registerOverlay();

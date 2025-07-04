@@ -12,6 +12,7 @@ mutable field net/minecraft/client/renderer/block/model/BakedQuad direction Lnet
 accessible field net/minecraft/client/renderer/block/model/BakedQuad tintIndex I
 mutable field net/minecraft/client/renderer/block/model/BakedQuad tintIndex I
 
+accessible field net/minecraft/client/renderer/block/model/BlockModel parent Lnet/minecraft/client/renderer/block/model/BlockModel;
 accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
 
 accessible method net/minecraft/client/renderer/entity/ItemRenderer renderModelLists (Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V
