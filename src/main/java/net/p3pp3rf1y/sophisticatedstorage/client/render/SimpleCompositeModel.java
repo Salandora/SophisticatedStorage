@@ -1,5 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedlibrary.model.models.BlockModelWrapper;
+import com.github.salandora.sophisticatedlibrary.model.util.SimpleModelState;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -18,11 +23,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
-import net.p3pp3rf1y.sophisticatedcore.client.model.BlockModelWrapper;
-import net.p3pp3rf1y.sophisticatedcore.client.model.SimpleModelState;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -197,7 +197,6 @@ public class SimpleCompositeModel implements IUnbakedGeometry {
 
 		@Override
 		public SimpleCompositeModel read(JsonObject jsonObject) {
-
 			ImmutableMap.Builder<String, BlockModel> childrenBuilder = ImmutableMap.builder();
 			readChildren(jsonObject, childrenBuilder);
 

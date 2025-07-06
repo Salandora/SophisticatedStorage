@@ -1,11 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedlibrary.model.models.MeshBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
-import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -13,9 +14,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
-import net.p3pp3rf1y.sophisticatedcore.client.model.MeshBakedModel;
 
 import java.util.List;
 import java.util.Map;

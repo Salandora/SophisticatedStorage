@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import com.github.salandora.sophisticatedlibrary.model.loading.BlockModelGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.models.BlockModelWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
@@ -12,8 +14,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.BlockModelGeometryBakingContext;
-import net.p3pp3rf1y.sophisticatedcore.client.model.BlockModelWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 
 import javax.annotation.Nullable;

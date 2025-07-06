@@ -1,8 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedlibrary.model.models.BlockModelWrapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
@@ -13,10 +16,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryBakingContext;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IUnbakedGeometry;
-import net.p3pp3rf1y.sophisticatedcore.client.model.BlockModelWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.client.util.QuaternionHelper;

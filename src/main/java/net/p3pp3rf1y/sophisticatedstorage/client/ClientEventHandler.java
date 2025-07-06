@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
+import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.loading.RegisterGeometryLoadersCallback;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -46,8 +48,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.p3pp3rf1y.sophisticatedcore.api.client.model.loading.IGeometryLoader;
-import net.p3pp3rf1y.sophisticatedcore.client.model.RegisterGeometryLoadersCallback;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
