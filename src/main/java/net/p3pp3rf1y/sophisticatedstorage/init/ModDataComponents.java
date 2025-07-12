@@ -1,8 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
+import com.github.salandora.sophisticatedlibrary.util.DeferredHolder;
+import com.github.salandora.sophisticatedlibrary.util.DeferredRegister;
 import com.mojang.serialization.Codec;
-import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
-import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;

@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
-import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
-import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
+import com.github.salandora.sophisticatedlibrary.util.DeferredHolder;
+import com.github.salandora.sophisticatedlibrary.util.DeferredRegister;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditionType;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;

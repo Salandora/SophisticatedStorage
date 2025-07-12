@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
-import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
-import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
+import com.github.salandora.sophisticatedlibrary.util.DeferredHolder;
+import com.github.salandora.sophisticatedlibrary.util.DeferredRegister;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
