@@ -74,8 +74,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				}
 				WoodStorageBlockItem.setPacked(stack, true);
 				StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
-				StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlotCount());
-				StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlotCount());
+				StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlots());
+				StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlots());
 			}
 		}
 	}
@@ -180,8 +180,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 		StorageWrapper storageWrapper = be.getStorageWrapper();
 		InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
 		UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
-		storageWrapper.changeSize(StorageBlockItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlotCount(),
-				StorageBlockItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlotCount());
+		storageWrapper.changeSize(StorageBlockItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlots(),
+				StorageBlockItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlots());
 	}
 
 	protected void setRenderBlockRenderProperties(ItemStack stack, WoodStorageBlockEntity be) {

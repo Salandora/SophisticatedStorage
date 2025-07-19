@@ -1,13 +1,16 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.BlockState;
+import com.github.salandora.sophisticatedlibrary.transfer.FabricStorageWrapper;
+import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -27,9 +30,8 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 		if (itemHandler == null) {
 			itemHandler = super.getExternalItemHandler(null);
-			if (itemHandler instanceof IItemHandlerSimpleInserter simpleInserter) {
-				//itemHandler = new OutputOnlyItemHandlerWrapper(simpleInserter);
-				itemHandler = FilteringStorage.extractOnlyOf(simpleInserter);
+			if (itemHandler instanceof FabricStorageWrapper<?> && ((FabricStorageWrapper<IItemHandler>) itemHandler).getWrapped() instanceof IItemHandlerSimpleInserter simpleInserter) {
+				itemHandler = FabricStorageWrapper.of(new OutputOnlyItemHandlerWrapper(simpleInserter));
 			}
 		}
 
@@ -42,7 +44,7 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		itemHandler = null;
 	}
 
-	/*private static class OutputOnlyItemHandlerWrapper implements IItemHandler {
+	private static class OutputOnlyItemHandlerWrapper implements IItemHandler {
 		private final IItemHandlerSimpleInserter itemHandler;
 
 		public OutputOnlyItemHandlerWrapper(IItemHandlerSimpleInserter itemHandler) {
@@ -78,5 +80,5 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 			return false;
 		}
-	}*/
+	}
 }

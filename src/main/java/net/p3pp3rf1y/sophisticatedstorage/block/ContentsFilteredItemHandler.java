@@ -1,8 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ISlotTracker;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
@@ -28,8 +25,8 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 	}
 
 	@Override
-	public int getSlotCount() {
-		return itemHandlerGetter.get().getSlotCount();
+	public int getSlots() {
+		return itemHandlerGetter.get().getSlots();
 	}
 
 	@Nonnull
@@ -47,28 +44,10 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 		return stack;
 	}
 
-	@Override
-	public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-		return itemHandlerGetter.get().getSlot(slot);
-	}
-
-	@Override
-	public long insertSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		if (matchesContents(resource.toStack((int) maxAmount))) {
-			return itemHandlerGetter.get().insertSlot(slot, resource, maxAmount, ctx);
-		}
-		return 0;
-	}
-
 	@Nonnull
 	@Override
 	public ItemStack extractItem(int slot, int amount, boolean simulate) {
 		return itemHandlerGetter.get().extractItem(slot, amount, simulate);
-	}
-
-	@Override
-	public long extractSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		return itemHandlerGetter.get().extractSlot(slot, resource, maxAmount, ctx);
 	}
 
 	@Override
@@ -91,19 +70,6 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 			return itemHandlerGetter.get().insertItem(stack, simulate);
 		}
 		return stack;
-	}
-
-	@Override
-	public long insert(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		if (matchesContents(resource.toStack((int) maxAmount))) {
-			return itemHandlerGetter.get().insert(resource, maxAmount, ctx);
-		}
-		return 0;
-	}
-
-	@Override
-	public long extract(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		return itemHandlerGetter.get().extract(resource, maxAmount, ctx);
 	}
 
 	@Override

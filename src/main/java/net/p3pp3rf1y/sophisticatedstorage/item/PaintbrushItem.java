@@ -92,7 +92,7 @@ public class PaintbrushItem extends ItemBase {
 
 	public static Optional<ItemRequirements> getItemRequirements(ItemStack paintbrush, Player player, Map<ResourceLocation, Integer> allPartsNeeded) {
 		Map<ResourceLocation, Integer> remainingParts = getRemainingParts(paintbrush);
-		DecorationHelper.ConsumptionResult result = DecorationHelper.consumeMaterialPartsNeeded(allPartsNeeded, remainingParts, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), true);
+		DecorationHelper.ConsumptionResult result = DecorationHelper.fabric_consumeMaterialPartsNeeded(allPartsNeeded, remainingParts, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), true);
 
 		List<ItemStack> itemsPresent = new ArrayList<>();
 		List<ItemStack> itemsMissing = new ArrayList<>();
@@ -143,7 +143,7 @@ public class PaintbrushItem extends ItemBase {
 
 	public static @NotNull Optional<ItemRequirements> getDyeItemRequirements(ItemStack paintbrush, Player player, Map<TagKey<Item>, Integer> allPartsNeeded) {
 		Map<ResourceLocation, Integer> remainingParts = getRemainingParts(paintbrush);
-		DecorationHelper.ConsumptionResult result = DecorationHelper.consumeDyePartsNeeded(allPartsNeeded, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), remainingParts, true);
+		DecorationHelper.ConsumptionResult result = DecorationHelper.fabric_consumeDyePartsNeeded(allPartsNeeded, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), remainingParts, true);
 
 		return compileDyeItemRequirements(allPartsNeeded, remainingParts, result);
 	}
@@ -287,7 +287,7 @@ public class PaintbrushItem extends ItemBase {
 			return false;
 		}
 
-		if (!DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, true)) {
+		if (!DecorationHelper.fabric_consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, true)) {
 			return false;
 		}
 
@@ -297,7 +297,7 @@ public class PaintbrushItem extends ItemBase {
 			materialHolder.setMaterials(Collections.emptyMap());
 		}
 
-		DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, false);
+		DecorationHelper.fabric_consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, false);
 		setRemainingParts(paintbrush, remainingParts);
 		return true;
 	}
@@ -314,11 +314,11 @@ public class PaintbrushItem extends ItemBase {
 
 		BarrelBlockItem.uncompactMaterials(originalMaterials);
 
-		if (!DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, true)) {
+		if (!DecorationHelper.fabric_consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, true)) {
 			return false;
 		}
 
-		DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, false);
+		DecorationHelper.fabric_consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, false);
 		setRemainingParts(paintbrush, remainingParts);
 
 		tintable.setColors(-1, -1);

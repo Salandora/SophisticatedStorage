@@ -141,7 +141,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		y = addDecorationSlot(decorativeBlocks, 4, x, y, DECORATION_SLOT_PADDING);
 		y = addDecorationSlot(decorativeBlocks, 5, x, y, DECORATION_SLOT_PADDING);
 		y = addDecorationSlot(decorativeBlocks, 6, x, y, 0);
-		decorationSlotRange = new SlotRange(0, decorativeBlocks.getSlotCount());
+		decorationSlotRange = new SlotRange(0, decorativeBlocks.getSlots());
 		x += 44;
 
 		ItemStackHandler dyes = blockEntity.getDyes();
@@ -150,7 +150,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		addSlot(new SlotItemHandler(dyes, 1, x, yOffset).sophisticatedCore_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
 		x += 18;
 		addSlot(new SlotItemHandler(dyes, 2, x, yOffset).sophisticatedCore_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
-		dyeSlotRange = new SlotRange(decorationSlotRange.firstSlot() + decorationSlotRange.numberOfSlots(), dyes.getSlotCount());
+		dyeSlotRange = new SlotRange(decorationSlotRange.firstSlot() + decorationSlotRange.numberOfSlots(), dyes.getSlots());
 
 		return y;
 	}
@@ -222,7 +222,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 	private boolean isValidDye(ItemStack stack) {
 		ItemStackHandler dyes = blockEntity.getDyes();
 
-		for (int slot = 0; slot < dyes.getSlotCount(); slot++) {
+		for (int slot = 0; slot < dyes.getSlots(); slot++) {
 			if (dyes.isItemValid(slot, stack)) {
 				return true;
 			}

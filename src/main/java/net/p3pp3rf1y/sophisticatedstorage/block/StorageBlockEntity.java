@@ -1,7 +1,10 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.SlottedStackStorage;
+import com.github.salandora.sophisticatedlibrary.transfer.FabricStorageWrapper;
+import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -56,7 +59,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	private boolean chunkBeingUnloaded = false;
 
 	@Nullable
-	private SlottedStackStorage cachedFailedInsertItemHandler;
+	private IItemHandler cachedFailedInsertItemHandler;
 	private boolean locked = false;
 	private boolean showLock = true;
 	private boolean showTier = true;
@@ -366,7 +369,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	public void changeStorageSize(int additionalInventorySlots, int additionalUpgradeSlots) {
-		int currentInventorySlots = getStorageWrapper().getInventoryHandler().getSlotCount();
+		int currentInventorySlots = getStorageWrapper().getInventoryHandler().getSlots();
 		getStorageWrapper().changeSize(additionalInventorySlots, additionalUpgradeSlots);
 		changeSlots(currentInventorySlots + additionalInventorySlots);
 	}
@@ -388,14 +391,14 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Nullable
-	public SlottedStackStorage getExternalItemHandler(@Nullable Direction side) {
+	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
 		if (side == null) {
-			return getStorageWrapper().getInventoryForInputOutput();
+			return FabricStorageWrapper.of(getStorageWrapper().getInventoryForInputOutput());
 		}
 		if (cachedFailedInsertItemHandler == null) {
 			cachedFailedInsertItemHandler = new CachedFailedInsertInventoryHandler(() -> getStorageWrapper().getInventoryForInputOutput(), () -> level != null ? level.getGameTime() : 0);
 		}
-		return cachedFailedInsertItemHandler;
+		return FabricStorageWrapper.of(cachedFailedInsertItemHandler);
 	}
 
 	public boolean shouldDropContents() {
@@ -507,7 +510,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	private void lock() {
 		locked = true;
 		if (memorizesItemsWhenLocked()) {
-			getStorageWrapper().getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).selectSlots(0, getStorageWrapper().getInventoryHandler().getSlotCount());
+			getStorageWrapper().getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).selectSlots(0, getStorageWrapper().getInventoryHandler().getSlots());
 		}
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {

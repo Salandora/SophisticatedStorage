@@ -177,7 +177,9 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		if (controllerItemHandlerCache != null) {
 			return controllerItemHandlerCache.find(side);
 		} else {
-			return WorldHelper.getBlockEntity(getLevel(), getControllerPos().get(), ControllerBlockEntity.class).map(c -> c.getExternalItemHandler(side)).orElse(null);
+			return WorldHelper.getBlockEntity(getLevel(), getControllerPos().get(), ControllerBlockEntity.class)
+					.map(c -> c.getExternalItemHandler(side))
+					.orElse(null);
 		}
 	}
 

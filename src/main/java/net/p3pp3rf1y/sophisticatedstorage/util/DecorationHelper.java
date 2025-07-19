@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.util;
 
+import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -45,7 +46,7 @@ public class DecorationHelper {
 		return Optional.empty();
 	}
 
-	public static boolean consumeDyes(int mainColorBeingSet, int accentColorBeingSet, Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> dyes, Integer storageMainColor, Integer storageAccentColor, boolean simulate) {
+	public static boolean consumeDyes(int mainColorBeingSet, int accentColorBeingSet, Map<ResourceLocation, Integer> remainingParts, List<IItemHandler> dyes, Integer storageMainColor, Integer storageAccentColor, boolean simulate) {
 		Map<TagKey<Item>, Integer> partsNeeded = getDyePartsNeeded(mainColorBeingSet, accentColorBeingSet, storageMainColor, storageAccentColor);
 		if (partsNeeded.isEmpty()) {
 			return true;
@@ -119,12 +120,12 @@ public class DecorationHelper {
 		return result;
 	}
 
-	public static boolean consumeMaterials(Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> decorativeBlocks, Map<BarrelMaterial, ResourceLocation> originalMaterials, Map<BarrelMaterial, ResourceLocation> materials, boolean simulate) {
+	public static boolean consumeMaterials(Map<ResourceLocation, Integer> remainingParts, List<IItemHandler> decorativeBlocks, Map<BarrelMaterial, ResourceLocation> originalMaterials, Map<BarrelMaterial, ResourceLocation> materials, boolean simulate) {
 		Map<ResourceLocation, Integer> partsNeeded = getMaterialPartsNeeded(originalMaterials, materials);
 		return consumeMaterialPartsNeeded(partsNeeded, remainingParts, decorativeBlocks, simulate).hasEnough();
 	}
 
-	public static ConsumptionResult consumeMaterialPartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> decorativeBlocks, boolean simulate) {
+	public static ConsumptionResult consumeMaterialPartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> remainingParts, List<IItemHandler> decorativeBlocks, boolean simulate) {
 		return consumePartsNeeded(partsNeeded, decorativeBlocks, location -> location,
 				(materialLocation, stack) -> getMaterialLocation(stack).map(ml -> ml.equals(materialLocation)).orElse(false), remainingParts, simulate);
 	}
@@ -161,11 +162,11 @@ public class DecorationHelper {
 		return materialLocation;
 	}
 
-	public static ConsumptionResult consumeDyePartsNeeded(Map<TagKey<Item>, Integer> partsNeeded, List<Storage<ItemVariant>> resourceHandlers, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
+	public static ConsumptionResult consumeDyePartsNeeded(Map<TagKey<Item>, Integer> partsNeeded, List<IItemHandler> resourceHandlers, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
 		return consumePartsNeeded(partsNeeded, resourceHandlers, TagKey::location, (dyeName, stack) -> stack.is(dyeName), remainingParts, simulate);
 	}
 
-	private static <T> ConsumptionResult consumePartsNeeded(Map<T, Integer> partsNeeded, List<Storage<ItemVariant>> resourceHandlers, Function<T, ResourceLocation> locationGetter, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
+	private static <T> ConsumptionResult consumePartsNeeded(Map<T, Integer> partsNeeded, List<IItemHandler> resourceHandlers, Function<T, ResourceLocation> locationGetter, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
 		Map<ResourceLocation, Integer> missingParts = new HashMap<>();
 		for (Map.Entry<T, Integer> entry : partsNeeded.entrySet()) {
 			T material = entry.getKey();
@@ -196,7 +197,92 @@ public class DecorationHelper {
 		return new ConsumptionResult(missingParts.isEmpty(), missingParts);
 	}
 
-	private static <T> SingleItemConsumptionResult consumeFromHandlers(List<Storage<ItemVariant>> resourceHandlers, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate, T material, Integer parts, ResourceLocation materialLocation) {
+	private static <T> SingleItemConsumptionResult consumeFromHandlers(List<IItemHandler> resourceHandlers, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate, T material, Integer parts, ResourceLocation materialLocation) {
+		for (IItemHandler resources : resourceHandlers) {
+			for (int slot = 0; slot < resources.getSlots(); slot++) {
+				ItemStack stack = resources.getStackInSlot(slot);
+				if (!stackMatcher.test(material, stack)) {
+					continue;
+				}
+
+				int toRemove = Math.ceilDiv(parts, BLOCK_TOTAL_PARTS);
+				ItemStack removed = resources.extractItem(slot, toRemove, simulate);
+				int partsRemoved = removed.getCount() * BLOCK_TOTAL_PARTS;
+
+				if (partsRemoved >= parts) {
+					if (partsRemoved > parts && !simulate) {
+						remainingParts.put(materialLocation, partsRemoved - parts);
+					}
+					return new SingleItemConsumptionResult(true, 0);
+				}
+				parts -= partsRemoved;
+			}
+		}
+		return new SingleItemConsumptionResult(false, parts);
+	}
+
+	private record SingleItemConsumptionResult(boolean hasEnough, int countMissing) {}
+
+	public record ConsumptionResult(boolean hasEnough, Map<ResourceLocation, Integer> missingParts) {}
+
+
+
+
+	public static boolean fabric_consumeMaterials(Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> decorativeBlocks, Map<BarrelMaterial, ResourceLocation> originalMaterials, Map<BarrelMaterial, ResourceLocation> materials, boolean simulate) {
+		Map<ResourceLocation, Integer> partsNeeded = getMaterialPartsNeeded(originalMaterials, materials);
+		return fabric_consumeMaterialPartsNeeded(partsNeeded, remainingParts, decorativeBlocks, simulate).hasEnough();
+	}
+
+	public static ConsumptionResult fabric_consumeMaterialPartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> decorativeBlocks, boolean simulate) {
+		return fabric_consumePartsNeeded(partsNeeded, decorativeBlocks, location -> location,
+				(materialLocation, stack) -> getMaterialLocation(stack).map(ml -> ml.equals(materialLocation)).orElse(false), remainingParts, simulate);
+	}
+
+	public static boolean fabric_consumeDyes(int mainColorBeingSet, int accentColorBeingSet, Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> dyes, Integer storageMainColor, Integer storageAccentColor, boolean simulate) {
+		Map<TagKey<Item>, Integer> partsNeeded = getDyePartsNeeded(mainColorBeingSet, accentColorBeingSet, storageMainColor, storageAccentColor);
+		if (partsNeeded.isEmpty()) {
+			return true;
+		}
+
+		return fabric_consumeDyePartsNeeded(partsNeeded, dyes, remainingParts, simulate).hasEnough();
+	}
+
+	public static ConsumptionResult fabric_consumeDyePartsNeeded(Map<TagKey<Item>, Integer> partsNeeded, List<Storage<ItemVariant>> resourceHandlers, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
+		return fabric_consumePartsNeeded(partsNeeded, resourceHandlers, TagKey::location, (dyeName, stack) -> stack.is(dyeName), remainingParts, simulate);
+	}
+
+	private static <T> ConsumptionResult fabric_consumePartsNeeded(Map<T, Integer> partsNeeded, List<Storage<ItemVariant>> resourceHandlers, Function<T, ResourceLocation> locationGetter, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
+		Map<ResourceLocation, Integer> missingParts = new HashMap<>();
+		for (Map.Entry<T, Integer> entry : partsNeeded.entrySet()) {
+			T material = entry.getKey();
+			Integer parts = entry.getValue();
+			ResourceLocation materialLocation = locationGetter.apply(material);
+			int remainingPartCount = remainingParts.getOrDefault(materialLocation, 0);
+			if (remainingPartCount > parts) {
+				if (!simulate) {
+					remainingParts.put(materialLocation, remainingPartCount - parts);
+				}
+				continue;
+			} else {
+				if (!simulate) {
+					remainingParts.remove(materialLocation);
+				}
+				if (remainingPartCount == parts) {
+					continue;
+				}
+			}
+
+			parts -= remainingPartCount;
+
+			SingleItemConsumptionResult singleItemConsumptionResult = fabric_consumeFromHandlers(resourceHandlers, stackMatcher, remainingParts, simulate, material, parts, materialLocation);
+			if (!singleItemConsumptionResult.hasEnough()) {
+				missingParts.put(materialLocation, singleItemConsumptionResult.countMissing());
+			}
+		}
+		return new ConsumptionResult(missingParts.isEmpty(), missingParts);
+	}
+
+	private static <T> SingleItemConsumptionResult fabric_consumeFromHandlers(List<Storage<ItemVariant>> resourceHandlers, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate, T material, Integer parts, ResourceLocation materialLocation) {
 		for (Storage<ItemVariant> resources : resourceHandlers) {
 			for (StorageView<ItemVariant> view : resources.nonEmptyViews()) {
 				ItemStack stack = view.getResource().toStack((int) view.getAmount());
@@ -226,8 +312,4 @@ public class DecorationHelper {
 		}
 		return new SingleItemConsumptionResult(false, parts);
 	}
-
-	private record SingleItemConsumptionResult(boolean hasEnough, int countMissing) {}
-
-	public record ConsumptionResult(boolean hasEnough, Map<ResourceLocation, Integer> missingParts) {}
 }

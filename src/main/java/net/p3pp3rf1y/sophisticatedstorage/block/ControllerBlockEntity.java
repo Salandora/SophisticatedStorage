@@ -1,6 +1,9 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.SlottedStackStorage;
+import com.github.salandora.sophisticatedlibrary.transfer.FabricStorageWrapper;
+import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -9,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
-import net.p3pp3rf1y.sophisticatedcore.util.Capabilities;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
@@ -24,7 +27,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 	private long lastDepositTime = -100;
 
 	@Nullable
-	private SlottedStackStorage cachedFailedInsertItemHandler;
+	private IItemHandler cachedFailedInsertItemHandler;
 
 	public ControllerBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlocks.CONTROLLER_BLOCK_ENTITY_TYPE.get(), pos, state);
@@ -217,14 +220,14 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 		return List.of();
 	}
 
-	public SlottedStackStorage getExternalItemHandler(@Nullable Direction side) {
+	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
 		if (side == null) {
-			return this;
+			return FabricStorageWrapper.of(this);
 		} else {
 			if (cachedFailedInsertItemHandler == null) {
 				cachedFailedInsertItemHandler = new CachedFailedInsertInventoryHandler(() -> this, () -> level != null ? level.getGameTime() : 0);
 			}
-			return cachedFailedInsertItemHandler;
+			return FabricStorageWrapper.of(cachedFailedInsertItemHandler);
 		}
 	}
 }

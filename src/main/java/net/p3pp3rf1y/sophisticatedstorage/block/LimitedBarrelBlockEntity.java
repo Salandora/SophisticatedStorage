@@ -107,7 +107,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	}
 
 	public boolean applyDye(int slot, ItemStack dyeStack, DyeColor dyeColor, boolean applyToAll) {
-		if (slot < 0 || slot >= getStorageWrapper().getInventoryHandler().getSlotCount()) {
+		if (slot < 0 || slot >= getStorageWrapper().getInventoryHandler().getSlots()) {
 			return false;
 		}
 
@@ -115,7 +115,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 		InventoryHandler invHandler = storageWrapper.getInventoryHandler();
 		if (applyToAll) {
 			boolean success = false;
-			for (int i = 0; i < invHandler.getSlotCount(); i++) {
+			for (int i = 0; i < invHandler.getSlots(); i++) {
 				success |= applyDye(i, dyeColor, invHandler);
 			}
 			if (!success) {
