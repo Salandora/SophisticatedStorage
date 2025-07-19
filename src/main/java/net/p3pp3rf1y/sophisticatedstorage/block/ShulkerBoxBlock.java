@@ -134,7 +134,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(be -> {
-			UUID storageUuid = stack.sophisticatedCore_get(ModCoreDataComponents.STORAGE_UUID);
+			UUID storageUuid = stack.sophisticatedLibrary_get(ModCoreDataComponents.STORAGE_UUID);
 			if (storageUuid != null) {
 				ItemContentsStorage itemContentsStorage = ItemContentsStorage.get();
 				be.loadAdditional(itemContentsStorage.getOrCreateStorageContents(storageUuid), level.registryAccess());
@@ -227,7 +227,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 		shulkerContents.remove(IControllerBoundable.CONTROLLER_POS_TAG);
 		if (!shulkerContents.isEmpty()) {
 			ItemContentsStorage.get().setStorageContents(shulkerBoxUuid, shulkerContents);
-			stack.sophisticatedCore_set(ModCoreDataComponents.STORAGE_UUID, shulkerBoxUuid);
+			stack.sophisticatedLibrary_set(ModCoreDataComponents.STORAGE_UUID, shulkerBoxUuid);
 		}
 		addBasicPropertiesToStack(stack, be, storageWrapper);
 		StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
@@ -235,7 +235,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 
 	private void addBasicPropertiesToStack(ItemStack stack, StorageBlockEntity be, StorageWrapper storageWrapper) {
 		if (be.hasCustomName()) {
-			stack.sophisticatedCore_set(DataComponents.CUSTOM_NAME, be.getCustomName());
+			stack.sophisticatedLibrary_set(DataComponents.CUSTOM_NAME, be.getCustomName());
 		}
 		if (stack.getItem() instanceof ShulkerBoxItem shulkerBoxItem) {
 			int mainColor = storageWrapper.getMainColor();

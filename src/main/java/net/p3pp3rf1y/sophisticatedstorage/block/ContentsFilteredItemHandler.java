@@ -81,11 +81,6 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 		return matchesContents(stack) && itemHandlerGetter.get().isItemValid(slot, stack);
 	}
 
-	@Override
-	public boolean isItemValid(int slot, ItemVariant resource, int count) {
-		return matchesContents(resource.toStack(count)) && itemHandlerGetter.get().isItemValid(slot, resource, count);
-	}
-
 	private boolean matchesContents(ItemStack stack) {
 		return slotTrackerGetter.get().getItems().contains(stack.getItem()) || memorySettingsGetter.get().matchesFilter(stack);
 	}

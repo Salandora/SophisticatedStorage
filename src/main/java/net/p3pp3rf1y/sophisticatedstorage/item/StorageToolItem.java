@@ -140,15 +140,15 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	private void setControllerLink(ItemStack tool, BlockPos pos) {
-		tool.sophisticatedCore_set(ModDataComponents.CONTROLLER_POS, pos);
+		tool.sophisticatedLibrary_set(ModDataComponents.CONTROLLER_POS, pos);
 	}
 
 	public static Optional<BlockPos> getControllerLink(ItemStack tool) {
-		return Optional.ofNullable(tool.sophisticatedCore_get(ModDataComponents.CONTROLLER_POS));
+		return Optional.ofNullable(tool.sophisticatedLibrary_get(ModDataComponents.CONTROLLER_POS));
 	}
 
 	private void removeControllerLink(ItemStack tool) {
-		tool.sophisticatedCore_remove(ModDataComponents.CONTROLLER_POS);
+		tool.sophisticatedLibrary_remove(ModDataComponents.CONTROLLER_POS);
 	}
 
 	public static Component getOverlayMessage(ItemStack tool) {
@@ -173,11 +173,11 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	public static Mode getMode(ItemStack tool) {
-		return tool.sophisticatedCore_getOrDefault(ModDataComponents.TOOL_MODE, Mode.LINK);
+		return tool.sophisticatedLibrary_getOrDefault(ModDataComponents.TOOL_MODE, Mode.LINK);
 	}
 
 	public static void cycleMode(ItemStack tool, boolean next) {
-		tool.sophisticatedCore_set(ModDataComponents.TOOL_MODE, next ? getMode(tool).next() : getMode(tool).previous());
+		tool.sophisticatedLibrary_set(ModDataComponents.TOOL_MODE, next ? getMode(tool).next() : getMode(tool).previous());
 	}
 
 	public enum Mode implements StringRepresentable {

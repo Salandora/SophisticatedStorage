@@ -1,8 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import com.github.salandora.sophisticatedlibrary.transfer.ItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,7 +13,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.ISyncedContainer;
-import net.p3pp3rf1y.sophisticatedcore.common.gui.SlotItemHandler;
+import com.github.salandora.sophisticatedlibrary.gui.SlotItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncContainerClientDataPayload;
 import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
@@ -121,10 +119,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 					return;
 				}
 				blockEntity.consumeIngredientsOnCraft();
-				try (Transaction ctx = Transaction.openOuter()) {
-					blockEntity.getStorageBlock().extractSlot(0, blockEntity.getStorageBlock().getVariantInSlot(0), 1, ctx);
-					ctx.commit();
-				}
+				blockEntity.getStorageBlock().extractItem(0, 1, false);
 			}
 		};
 		addSlot(resultSlot);
@@ -199,13 +194,13 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		ItemStack slotStack = slot.getItem();
 		ItemStack slotStackCopy = slotStack.copy();
 		if (isPlayerSlot(slotIndex)) {
-			if (blockEntity.getDecorativeBlocks().isItemValid(decorationSlotRange.firstSlot(), ItemVariant.of(slotStack), slotStack.getCount())
+			if (blockEntity.getDecorativeBlocks().isItemValid(decorationSlotRange.firstSlot(), slotStack)
 					&& !moveItemStackTo(slotStack, decorationSlotRange, false)) {
 				return ItemStack.EMPTY;
 			} else if (isValidDye(slotStack)
 					&& !moveItemStackTo(slotStack, dyeSlotRange, false)) {
 				return ItemStack.EMPTY;
-			} else if (blockEntity.getStorageBlock().isItemValid(0, ItemVariant.of(slotStack), slotStack.getCount())
+			} else if (blockEntity.getStorageBlock().isItemValid(0, slotStack)
 					&& !moveItemStackTo(slotStack, storageSlotRange, false)) {
 				return ItemStack.EMPTY;
 			}
@@ -228,7 +223,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		ItemStackHandler dyes = blockEntity.getDyes();
 
 		for (int slot = 0; slot < dyes.getSlotCount(); slot++) {
-			if (dyes.isItemValid(slot, ItemVariant.of(stack), stack.getCount())) {
+			if (dyes.isItemValid(slot, stack)) {
 				return true;
 			}
 		}

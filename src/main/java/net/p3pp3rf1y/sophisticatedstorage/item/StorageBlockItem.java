@@ -1,11 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import com.github.salandora.sophisticatedlibrary.common.extensions.component.SophisticatedDataComponentHolder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
@@ -23,7 +23,7 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	}
 
 	public static Optional<CompoundTag> getEntityWrapperTagFromStack(SophisticatedDataComponentHolder componentHolder) {
-		CustomData customData = componentHolder.sophisticatedCore_get(() -> DataComponents.BLOCK_ENTITY_DATA);
+		CustomData customData = componentHolder.sophisticatedLibrary_get(() -> DataComponents.BLOCK_ENTITY_DATA);
 		if (customData == null) {
 			return Optional.empty();
 		}
@@ -33,34 +33,34 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	public static Optional<Integer> getMainColorFromComponentHolder(SophisticatedDataComponentHolder componentHolder) {
 		return getEntityWrapperTagFromStack(componentHolder)
 				.flatMap(tag -> tag.contains(StorageWrapper.MAIN_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.MAIN_COLOR_TAG)) : Optional.empty())
-				.or(() -> Optional.ofNullable(componentHolder.sophisticatedCore_get(ModCoreDataComponents.MAIN_COLOR)));
+				.or(() -> Optional.ofNullable(componentHolder.sophisticatedLibrary_get(ModCoreDataComponents.MAIN_COLOR)));
 	}
 
 	public static Optional<Integer> getAccentColorFromComponentHolder(SophisticatedDataComponentHolder componentHolder) {
 		return getEntityWrapperTagFromStack(componentHolder)
 				.flatMap(tag -> tag.contains(StorageWrapper.ACCENT_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.ACCENT_COLOR_TAG)) : Optional.empty())
-				.or(() -> Optional.ofNullable(componentHolder.sophisticatedCore_get(ModCoreDataComponents.ACCENT_COLOR)));
+				.or(() -> Optional.ofNullable(componentHolder.sophisticatedLibrary_get(ModCoreDataComponents.ACCENT_COLOR)));
 	}
 
 	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-		storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
+		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
 	}
 
 	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-		storageStack.sophisticatedCore_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
+		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
 	}
 
 	public static int getNumberOfInventorySlots(ItemStack storageStack) {
-		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
+		return storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
 	}
 
 	public static int getNumberOfUpgradeSlots(ItemStack storageStack) {
-		return storageStack.sophisticatedCore_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+		return storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
 	}
 
 	@Override
 	public void setMainColor(ItemStack storageStack, int mainColor) {
-		storageStack.sophisticatedCore_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
 	}
 
 	@Override
@@ -70,17 +70,17 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 
 	@Override
 	public void setAccentColor(ItemStack storageStack, int accentColor) {
-		storageStack.sophisticatedCore_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
+		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
 	}
 
 	@Override
 	public void removeMainColor(ItemStack stack) {
-		stack.sophisticatedCore_remove(ModCoreDataComponents.MAIN_COLOR);
+		stack.sophisticatedLibrary_remove(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	@Override
 	public void removeAccentColor(ItemStack stack) {
-		stack.sophisticatedCore_remove(ModCoreDataComponents.ACCENT_COLOR);
+		stack.sophisticatedLibrary_remove(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 	@Override
@@ -89,14 +89,14 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	}
 
 	public static boolean showsTier(ItemStack stack) {
-		return stack.sophisticatedCore_getOrDefault(ModDataComponents.SHOWS_TIER, true);
+		return stack.sophisticatedLibrary_getOrDefault(ModDataComponents.SHOWS_TIER, true);
 	}
 
 	public static void setShowsTier(ItemStack stack, boolean showsTier) {
 		if (showsTier) {
-			stack.sophisticatedCore_remove(ModDataComponents.SHOWS_TIER);
+			stack.sophisticatedLibrary_remove(ModDataComponents.SHOWS_TIER);
 		} else {
-			stack.sophisticatedCore_set(ModDataComponents.SHOWS_TIER, false);
+			stack.sophisticatedLibrary_set(ModDataComponents.SHOWS_TIER, false);
 		}
 	}
 }

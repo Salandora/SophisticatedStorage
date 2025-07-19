@@ -616,15 +616,14 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 		}
 	}
 
-	// TODO:
 	@Override
-	public boolean isItemValid(int slot, ItemVariant resource, int count, @Nullable Player player, TriPredicate<Integer, ItemVariant, Integer> isItemValidSuper) {
+	public boolean isItemValid(int slot, ItemStack stack, @Nullable Player player, BiPredicate<Integer, ItemStack> isItemValidSuper) {
 		if (!slotDefinitions.containsKey(slot)) {
 			return true;
 		}
 
 		SlotDefinition slotDefinition = slotDefinitions.get(slot);
-		return slotDefinition.isAccessible() && ItemStack.isSameItemSameComponents(slotDefinition.item(), resource.toStack(count));
+		return slotDefinition.isAccessible() && ItemStack.isSameItemSameComponents(slotDefinition.item(), stack);
 	}
 
 	@Override

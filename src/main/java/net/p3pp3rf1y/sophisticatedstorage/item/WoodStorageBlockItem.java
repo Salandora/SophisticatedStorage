@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import com.github.salandora.sophisticatedlibrary.common.extensions.component.SophisticatedDataComponentHolder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
-import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
 
 import javax.annotation.Nullable;
@@ -36,11 +36,11 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     public static void setPacked(ItemStack storageStack, boolean packed) {
-        storageStack.sophisticatedCore_set(ModDataComponents.PACKED, packed);
+        storageStack.sophisticatedLibrary_set(ModDataComponents.PACKED, packed);
     }
 
     public static boolean isPacked(ItemStack storageStack) {
-        return storageStack.sophisticatedCore_getOrDefault(ModDataComponents.PACKED, false);
+        return storageStack.sophisticatedLibrary_getOrDefault(ModDataComponents.PACKED, false);
     }
 
     @Override
@@ -91,15 +91,15 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     private void removeWoodType(ItemStack storageStack) {
-        storageStack.sophisticatedCore_remove(ModDataComponents.WOOD_TYPE);
+        storageStack.sophisticatedLibrary_remove(ModDataComponents.WOOD_TYPE);
     }
 
     public static Optional<WoodType> getWoodType(SophisticatedDataComponentHolder componentHolder) {
-        return Optional.ofNullable(componentHolder.sophisticatedCore_get(ModDataComponents.WOOD_TYPE));
+        return Optional.ofNullable(componentHolder.sophisticatedLibrary_get(ModDataComponents.WOOD_TYPE));
     }
 
     public static ItemStack setWoodType(ItemStack storageStack, WoodType woodType) {
-        storageStack.sophisticatedCore_set(ModDataComponents.WOOD_TYPE, woodType);
+        storageStack.sophisticatedLibrary_set(ModDataComponents.WOOD_TYPE, woodType);
         return storageStack;
     }
 

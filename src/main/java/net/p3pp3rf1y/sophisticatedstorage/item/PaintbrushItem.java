@@ -55,7 +55,7 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	public static void setBarrelMaterials(ItemStack paintbrush, Map<BarrelMaterial, ResourceLocation> materials) {
-		paintbrush.sophisticatedCore_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
+		paintbrush.sophisticatedLibrary_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
 		resetMainColor(paintbrush);
 		resetAccentColor(paintbrush);
 	}
@@ -353,33 +353,33 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	private static void resetBarrelMaterials(ItemStack paintbrush) {
-		paintbrush.sophisticatedCore_remove(ModDataComponents.BARREL_MATERIALS);
+		paintbrush.sophisticatedLibrary_remove(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	public static void resetMainColor(ItemStack paintbrush) {
-		paintbrush.sophisticatedCore_remove(ModCoreDataComponents.MAIN_COLOR);
+		paintbrush.sophisticatedLibrary_remove(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	public static void resetAccentColor(ItemStack paintbrush) {
-		paintbrush.sophisticatedCore_remove(ModCoreDataComponents.ACCENT_COLOR);
+		paintbrush.sophisticatedLibrary_remove(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 	public static void setMainColor(ItemStack paintbrush, int mainColor) {
-		paintbrush.sophisticatedCore_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		paintbrush.sophisticatedLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
 		resetBarrelMaterials(paintbrush);
 	}
 
 	public static void setAccentColor(ItemStack paintbrush, int secondaryColor) {
-		paintbrush.sophisticatedCore_set(ModCoreDataComponents.ACCENT_COLOR, secondaryColor);
+		paintbrush.sophisticatedLibrary_set(ModCoreDataComponents.ACCENT_COLOR, secondaryColor);
 		resetBarrelMaterials(paintbrush);
 	}
 
 	public static void setRemainingParts(ItemStack paintbrush, Map<ResourceLocation, Integer> remainingParts) {
-		paintbrush.sophisticatedCore_set(ModDataComponents.REMAINING_PARTS, remainingParts);
+		paintbrush.sophisticatedLibrary_set(ModDataComponents.REMAINING_PARTS, remainingParts);
 	}
 
 	public static Map<ResourceLocation, Integer> getRemainingParts(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_getOrDefault(ModDataComponents.REMAINING_PARTS, Collections.emptyMap());
+		return paintbrush.sophisticatedLibrary_getOrDefault(ModDataComponents.REMAINING_PARTS, Collections.emptyMap());
 	}
 
 	@Override
@@ -421,27 +421,27 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	private static boolean hasMainColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_has(ModCoreDataComponents.MAIN_COLOR);
+		return paintbrush.sophisticatedLibrary_has(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	private static boolean hasAccentColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_has(ModCoreDataComponents.ACCENT_COLOR);
+		return paintbrush.sophisticatedLibrary_has(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 	private static boolean hasBarrelMaterials(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_has(ModDataComponents.BARREL_MATERIALS);
+		return paintbrush.sophisticatedLibrary_has(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	public static int getMainColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
+		return paintbrush.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
 	}
 
 	public static int getAccentColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
+		return paintbrush.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getBarrelMaterials(ItemStack paintbrush) {
-		return paintbrush.sophisticatedCore_getOrDefault(ModDataComponents.BARREL_MATERIALS, Collections.emptyMap());
+		return paintbrush.sophisticatedLibrary_getOrDefault(ModDataComponents.BARREL_MATERIALS, Collections.emptyMap());
 	}
 
 	public record ItemRequirements(List<ItemStack> itemsPresent, List<ItemStack> itemsMissing) {}

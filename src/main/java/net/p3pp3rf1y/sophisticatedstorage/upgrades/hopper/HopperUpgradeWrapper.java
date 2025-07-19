@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
+import com.github.salandora.sophisticatedlibrary.transfer.SlottedStackStorage;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -18,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
-import net.p3pp3rf1y.sophisticatedcore.inventory.IInventoryHandlerHelper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterLogic;
@@ -35,7 +35,6 @@ import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrad
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -81,7 +80,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void initDirections(Level level, BlockPos pos) {
-		if (upgrade.sophisticatedCore_has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.sophisticatedCore_has(ModDataComponents.PULL_DIRECTIONS)) {
+		if (upgrade.sophisticatedLibrary_has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.sophisticatedLibrary_has(ModDataComponents.PULL_DIRECTIONS)) {
 			return;
 		}
 		BlockState state = level.getBlockState(pos);
@@ -218,7 +217,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		if (!entities.isEmpty()) {
 			Collections.shuffle(entities);
 			for (Entity e : entities) {
-				IInventoryHandlerHelper entityCap = Capabilities.ItemHandler.ENTITY_AUTOMATION.find(e, direction.getOpposite());
+				SlottedStackStorage entityCap = Capabilities.ItemHandler.ENTITY_AUTOMATION.find(e, direction.getOpposite());
 				if (entityCap != null) {
 					return run.test(List.of(entityCap));
 				}
@@ -275,23 +274,23 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void serializePullDirections() {
-		upgrade.sophisticatedCore_set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
+		upgrade.sophisticatedLibrary_set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
 		save();
 	}
 
 	private void serializePushDirections() {
-		upgrade.sophisticatedCore_set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
+		upgrade.sophisticatedLibrary_set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
 		save();
 	}
 
 	public void deserialize() {
 		pullDirections.clear();
 		pushDirections.clear();
-		Set<Direction> directions = upgrade.sophisticatedCore_get(ModDataComponents.PULL_DIRECTIONS);
+		Set<Direction> directions = upgrade.sophisticatedLibrary_get(ModDataComponents.PULL_DIRECTIONS);
 		if (directions != null) {
 			pullDirections.addAll(directions);
 		}
-		directions = upgrade.sophisticatedCore_get(ModDataComponents.PUSH_DIRECTIONS);
+		directions = upgrade.sophisticatedLibrary_get(ModDataComponents.PUSH_DIRECTIONS);
 		if (directions != null) {
 			pushDirections.addAll(directions);
 		}

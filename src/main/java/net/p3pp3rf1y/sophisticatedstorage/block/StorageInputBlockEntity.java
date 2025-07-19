@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import com.github.salandora.sophisticatedlibrary.transfer.SlottedStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
@@ -64,11 +64,6 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public void setStackInSlot(int slot, ItemStack stack) {
-			itemHandler.setStackInSlot(slot, stack);
-		}
-
-		@Override
 		public @NotNull ItemStack getStackInSlot(int slot) {
 			return ItemStack.EMPTY;
 		}
@@ -84,6 +79,11 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
+		public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+			return itemHandler.insertItem(slot, stack, simulate);
+		}
+
+		@Override
 		public long extract(ItemVariant resource, long maxAmount, TransactionContext ctx) {
 			return 0;
 		}
@@ -94,13 +94,13 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public int getSlotLimit(int slot) {
-			return 99;
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			return ItemStack.EMPTY;
 		}
 
 		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return true;
+		public int getSlotLimit(int slot) {
+			return 99;
 		}
 	}
 

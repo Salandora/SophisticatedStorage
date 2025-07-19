@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import com.github.salandora.sophisticatedlibrary.common.extensions.component.SophisticatedDataComponentHolder;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -8,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.p3pp3rf1y.sophisticatedcore.extensions.component.SophisticatedDataComponentHolder;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
@@ -40,26 +40,26 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 
 	public static void setFlatTop(ItemStack stack, boolean flatTop) {
 		if (flatTop) {
-			stack.sophisticatedCore_set(ModDataComponents.FLAT_TOP, true);
+			stack.sophisticatedLibrary_set(ModDataComponents.FLAT_TOP, true);
 		} else {
-			stack.sophisticatedCore_remove(ModDataComponents.FLAT_TOP);
+			stack.sophisticatedLibrary_remove(ModDataComponents.FLAT_TOP);
 		}
 	}
 
 	public static boolean isFlatTop(SophisticatedDataComponentHolder componentHolder) {
-		return componentHolder.sophisticatedCore_getOrDefault(ModDataComponents.FLAT_TOP, false);
+		return componentHolder.sophisticatedLibrary_getOrDefault(ModDataComponents.FLAT_TOP, false);
 	}
 
 	public static void setMaterials(ItemStack barrel, Map<BarrelMaterial, ResourceLocation> materials) {
-		barrel.sophisticatedCore_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
+		barrel.sophisticatedLibrary_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getMaterials(ItemStack barrel) {
-		return barrel.sophisticatedCore_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of());
+		return barrel.sophisticatedLibrary_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of());
 	}
 
 	public static void removeMaterials(ItemStack stack) {
-		stack.sophisticatedCore_remove(ModDataComponents.BARREL_MATERIALS);
+		stack.sophisticatedLibrary_remove(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	public static void uncompactMaterials(Map<BarrelMaterial, ResourceLocation> materials) {
