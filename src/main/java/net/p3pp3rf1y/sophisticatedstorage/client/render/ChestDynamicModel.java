@@ -95,6 +95,7 @@ public class ChestDynamicModel implements IUnbakedGeometry {
 		}
 
 		@Nonnull
+		@Override
 		public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
 			return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class)
 					.map(be -> {

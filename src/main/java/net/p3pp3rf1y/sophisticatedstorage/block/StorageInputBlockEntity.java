@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.FabricStorageWrapper;
 import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -11,8 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	@Nullable
@@ -31,8 +29,8 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 
 		if (itemHandler == null) {
 			itemHandler = super.getExternalItemHandler(null);
-			if (itemHandler instanceof FabricStorageWrapper<?> && ((FabricStorageWrapper<IItemHandler>) itemHandler).getWrapped() instanceof IItemHandlerSimpleInserter simpleInserter) {
-				itemHandler = FabricStorageWrapper.of(new SingleSlotInputItemHandlerWrapper(simpleInserter));
+			if (itemHandler instanceof IItemHandlerSimpleInserter simpleInserter) {
+				itemHandler = new SingleSlotInputItemHandlerWrapper(simpleInserter);
 			}
 		}
 
@@ -53,13 +51,18 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public int getSlots() {
+		public int getSlotCount() {
 			return Math.min(itemHandler.getSlotCount(), 1);
 		}
 
 		@Override
 		public @NotNull ItemStack getStackInSlot(int slot) {
 			return ItemStack.EMPTY;
+		}
+
+		@Override
+		public void setStackInSlot(int slot, ItemStack stack) {
+			itemHandler.setStackInSlot(slot, stack);
 		}
 
 		@Override

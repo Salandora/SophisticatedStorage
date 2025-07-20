@@ -124,7 +124,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 
 				try (Transaction transferTransaction = Transaction.openOuter()) {
 					long accepted = toHandler.insert(resource, maxExtracted, transferTransaction);
-					if (fromHandler.extract(resource, accepted, transferTransaction) == accepted) {
+					if (view.extract(resource, accepted, transferTransaction) == accepted) {
 						transferTransaction.commit();
 						return true;
 					}

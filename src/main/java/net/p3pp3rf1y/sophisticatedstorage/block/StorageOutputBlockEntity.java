@@ -11,8 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	@Nullable
@@ -30,8 +29,8 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 		if (itemHandler == null) {
 			itemHandler = super.getExternalItemHandler(null);
-			if (itemHandler instanceof FabricStorageWrapper<?> && ((FabricStorageWrapper<IItemHandler>) itemHandler).getWrapped() instanceof IItemHandlerSimpleInserter simpleInserter) {
-				itemHandler = FabricStorageWrapper.of(new OutputOnlyItemHandlerWrapper(simpleInserter));
+			if (itemHandler instanceof IItemHandlerSimpleInserter simpleInserter) {
+				itemHandler = new OutputOnlyItemHandlerWrapper(simpleInserter);
 			}
 		}
 
@@ -52,13 +51,18 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public int getSlots() {
-			return itemHandler.getSlots();
+		public int getSlotCount() {
+			return itemHandler.getSlotCount();
 		}
 
 		@Override
 		public @NotNull ItemStack getStackInSlot(int slot) {
 			return itemHandler.getStackInSlot(slot);
+		}
+
+		@Override
+		public void setStackInSlot(int slot, ItemStack stack) {
+			// noop
 		}
 
 		@Override

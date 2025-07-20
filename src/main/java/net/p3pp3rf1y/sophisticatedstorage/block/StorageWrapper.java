@@ -197,7 +197,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 		initInventoryHandler();
 		getUpgradeHandler().refreshUpgradeWrappers();
-		if (SophisticatedCore.isLogicalServerThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlots()) {
+		if (SophisticatedCore.isLogicalServerThread() && getRenderInfo().getUpgradeItems().size() != getUpgradeHandler().getSlotCount()) {
 			getUpgradeHandler().setRenderUpgradeItems();
 		}
 	}

@@ -5,7 +5,6 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.ISlotTracker;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -25,8 +24,8 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 	}
 
 	@Override
-	public int getSlots() {
-		return itemHandlerGetter.get().getSlots();
+	public int getSlotCount() {
+		return itemHandlerGetter.get().getSlotCount();
 	}
 
 	@Nonnull
@@ -65,7 +64,7 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 	}
 
 	@Override
-	public @NotNull ItemStack insertItem(ItemStack stack, boolean simulate) {
+	public ItemStack insertItem(ItemStack stack, boolean simulate) {
 		if (matchesContents(stack)) {
 			return itemHandlerGetter.get().insertItem(stack, simulate);
 		}
@@ -102,4 +101,3 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 		itemHandlerGetter.get().setStackInSlot(slot, stack);
 	}
 }
-

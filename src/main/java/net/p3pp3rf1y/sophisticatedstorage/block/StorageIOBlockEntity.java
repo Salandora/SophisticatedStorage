@@ -33,7 +33,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	private boolean chunkBeingUnloaded = false;
 
 	@Nullable
-	private BlockApiCache<Storage<ItemVariant>, @org.jetbrains.annotations.Nullable Direction> controllerItemHandlerCache;
+	private BlockApiCache<Storage<ItemVariant>, Direction> controllerItemHandlerCache;
 
 	protected StorageIOBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -177,9 +177,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		if (controllerItemHandlerCache != null) {
 			return controllerItemHandlerCache.find(side);
 		} else {
-			return WorldHelper.getBlockEntity(getLevel(), getControllerPos().get(), ControllerBlockEntity.class)
-					.map(c -> c.getExternalItemHandler(side))
-					.orElse(null);
+			return WorldHelper.getBlockEntity(getLevel(), getControllerPos().get(), ControllerBlockEntity.class).map(c -> c.getExternalItemHandler(side)).orElse(null);
 		}
 	}
 

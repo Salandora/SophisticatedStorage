@@ -149,8 +149,8 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 				storageWrapper.setColors(shulkerBoxItem.getMainColor(stack).orElse(-1), shulkerBoxItem.getAccentColor(stack).orElse(-1));
 				InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
 				UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
-				storageWrapper.changeSize(shulkerBoxItem.getNumberOfInventorySlots(level.registryAccess(), stack) - inventoryHandler.getSlots(),
-						shulkerBoxItem.getNumberOfUpgradeSlots(level.registryAccess(), stack) - upgradeHandler.getSlots());
+				storageWrapper.changeSize(shulkerBoxItem.getNumberOfInventorySlots(level.registryAccess(), stack) - inventoryHandler.getSlotCount(),
+						shulkerBoxItem.getNumberOfUpgradeSlots(level.registryAccess(), stack) - upgradeHandler.getSlotCount());
 			}
 
 			be.getStorageWrapper().onInit();
@@ -246,8 +246,8 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 			if (accentColor != -1) {
 				shulkerBoxItem.setAccentColor(stack, accentColor);
 			}
-			StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlots());
-			StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlots());
+			StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlotCount());
+			StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlotCount());
 		}
 	}
 

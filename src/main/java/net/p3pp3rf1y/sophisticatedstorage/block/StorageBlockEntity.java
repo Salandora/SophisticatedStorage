@@ -369,7 +369,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	public void changeStorageSize(int additionalInventorySlots, int additionalUpgradeSlots) {
-		int currentInventorySlots = getStorageWrapper().getInventoryHandler().getSlots();
+		int currentInventorySlots = getStorageWrapper().getInventoryHandler().getSlotCount();
 		getStorageWrapper().changeSize(additionalInventorySlots, additionalUpgradeSlots);
 		changeSlots(currentInventorySlots + additionalInventorySlots);
 	}
@@ -510,7 +510,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	private void lock() {
 		locked = true;
 		if (memorizesItemsWhenLocked()) {
-			getStorageWrapper().getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).selectSlots(0, getStorageWrapper().getInventoryHandler().getSlots());
+			getStorageWrapper().getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).selectSlots(0, getStorageWrapper().getInventoryHandler().getSlotCount());
 		}
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {

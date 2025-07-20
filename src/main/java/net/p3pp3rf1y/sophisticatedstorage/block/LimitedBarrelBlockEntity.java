@@ -107,7 +107,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	}
 
 	public boolean applyDye(int slot, ItemStack dyeStack, DyeColor dyeColor, boolean applyToAll) {
-		if (slot < 0 || slot >= getStorageWrapper().getInventoryHandler().getSlots()) {
+		if (slot < 0 || slot >= getStorageWrapper().getInventoryHandler().getSlotCount()) {
 			return false;
 		}
 
@@ -115,7 +115,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 		InventoryHandler invHandler = storageWrapper.getInventoryHandler();
 		if (applyToAll) {
 			boolean success = false;
-			for (int i = 0; i < invHandler.getSlots(); i++) {
+			for (int i = 0; i < invHandler.getSlotCount(); i++) {
 				success |= applyDye(i, dyeColor, invHandler);
 			}
 			if (!success) {
@@ -195,14 +195,14 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean depositFromAllOfPlayersInventory(Player player, int slot, InventoryHandler invHandler, ItemStack stackInSlot, MemorySettingsCategory memorySettings) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		Predicate<ItemStack> memoryItemMatches = itemStack -> memorySettings.isSlotSelected(slot) && memorySettings.matchesFilter(slot, itemStack);
-		CapabilityHelper.runOnItemHandler(player, inventoryHandler -> InventoryHelper.iterate(inventoryHandler, (playerSlot, playerStack) -> {
+		CapabilityHelper.runOnItemHandler(player, playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
 			if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameComponents(stackInSlot, playerStack)))) {
 
 				ItemStack result = invHandler.insertItemOnlyToSlot(slot, playerStack, true);
 				if (result.getCount() < playerStack.getCount()) {
-					ItemStack extracted = inventoryHandler.extractItem(playerSlot, playerStack.getCount() - result.getCount(), true);
+					ItemStack extracted = playerInventory.extractItem(playerSlot, playerStack.getCount() - result.getCount(), true);
 					if (!extracted.isEmpty()) {
-						invHandler.insertItemOnlyToSlot(slot, inventoryHandler.extractItem(playerSlot, extracted.getCount(), false), false);
+						invHandler.insertItemOnlyToSlot(slot, playerInventory.extractItem(playerSlot, extracted.getCount(), false), false);
 						success.set(true);
 					}
 				}

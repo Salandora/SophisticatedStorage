@@ -2,6 +2,7 @@ package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.github.salandora.sophisticatedlibrary.model.loading.BlockModelGeometryBakingContext;
 import com.github.salandora.sophisticatedlibrary.model.models.BlockModelWrapper;
+import com.github.salandora.sophisticatedlibrary.model.models.ElementsModel;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;

@@ -144,7 +144,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 
 			level.setBlock(pos, newBlockState, 3);
 			level.setBlockEntity(newBlockEntity);
-			newBlockEntity.changeStorageSize(newInventorySize - newBlockEntity.getStorageWrapper().getInventoryHandler().getSlots(), newUpgradeSize - newBlockEntity.getStorageWrapper().getUpgradeHandler().getSlots());
+			newBlockEntity.changeStorageSize(newInventorySize - newBlockEntity.getStorageWrapper().getInventoryHandler().getSlotCount(), newUpgradeSize - newBlockEntity.getStorageWrapper().getUpgradeHandler().getSlotCount());
 			WorldHelper.notifyBlockUpdate(newBlockEntity);
 			return newBlockEntity;
 		}
@@ -297,7 +297,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 			}
 			StorageWrapper storageWrapper = newBe.getStorageWrapper();
 			InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
-			if (inventoryHandler.getSlots() < items.size()) {
+			if (inventoryHandler.getSlotCount() < items.size()) {
 				inventoryHandler.setSize(items.size());
 			}
 

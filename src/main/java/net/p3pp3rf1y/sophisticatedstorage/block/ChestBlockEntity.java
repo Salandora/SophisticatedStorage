@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
@@ -106,9 +105,9 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 	private void expandAndMoveItemsAndSettings(ChestBlockEntity mainBE) {
 		InventoryHandler mainInventoryHandler = mainBE.getStorageWrapper().getInventoryHandler();
-		int originalNumberOfSlots = mainInventoryHandler.getSlots();
+		int originalNumberOfSlots = mainInventoryHandler.getSlotCount();
 		InventoryHandler thisInventoryHandler = getStorageWrapper().getInventoryHandler();
-		int inventorySlotDiff = 2 * (mainBE.getBlockState().getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNumberOfInventorySlots() : 0) - mainInventoryHandler.getSlots();
+		int inventorySlotDiff = 2 * (mainBE.getBlockState().getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNumberOfInventorySlots() : 0) - mainInventoryHandler.getSlotCount();
 		mainBE.changeStorageSize(inventorySlotDiff, 0);
 
 		moveStacksToMain(thisInventoryHandler, mainInventoryHandler, originalNumberOfSlots);
@@ -136,8 +135,8 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	private static void moveStacksToMain(InventoryHandler thisInventoryHandler, InventoryHandler mainInventoryHandler, int originalNumberOfSlots) {
-		int thisSlots = thisInventoryHandler.getSlots();
-		int mainSlots = mainInventoryHandler.getSlots();
+		int thisSlots = thisInventoryHandler.getSlotCount();
+		int mainSlots = mainInventoryHandler.getSlotCount();
 		for (int slot = 0; slot < thisSlots && slot + originalNumberOfSlots < mainSlots; slot++) {
 			ItemStack slotStack = thisInventoryHandler.getSlotStack(slot);
 			if (!slotStack.isEmpty()) {
@@ -190,9 +189,9 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		runOnTheOtherPart(level, getBlockPos(), getBlockState(), (be, pos) -> {
 			be.removeDoubleMainPos();
 			InventoryHandler mainInventoryHandler = getStorageWrapper().getInventoryHandler();
-			int firstIndex = mainInventoryHandler.getSlots() / 2;
+			int firstIndex = mainInventoryHandler.getSlotCount() / 2;
 
-			for (int slot = firstIndex; slot < mainInventoryHandler.getSlots(); slot++) {
+			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
 				ItemStack slotStack = mainInventoryHandler.getSlotStack(slot);
 				be.getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, slotStack.split(slotStack.getMaxStackSize()));
 
@@ -212,13 +211,13 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).ifPresent(mainBE -> {
 			StorageWrapper mainStorageWrapper = mainBE.getStorageWrapper();
 			InventoryHandler mainInventoryHandler = mainStorageWrapper.getInventoryHandler();
-			int firstIndex = mainInventoryHandler.getSlots() / 2;
+			int firstIndex = mainInventoryHandler.getSlotCount() / 2;
 
-			for (int slot = firstIndex; slot < mainInventoryHandler.getSlots(); slot++) {
+			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
 				getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, mainInventoryHandler.getSlotStack(slot));
 				mainInventoryHandler.setSlotStack(slot, ItemStack.EMPTY);
 			}
-			int inventorySlotDiff = (mainBE.getBlockState().getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNumberOfInventorySlots() : 0) - mainInventoryHandler.getSlots();
+			int inventorySlotDiff = (mainBE.getBlockState().getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNumberOfInventorySlots() : 0) - mainInventoryHandler.getSlotCount();
 
 			mainBE.changeStorageSize(inventorySlotDiff, 0);
 			deleteSettingsFromSlot(mainBE, firstIndex);
@@ -391,7 +390,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 		List<ItemStack> dropItems = new ArrayList<>();
 
-		for (int slot = chestBlock.getNumberOfInventorySlots(); slot < invHandler.getSlots(); slot++) {
+		for (int slot = chestBlock.getNumberOfInventorySlots(); slot < invHandler.getSlotCount(); slot++) {
 			ItemStack slotStack = invHandler.getSlotStack(slot);
 
 			if (!slotStack.isEmpty()) {
@@ -405,7 +404,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			);
 		}
 
-		int inventorySlotDiff = chestBlock.getNumberOfInventorySlots() - invHandler.getSlots();
+		int inventorySlotDiff = chestBlock.getNumberOfInventorySlots() - invHandler.getSlotCount();
 
 		changeStorageSize(inventorySlotDiff, 0);
 		deleteSettingsFromSlot(this, chestBlock.getNumberOfInventorySlots());
@@ -423,7 +422,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		super.loadAdditional(tag, registries);
 		if (!isBeingUpgraded() && getBlockState().getValue(ChestBlock.TYPE) == ChestType.SINGLE) {
 			if (getBlockState().getBlock() instanceof ChestBlock chestBlock
-					&& getStorageWrapper().getInventoryHandler().getSlots() > chestBlock.getNumberOfInventorySlots()) {
+					&& getStorageWrapper().getInventoryHandler().getSlotCount() > chestBlock.getNumberOfInventorySlots()) {
 				dropSecondPartContents(chestBlock, worldPosition);
 			}
 			if (!isMainChest()) {

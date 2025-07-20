@@ -199,7 +199,7 @@ public class DecorationHelper {
 
 	private static <T> SingleItemConsumptionResult consumeFromHandlers(List<IItemHandler> resourceHandlers, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate, T material, Integer parts, ResourceLocation materialLocation) {
 		for (IItemHandler resources : resourceHandlers) {
-			for (int slot = 0; slot < resources.getSlots(); slot++) {
+			for (int slot = 0; slot < resources.getSlotCount(); slot++) {
 				ItemStack stack = resources.getStackInSlot(slot);
 				if (!stackMatcher.test(material, stack)) {
 					continue;

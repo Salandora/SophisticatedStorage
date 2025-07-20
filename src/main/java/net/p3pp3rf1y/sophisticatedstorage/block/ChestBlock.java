@@ -118,7 +118,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			ChestType chesttype = facingState.getValue(TYPE);
 			if (state.getValue(TYPE) == ChestType.SINGLE && chesttype != ChestType.SINGLE && state.getValue(FACING) == facingState.getValue(FACING) && getConnectedDirection(facingState) == facing.getOpposite()) {
 				level.getBlockEntity(currentPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE.get()).ifPresent(be -> {
-					if (state.getBlock() instanceof ChestBlock chestBlock && be.getStorageWrapper().getInventoryHandler().getSlots() <= chestBlock.getNumberOfInventorySlots()) {
+					if (state.getBlock() instanceof ChestBlock chestBlock && be.getStorageWrapper().getInventoryHandler().getSlotCount() <= chestBlock.getNumberOfInventorySlots()) {
 						joinWithChest(level, facingPos, chesttype.getOpposite(), be);
 					}
 					if (be.isMainChest()) {
