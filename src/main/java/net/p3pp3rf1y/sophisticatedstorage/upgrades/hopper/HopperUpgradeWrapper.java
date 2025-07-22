@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
-import com.github.salandora.sophisticatedlibrary.transfer.FabricStorageWrapper;
-import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -25,7 +24,6 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
-import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.BlockSide;
@@ -98,7 +96,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 
 	private boolean pullItems(List<Storage<ItemVariant>> fromHandlers) {
 		for (Storage<ItemVariant> fromHandler : fromHandlers) {
-			if (moveItems(fromHandler, FabricStorageWrapper.of(storageWrapper.getInventoryForUpgradeProcessing()), inputFilterLogic)) {
+			if (moveItems(fromHandler, storageWrapper.getInventoryForUpgradeProcessing(), inputFilterLogic)) {
 				return true;
 			}
 		}
@@ -108,7 +106,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	private boolean pushItems(List<Storage<ItemVariant>> toHandlers) {
 		for (Storage<ItemVariant> toHandler : toHandlers) {
 			outputFilterLogic.setInventory(toHandler);
-			if (moveItems(FabricStorageWrapper.of(storageWrapper.getInventoryForUpgradeProcessing()), toHandler, outputFilterLogic)) {
+			if (moveItems(storageWrapper.getInventoryForUpgradeProcessing(), toHandler, outputFilterLogic)) {
 				return true;
 			}
 		}
@@ -218,9 +216,9 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		if (!entities.isEmpty()) {
 			Collections.shuffle(entities);
 			for (Entity e : entities) {
-				IItemHandler entityCap = Capabilities.ItemHandler.ENTITY_AUTOMATION.find(e, direction.getOpposite());
+				Storage<ItemVariant> entityCap = Capabilities.ItemHandler.ENTITY_AUTOMATION.find(e, direction.getOpposite());
 				if (entityCap != null) {
-					return run.test(List.of(FabricStorageWrapper.of(entityCap)));
+					return run.test(List.of(entityCap));
 				}
 			}
 		}

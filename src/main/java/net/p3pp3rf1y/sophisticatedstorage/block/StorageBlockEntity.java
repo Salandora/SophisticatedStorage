@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.FabricStorageWrapper;
 import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -393,12 +392,12 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	@Nullable
 	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
 		if (side == null) {
-			return FabricStorageWrapper.of(getStorageWrapper().getInventoryForInputOutput());
+			return getStorageWrapper().getInventoryForInputOutput();
 		}
 		if (cachedFailedInsertItemHandler == null) {
 			cachedFailedInsertItemHandler = new CachedFailedInsertInventoryHandler(() -> getStorageWrapper().getInventoryForInputOutput(), () -> level != null ? level.getGameTime() : 0);
 		}
-		return FabricStorageWrapper.of(cachedFailedInsertItemHandler);
+		return cachedFailedInsertItemHandler;
 	}
 
 	public boolean shouldDropContents() {
