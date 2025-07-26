@@ -193,6 +193,9 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
 				ItemStack slotStack = mainInventoryHandler.getSlotStack(slot);
 				be.getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, slotStack.split(slotStack.getMaxStackSize()));
+
+				// TODO: Remove after rewrite as this is not necessary anymore then
+				mainInventoryHandler.setSlotStack(slot, slotStack);
 			}
 
 			copySettings(this, be, firstIndex, -firstIndex);
