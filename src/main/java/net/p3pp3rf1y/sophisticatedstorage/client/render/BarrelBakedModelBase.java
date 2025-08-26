@@ -4,12 +4,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Axis;
 import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -28,17 +26,20 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
-import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockEntity;
@@ -293,15 +294,15 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return ret;
 	}
 
-	public List<BakedQuad> getTierQuads(BlockState state, RandomSource rand, String woodName, @Nullable RenderType renderType) {
+	public List<BakedQuad> getTierQuads(BlockState state, RandomSource rand, String woodName, RenderType renderType) {
 		return getPartQuads(state, rand, woodName, BarrelModelPart.TIER, renderType);
 	}
 
-	public List<BakedQuad> getLockQuads(BlockState state, RandomSource rand, String woodName, @Nullable RenderType renderType) {
+	public List<BakedQuad> getLockQuads(BlockState state, RandomSource rand, String woodName, RenderType renderType) {
 		return getPartQuads(state, rand, woodName, BarrelModelPart.LOCKED, renderType);
 	}
 
-	private List<BakedQuad> getPartQuads(BlockState state, RandomSource rand, String woodName, BarrelModelPart part, @Nullable RenderType renderType) {
+	private List<BakedQuad> getPartQuads(BlockState state, RandomSource rand, String woodName, BarrelModelPart part, RenderType renderType) {
 		List<BakedQuad> ret = new ArrayList<>();
 
 		Map<BarrelModelPart, BakedModel> modelParts = getWoodModelParts(woodName, false);
@@ -408,7 +409,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 		return extraData.has(SHOWS_TIER) && Boolean.TRUE.equals(extraData.get(SHOWS_TIER));
 	}
 
-	private int createHash(@Nullable BlockState state, @Nullable Direction side, ModelData data, @Nullable RenderType renderType) {
+	private int createHash(@Nullable BlockState state, @Nullable Direction side, ModelData data, RenderType renderType) {
 		int hash;
 		if (state != null) {
 			hash = getInWorldBlockHash(state, data, renderType);
@@ -726,7 +727,11 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 				for (BarrelMaterial barrelMaterial : PARTICLE_ICON_MATERIAL_PRIORITY) {
 					if (materials.containsKey(barrelMaterial)) {
 						BlockState blockState = getDefaultBlockState(materials.get(barrelMaterial));
-						return Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState).getParticleIcon();
+						BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState);
+						if (model instanceof CustomParticleIcon dataModel) {
+							return dataModel.getParticleIcon(data);
+						}
+						return model.getParticleIcon();
 					}
 				}
 			}
@@ -856,6 +861,7 @@ public abstract class BarrelBakedModelBase implements BakedModel, CustomParticle
 				setProperties();
 				super.emitItemQuads(stack, randomSupplier, context);
 			}
+
 
 			@Override
 			public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
