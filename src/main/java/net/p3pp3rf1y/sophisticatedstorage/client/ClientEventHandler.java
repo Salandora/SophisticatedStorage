@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
+import com.github.salandora.sophisticatedlibrary.event.api.client.ClientLifecycleEvents;
+import com.github.salandora.sophisticatedlibrary.event.api.client.ClientRawInputEvent;
 import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
 import com.github.salandora.sophisticatedlibrary.model.loading.RegisterGeometryLoadersCallback;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -50,8 +52,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
-import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
-import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
