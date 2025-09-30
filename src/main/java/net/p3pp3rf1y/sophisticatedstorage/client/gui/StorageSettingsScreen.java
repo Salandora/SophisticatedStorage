@@ -1,11 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.gui;
 
+import com.github.salandora.sophisticatedlibrary.network.PacketDistributor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Position;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SettingsContainerMenu;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.settings.StorageSettingsTabControlBase;
 import net.p3pp3rf1y.sophisticatedstorage.network.OpenStorageInventoryPayload;
 

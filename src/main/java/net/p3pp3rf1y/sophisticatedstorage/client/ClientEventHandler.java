@@ -4,6 +4,7 @@ import com.github.salandora.sophisticatedlibrary.event.api.client.ClientLifecycl
 import com.github.salandora.sophisticatedlibrary.event.api.client.ClientRawInputEvent;
 import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
 import com.github.salandora.sophisticatedlibrary.model.loading.RegisterGeometryLoadersCallback;
+import com.github.salandora.sophisticatedlibrary.network.PacketDistributor;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -52,7 +53,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;

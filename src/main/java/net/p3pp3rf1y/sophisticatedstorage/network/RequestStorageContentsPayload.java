@@ -1,12 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.network;
 
+import com.github.salandora.sophisticatedlibrary.network.PacketDistributor;
+import com.github.salandora.sophisticatedlibrary.network.handling.IPayloadContext;
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 
@@ -25,7 +25,7 @@ RequestStorageContentsPayload(UUID storageUuid) implements CustomPacketPayload {
 		return TYPE;
 	}
 
-	public static void handlePayload(RequestStorageContentsPayload payload, ServerPlayNetworking.Context context) {
+	public static void handlePayload(RequestStorageContentsPayload payload, IPayloadContext context) {
 		if (!(context.player() instanceof ServerPlayer serverPlayer)) {
 			return;
 		}

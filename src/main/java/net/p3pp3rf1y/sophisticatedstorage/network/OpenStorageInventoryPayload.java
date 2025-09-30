@@ -1,13 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.network;
 
+import com.github.salandora.sophisticatedlibrary.network.handling.IPayloadContext;
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SophisticatedMenuProvider;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
@@ -28,7 +27,7 @@ public record OpenStorageInventoryPayload(BlockPos pos) implements CustomPacketP
 		return TYPE;
 	}
 
-	public static void handlePayload(OpenStorageInventoryPayload payload, ServerPlayNetworking.Context context) {
+	public static void handlePayload(OpenStorageInventoryPayload payload, IPayloadContext context) {
 		context.player().sophisticatedCore_openMenu(
 				new SophisticatedMenuProvider(
 						(w, p, pl) -> instantiateContainerMenu(w, pl, payload.pos),

@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
+import com.github.salandora.sophisticatedlibrary.gui.SlotItemHandler;
+import com.github.salandora.sophisticatedlibrary.network.PacketDistributor;
 import com.github.salandora.sophisticatedlibrary.transfer.ItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -13,8 +15,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.ISyncedContainer;
-import com.github.salandora.sophisticatedlibrary.gui.SlotItemHandler;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncContainerClientDataPayload;
 import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;

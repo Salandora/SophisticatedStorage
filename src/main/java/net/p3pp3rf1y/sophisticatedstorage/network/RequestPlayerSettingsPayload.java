@@ -1,11 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.network;
 
+import com.github.salandora.sophisticatedlibrary.network.PacketDistributor;
+import com.github.salandora.sophisticatedlibrary.network.handling.IPayloadContext;
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsPayload;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
 import net.p3pp3rf1y.sophisticatedcore.util.StreamCodecHelper;
@@ -21,7 +21,7 @@ public class RequestPlayerSettingsPayload implements CustomPacketPayload {
 		return TYPE;
 	}
 
-	public static void handlePayload(ServerPlayNetworking.Context context) {
+	public static void handlePayload(IPayloadContext context) {
 		String playerTagName = StorageSettingsHandler.SOPHISTICATED_STORAGE_SETTINGS_PLAYER_TAG;
 		if (context.player() instanceof ServerPlayer serverPlayer) {
 			PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerSettingsPayload(playerTagName, SettingsManager.getPlayerSettingsTag(context.player(), playerTagName)));
