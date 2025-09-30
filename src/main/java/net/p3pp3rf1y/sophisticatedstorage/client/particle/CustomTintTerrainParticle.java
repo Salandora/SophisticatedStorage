@@ -37,7 +37,7 @@ public class CustomTintTerrainParticle extends TerrainParticle {
 			BlockPos pos = type.getPos();
 			BlockState state = type.getState();
 			CustomTintTerrainParticle particle = new CustomTintTerrainParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, state, pos);
-			particle.sophisticatedCore_updateSprite(state, pos);
+			particle.sophisticatedLibrary_updateSprite(state, pos);
 			return particle;
 		}
 	}

@@ -145,11 +145,11 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		x += 44;
 
 		ItemStackHandler dyes = blockEntity.getDyes();
-		addSlot(new SlotItemHandler(dyes, 0, x, yOffset).sophisticatedCore_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_RED_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler(dyes, 0, x, yOffset).sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_RED_DYE_SLOT_BACKGROUND));
 		x += 18;
-		addSlot(new SlotItemHandler(dyes, 1, x, yOffset).sophisticatedCore_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler(dyes, 1, x, yOffset).sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
 		x += 18;
-		addSlot(new SlotItemHandler(dyes, 2, x, yOffset).sophisticatedCore_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler(dyes, 2, x, yOffset).sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
 		dyeSlotRange = new SlotRange(decorationSlotRange.firstSlot() + decorationSlotRange.numberOfSlots(), dyes.getSlotCount());
 
 		return y;
@@ -164,7 +164,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 					slotChangedListener.run();
 				}
 			}
-		}.sophisticatedCore_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_MATERIAL_SLOT_BACKGROUND));
+		}.sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_MATERIAL_SLOT_BACKGROUND));
 		y += 18;
 		y += yPadding;
 		return y;
