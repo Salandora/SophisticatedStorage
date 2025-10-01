@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -627,17 +626,18 @@ public class DecorationTableScreen extends AbstractContainerScreen<DecorationTab
 			BakedModel bakedModel = itemRenderer.getModel(previewStack, null, null, 0);
 			int combinedLight = 15728880;
 			if (bakedModel.isCustomRenderer()) {
-				BuiltinItemRendererRegistry.INSTANCE.get(previewStack.getItem()).render(previewStack, ItemDisplayContext.GUI, pose, guiGraphics.bufferSource(), combinedLight, OverlayTexture.NO_OVERLAY);
+				// Use BlockEntityRendererWithoutLevel so other mod mixins can be handled
+				itemRenderer.blockEntityRenderer.renderByItem(previewStack, ItemDisplayContext.GUI, pose, guiGraphics.bufferSource(), combinedLight, OverlayTexture.NO_OVERLAY);
 			} else {
-				/*Iterator<BakedModel> renderPasses = bakedModel.getRenderPasses(previewStack, true).iterator();
-				renderPasses.forEachRemaining(model -> {
-					Iterator<RenderType> renderTypes = model.getRenderTypes(previewStack, true).iterator();*/
+				//Iterator<BakedModel> renderPasses = bakedModel.getRenderPasses(previewStack, true).iterator();
+				//renderPasses.forEachRemaining(model -> {
+					//Iterator<RenderType> renderTypes = model.getRenderTypes(previewStack, true).iterator();
 					RenderType renderType = ItemBlockRenderTypes.getRenderType(previewStack, true);
 					//renderTypes.forEachRemaining(renderType -> {
 						VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect(guiGraphics.bufferSource(), renderType, true, previewStack.hasFoil());
 						itemRenderer.renderModelLists(bakedModel, previewStack, combinedLight, OverlayTexture.NO_OVERLAY, pose, vertexconsumer);
-					/*});
-				});*/
+					//});
+				//});
 			}
 			pose.popPose();
 		}
