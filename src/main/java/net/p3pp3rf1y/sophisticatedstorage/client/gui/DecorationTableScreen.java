@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -39,8 +38,8 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.DecorationTableMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
-import net.p3pp3rf1y.sophisticatedstorage.util.DecorationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.client.accessor.ItemRendererAccessor;
+import net.p3pp3rf1y.sophisticatedstorage.util.DecorationHelper;
 import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
@@ -625,15 +624,16 @@ public class DecorationTableScreen extends AbstractContainerScreen<DecorationTab
 			BakedModel bakedModel = itemRenderer.getModel(previewStack, null, null, 0);
 			int combinedLight = 15728880;
 			if (bakedModel.isCustomRenderer()) {
-				BuiltinItemRendererRegistry.INSTANCE.get(previewStack.getItem()).render(previewStack, ItemDisplayContext.GUI, pose, guiGraphics.bufferSource(), combinedLight, OverlayTexture.NO_OVERLAY);
+				// Use BlockEntityRendererWithoutLevel so other mod mixins can be handled
+				((ItemRendererAccessor) itemRenderer).getBlockEntityRenderer().renderByItem(previewStack, ItemDisplayContext.GUI, pose, guiGraphics.bufferSource(), combinedLight, OverlayTexture.NO_OVERLAY);
 			} else {
 				/*Iterator<BakedModel> renderPasses = bakedModel.getRenderPasses(previewStack, true).iterator();
 				renderPasses.forEachRemaining(model -> {
 					Iterator<RenderType> renderTypes = model.getRenderTypes(previewStack, true).iterator();*/
-				RenderType renderType = ItemBlockRenderTypes.getRenderType(previewStack, true);
-				//renderTypes.forEachRemaining(renderType -> {
-				VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect(guiGraphics.bufferSource(), renderType, true, previewStack.hasFoil());
-				((ItemRendererAccessor) itemRenderer).callRenderModelLists(bakedModel, previewStack, combinedLight, OverlayTexture.NO_OVERLAY, pose, vertexconsumer);
+					RenderType renderType = ItemBlockRenderTypes.getRenderType(previewStack, true);
+					//renderTypes.forEachRemaining(renderType -> {
+					VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect(guiGraphics.bufferSource(), renderType, true, previewStack.hasFoil());
+					((ItemRendererAccessor) itemRenderer).callRenderModelLists(bakedModel, previewStack, combinedLight, OverlayTexture.NO_OVERLAY, pose, vertexconsumer);
 					/*});
 				});*/
 			}
