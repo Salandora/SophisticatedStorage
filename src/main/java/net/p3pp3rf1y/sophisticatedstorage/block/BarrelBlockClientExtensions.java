@@ -1,5 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
+import com.github.salandora.sophisticatedlibrary.common.client.api.IClientBlockExtensions;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
@@ -12,17 +15,20 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParticle;
 
 import java.util.Random;
 
 @Environment(EnvType.CLIENT)
-class BarrelBlockClientExtensions {
+public class BarrelBlockClientExtensions implements IClientBlockExtensions {
+	private final BarrelBlock barrelBlock;
 	private static final Random random = new Random();
 
-	public static boolean addHitEffects(BarrelBlock barrelBlock, BlockState state, Level level, HitResult target, ParticleEngine manager) {
+	public BarrelBlockClientExtensions(BarrelBlock barrelBlock) {
+		this.barrelBlock = barrelBlock;
+	}
+
+	public boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
 		if (state.getBlock() != barrelBlock || !(level instanceof ClientLevel clientLevel) || !(target instanceof BlockHitResult blockHitResult)) {
 			return false;
 		}
@@ -70,7 +76,7 @@ class BarrelBlockClientExtensions {
 		return true;
 	}
 
-	public static boolean addDestroyEffects(BarrelBlock barrelBlock, BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
+	public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
 		if (state.getBlock() != barrelBlock || !(level instanceof ClientLevel clientLevel)) {
 			return false;
 		}

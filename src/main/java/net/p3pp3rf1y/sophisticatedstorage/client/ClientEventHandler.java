@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
+import com.github.salandora.sophisticatedlibrary.common.client.api.ClientExtensionManager;
 import com.github.salandora.sophisticatedlibrary.event.api.client.ClientLifecycleEvents;
 import com.github.salandora.sophisticatedlibrary.event.api.client.ClientRawInputEvent;
 import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
@@ -55,6 +56,7 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
+import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockClientExtensions;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.PaintbrushOverlay;
@@ -345,13 +347,14 @@ public class ClientEventHandler {
 	}
 
 	private static void registerStorageClientExtensions() {
-		/*registerBarrelClientExtensions(event,
+		registerBarrelClientExtensions(
 				ModBlocks.BARREL.get(), ModBlocks.COPPER_BARREL.get(), ModBlocks.IRON_BARREL.get(), ModBlocks.GOLD_BARREL.get(), ModBlocks.DIAMOND_BARREL.get(), ModBlocks.NETHERITE_BARREL.get(),
 				ModBlocks.LIMITED_BARREL_1.get(), ModBlocks.LIMITED_COPPER_BARREL_1.get(), ModBlocks.LIMITED_IRON_BARREL_1.get(), ModBlocks.LIMITED_GOLD_BARREL_1.get(), ModBlocks.LIMITED_DIAMOND_BARREL_1.get(), ModBlocks.LIMITED_NETHERITE_BARREL_1.get(),
 				ModBlocks.LIMITED_BARREL_2.get(), ModBlocks.LIMITED_COPPER_BARREL_2.get(), ModBlocks.LIMITED_IRON_BARREL_2.get(), ModBlocks.LIMITED_GOLD_BARREL_2.get(), ModBlocks.LIMITED_DIAMOND_BARREL_2.get(), ModBlocks.LIMITED_NETHERITE_BARREL_2.get(),
 				ModBlocks.LIMITED_BARREL_3.get(), ModBlocks.LIMITED_COPPER_BARREL_3.get(), ModBlocks.LIMITED_IRON_BARREL_3.get(), ModBlocks.LIMITED_GOLD_BARREL_3.get(), ModBlocks.LIMITED_DIAMOND_BARREL_3.get(), ModBlocks.LIMITED_NETHERITE_BARREL_3.get(),
 				ModBlocks.LIMITED_BARREL_4.get(), ModBlocks.LIMITED_COPPER_BARREL_4.get(), ModBlocks.LIMITED_IRON_BARREL_4.get(), ModBlocks.LIMITED_GOLD_BARREL_4.get(), ModBlocks.LIMITED_DIAMOND_BARREL_4.get(), ModBlocks.LIMITED_NETHERITE_BARREL_4.get()
-		);*/
+		);
+
 		for (Supplier<BlockItem> item : ModBlocks.CHEST_ITEMS) {
 			BuiltinItemRendererRegistry.INSTANCE.register(item.get(), ChestItemRenderer::render);
 		}
@@ -361,9 +364,9 @@ public class ClientEventHandler {
 		}
 	}
 
-	/*private static void registerBarrelClientExtensions(RegisterClientExtensionsEvent event, BarrelBlock... barrelBlocks) {
+	private static void registerBarrelClientExtensions(BarrelBlock... barrelBlocks) {
 		for (int i = 0; i < barrelBlocks.length; i++) {
-			event.registerBlock(new BarrelBlockClientExtensions(barrelBlocks[i]), barrelBlocks[i]);
+			ClientExtensionManager.registerBlock(new BarrelBlockClientExtensions(barrelBlocks[i]), barrelBlocks[i]);
 		}
-	}*/
+	}
 }
