@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
-import com.github.salandora.sophisticatedlibrary.common.extensions.component.SophisticatedDataComponentHolder;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.component.SophisticatedDataComponentHolder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;

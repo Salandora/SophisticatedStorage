@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
-import com.github.salandora.sophisticatedlibrary.common.extensions.component.SophisticatedDataComponentHolder;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.component.SophisticatedDataComponentHolder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;

@@ -1,11 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
-import com.github.salandora.sophisticatedlibrary.common.client.api.ClientExtensionManager;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.client.ClientExtensionManager;
 import com.github.salandora.sophisticatedlibrary.event.api.client.ClientLifecycleEvents;
 import com.github.salandora.sophisticatedlibrary.event.api.client.ClientRawInputEvent;
-import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
-import com.github.salandora.sophisticatedlibrary.model.loading.RegisterGeometryLoadersCallback;
-import com.github.salandora.sophisticatedlibrary.network.PacketDistributor;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.RegisterGeometryLoadersCallback;
+import com.github.salandora.sophisticatedlibrary.network.api.v1.PacketDistributor;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

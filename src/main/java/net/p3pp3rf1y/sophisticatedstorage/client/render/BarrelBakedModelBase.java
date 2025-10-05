@@ -1,7 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.github.salandora.sophisticatedlibrary.model.util.ModelData;
-import com.github.salandora.sophisticatedlibrary.model.util.ModelProperty;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.client.render.CustomParticleIcon;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelProperty;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -28,11 +29,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import com.github.salandora.sophisticatedlibrary.model.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;

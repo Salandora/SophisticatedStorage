@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.github.salandora.sophisticatedlibrary.model.util.ModelData;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

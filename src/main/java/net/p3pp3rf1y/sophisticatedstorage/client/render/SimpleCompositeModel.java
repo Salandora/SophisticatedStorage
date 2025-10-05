@@ -1,10 +1,12 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryBakingContext;
-import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
-import com.github.salandora.sophisticatedlibrary.model.loading.IUnbakedGeometry;
-import com.github.salandora.sophisticatedlibrary.model.models.BlockModelWrapper;
-import com.github.salandora.sophisticatedlibrary.model.util.SimpleModelState;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.models.BlockModelWrapper;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.SimpleModelState;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

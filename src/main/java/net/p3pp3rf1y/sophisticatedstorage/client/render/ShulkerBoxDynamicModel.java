@@ -1,10 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryBakingContext;
-import com.github.salandora.sophisticatedlibrary.model.loading.IGeometryLoader;
-import com.github.salandora.sophisticatedlibrary.model.loading.IUnbakedGeometry;
-import com.github.salandora.sophisticatedlibrary.model.util.ModelData;
-import com.github.salandora.sophisticatedlibrary.model.util.ModelProperty;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.client.render.CustomParticleIcon;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelProperty;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -24,7 +25,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import com.github.salandora.sophisticatedlibrary.model.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
