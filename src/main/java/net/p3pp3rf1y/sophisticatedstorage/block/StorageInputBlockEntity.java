@@ -11,9 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	@Nullable
@@ -55,7 +55,7 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 
 		@Override
 		public int getSlotCount() {
-			return 1;
+			return Math.min(itemHandler.getSlotCount(), 1);
 		}
 
 		@Override
