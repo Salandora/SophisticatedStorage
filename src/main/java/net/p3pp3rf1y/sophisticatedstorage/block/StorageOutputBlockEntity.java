@@ -12,9 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	public StorageOutputBlockEntity(BlockPos pos, BlockState state) {
@@ -34,8 +34,8 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	@Override
 	protected <T> T wrapCapability(BlockApiLookup<T, Direction> cap, T capability) {
 		if (cap == ItemStorage.SIDED) {
-			if (capability instanceof IItemHandlerSimpleInserter) {
-				return (T) new OutputOnlyItemHandlerWrapper((IItemHandlerSimpleInserter) capability);
+			if (capability instanceof IItemHandlerSimpleInserter itemHandler) {
+				return (T) new OutputOnlyItemHandlerWrapper(itemHandler);
 			}
 		}
 

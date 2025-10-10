@@ -35,8 +35,8 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	@Override
 	protected <T> T wrapCapability(BlockApiLookup<T, Direction> cap, T capability) {
 		if (cap == ItemStorage.SIDED) {
-			if (capability instanceof IItemHandlerSimpleInserter) {
-				return (T) new SingleSlotInputItemHandlerWrapper((IItemHandlerSimpleInserter) capability);
+			if (capability instanceof IItemHandlerSimpleInserter itemHandler) {
+				return (T) new SingleSlotInputItemHandlerWrapper(itemHandler);
 			}
 		}
 
@@ -52,7 +52,7 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 
 		@Override
 		public int getSlotCount() {
-			return 1;
+			return Math.min(itemHandler.getSlotCount(), 1);
 		}
 
 		@Override
