@@ -11,4 +11,14 @@ public class QuaternionHelper {
     public static Quaternionf quatFromXYZDegree(float x, float y, float z) {
         return new Quaternionf().rotateXYZ(Math.toRadians(x), Math.toRadians(y), Math.toRadians(z));
     }
+
+	public static int hashCode(Quaternionf q) {
+		final int prime = 31;
+		long result = 1;
+		result = prime * result + Float.floatToIntBits(q.w);
+		result = prime * result + Float.floatToIntBits(q.x);
+		result = prime * result + Float.floatToIntBits(q.y);
+		result = prime * result + Float.floatToIntBits(q.z);
+		return Long.hashCode(result);
+	}
 }

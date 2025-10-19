@@ -18,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.WoodStorageBlockBase;
-import org.joml.Quaternionf;
+import net.p3pp3rf1y.sophisticatedstorage.client.util.QuaternionHelper;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -191,11 +191,9 @@ public abstract class BarrelDynamicModelBase<T extends BarrelDynamicModelBase<T>
 		Transformation rotation = modelTransform.getRotation();
 		hash = 31 * hash + rotation.getMatrix().hashCode();
 		hash = 31 * hash + rotation.getTranslation().hashCode();
-		Quaternionf leftRotation = rotation.getLeftRotation();
-		hash = 31 * hash + leftRotation.hashCode();
-		hash = 31 * hash + Objects.hash(leftRotation.x(), leftRotation.y(), leftRotation.z());
+		hash = 31 * hash + QuaternionHelper.hashCode(rotation.getLeftRotation());
 		hash = 31 * hash + rotation.getScale().hashCode();
-
+		hash = 31 * hash + QuaternionHelper.hashCode(rotation.getRightRotation());
 		return hash;
 	}
 
