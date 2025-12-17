@@ -255,6 +255,11 @@ dependencies {
     modCompileOnly("earth.terrarium.chipped:chipped-fabric-${minecraft_version}:${project.chipped_version}")
     modLocalRuntime("earth.terrarium.chipped:chipped-fabric-${minecraft_version}:${project.chipped_version}")
 
+    // Tom's Storage Network
+    modCompileOnly("maven.modrinth:toms-storage:${project.toms_storage_version}")
+    modCompileOnly("org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cca_version}")
+    modCompileOnly("org.ladysnake.cardinal-components-api:cardinal-components-block:${project.cca_version}")
+
     /*modCompileOnly("committee.nova.mkb.fabric:mkb-${project.minecraft_version}:${project.mkb_mod_version}") {
         transitive = false
     }*/
@@ -574,7 +579,7 @@ task curseforge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
     // Dependencies
     mainFile.addRequirement('fabric-api')
     mainFile.addRequirement('sophisticated-core-unofficial-fabric-port')
-    mainFile.addEmbedded('forge-config-api-port-fabric')
+    mainFile.addEmbedded('forge-config-api-port')
     mainFile.addEmbedded('porting-lib')
     mainFile.addOptional('jei')
     mainFile.addOptional('emi')
