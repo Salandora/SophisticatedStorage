@@ -1,13 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -24,6 +19,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.ContentsFilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.VerticalFacing;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.BlockSide;
@@ -94,8 +90,8 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		}
 	}
 
-	private boolean pullItems(List<Storage<ItemVariant>> fromHandlers) {
-		for (Storage<ItemVariant> fromHandler : fromHandlers) {
+	private boolean pullItems(List<IItemHandler> fromHandlers) {
+		for (IItemHandler fromHandler : fromHandlers) {
 			if (moveItems(fromHandler, storageWrapper.getInventoryForUpgradeProcessing(), inputFilterLogic)) {
 				return true;
 			}
@@ -103,8 +99,8 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		return false;
 	}
 
-	private boolean pushItems(List<Storage<ItemVariant>> toHandlers) {
-		for (Storage<ItemVariant> toHandler : toHandlers) {
+	private boolean pushItems(List<IItemHandler> toHandlers) {
+		for (IItemHandler toHandler : toHandlers) {
 			outputFilterLogic.setInventory(toHandler);
 			if (moveItems(storageWrapper.getInventoryForUpgradeProcessing(), toHandler, outputFilterLogic)) {
 				return true;
@@ -113,17 +109,15 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		return false;
 	}
 
-	private boolean moveItems(Storage<ItemVariant> fromHandler, Storage<ItemVariant> toHandler, FilterLogic filterLogic) {
-		for (StorageView<ItemVariant> view : fromHandler.nonEmptyViews()) {
-			ItemVariant resource = view.getResource();
-			ItemStack slotStack = resource.toStack((int) view.getAmount());
+	private boolean moveItems(IItemHandler fromHandler, IItemHandler toHandler, FilterLogic filterLogic) {
+		for (int slot = 0; slot < fromHandler.getSlotCount(); slot++) {
+			ItemStack slotStack = fromHandler.getStackInSlot(slot);
 			if (!slotStack.isEmpty() && filterLogic.matchesFilter(slotStack)) {
-				long maxExtracted = StorageUtil.simulateExtract(view, resource, upgradeItem.getMaxTransferStackSize(), null);
-
-				try (Transaction transferTransaction = Transaction.openOuter()) {
-					long accepted = toHandler.insert(resource, maxExtracted, transferTransaction);
-					if (view.extract(resource, accepted, transferTransaction) == accepted) {
-						transferTransaction.commit();
+				ItemStack extractedStack = fromHandler.extractItem(slot, upgradeItem.getMaxTransferStackSize(), true);
+				if (!extractedStack.isEmpty()) {
+					ItemStack remainder = InventoryHelper.insertIntoInventory(extractedStack, toHandler, true);
+					if (remainder.getCount() < extractedStack.getCount()) {
+						InventoryHelper.insertIntoInventory(fromHandler.extractItem(slot, extractedStack.getCount() - remainder.getCount(), false), toHandler, false);
 						return true;
 					}
 				}
@@ -147,7 +141,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			return true;
 		}
 
-		for (BlockApiCache<Storage<ItemVariant>, Direction> handler : holder.handlers()) {
+		for (BlockApiCache<IItemHandler, Direction> handler : holder.handlers()) {
 			if (handler.find(direction.getOpposite()) == null) {
 				return true;
 			}
@@ -179,7 +173,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		BlockState storageState = level.getBlockState(pos);
 		List<BlockPos> offsetPositions = storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : List.of(pos.relative(direction));
 
-		List<BlockApiCache<Storage<ItemVariant>, Direction>> caches = new ArrayList<>();
+		List<BlockApiCache<IItemHandler, Direction>> caches = new ArrayList<>();
 
 		AtomicBoolean refreshOnEveryNeighborChange = new AtomicBoolean(false);
 		offsetPositions.forEach(offsetPos -> {
@@ -188,24 +182,24 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 				return storageInputBlockEntity.getControllerPos();
 			}).orElse(offsetPos);
 
-			caches.add(BlockApiCache.create(ItemStorage.SIDED, serverLevel, offsetPos));
+			caches.add(BlockApiCache.create(Capabilities.ItemHandler.SIDED, serverLevel, offsetPos));
 			// caches.add(BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, serverLevel, offsetPos, direction.getOpposite(), validityCheck, () -> handlerCache.remove(direction)));
 		});
 		return new ItemHandlerHolder(caches, refreshOnEveryNeighborChange.get());
 	}
 
-	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<Storage<ItemVariant>>> run, @Nullable Entity entity) {
+	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run, @Nullable Entity entity) {
 		ItemHandlerHolder holder = getItemHandlerHolder(level, pos, direction, entity == null);
 		if (holder == null) {
 			return runOnAutomationEntityItemHandlers(level, pos, direction, run, entity);
 		}
 
-		List<Storage<ItemVariant>> handler = holder.handlers().stream().map(handlerCache -> handlerCache.find(direction.getOpposite())).filter(Objects::nonNull).toList();
+		List<IItemHandler> handler = holder.handlers().stream().map(handlerCache -> handlerCache.find(direction.getOpposite())).filter(Objects::nonNull).toList();
 
 		return handler.isEmpty() ? runOnAutomationEntityItemHandlers(level, pos, direction, run, entity) : run.test(handler);
 	}
 
-	private boolean runOnAutomationEntityItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<Storage<ItemVariant>>> run, @Nullable Entity entity) {
+	private boolean runOnAutomationEntityItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run, @Nullable Entity entity) {
 		BlockState storageState = level.getBlockState(pos);
 		List<BlockPos> offsetPositions = entity == null && storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : List.of(pos.relative(direction));
 
@@ -216,7 +210,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		if (!entities.isEmpty()) {
 			Collections.shuffle(entities);
 			for (Entity e : entities) {
-				Storage<ItemVariant> entityCap = Capabilities.ItemHandler.ENTITY_AUTOMATION.find(e, direction.getOpposite());
+				IItemHandler entityCap = Capabilities.ItemHandler.ENTITY_AUTOMATION.find(e, direction.getOpposite());
 				if (entityCap != null) {
 					return run.test(List.of(entityCap));
 				}
@@ -300,7 +294,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		setPullingFrom(pullDirection, true);
 	}
 
-	private record ItemHandlerHolder(List<BlockApiCache<Storage<ItemVariant>, Direction>> handlers,
+	private record ItemHandlerHolder(List<BlockApiCache<IItemHandler, Direction>> handlers,
 									 boolean refreshOnEveryNeighborChange) {
 	}
 }

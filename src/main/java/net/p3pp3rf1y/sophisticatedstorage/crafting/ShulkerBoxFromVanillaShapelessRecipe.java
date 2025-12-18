@@ -1,9 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -43,10 +41,10 @@ public class ShulkerBoxFromVanillaShapelessRecipe extends ShapelessRecipe implem
 	public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
 		ItemStack upgradedStorage = super.assemble(input, registries);
 		getVanillaShulkerBox(input).ifPresent(vanillaShulkerBox -> {
-			@Nullable Storage<ItemVariant> itemCap = ContainerItemContext.withConstant(vanillaShulkerBox).find(ItemStorage.ITEM);
+			@Nullable IItemHandler itemCap = vanillaShulkerBox.sophisticatedLibrary_getCapability(Capabilities.ItemHandler.ITEM);
 			if (itemCap != null) {
 				StackStorageWrapper wrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
-				InventoryHelper.iterate(itemCap, stack -> {
+				InventoryHelper.iterate(itemCap, (slot, stack) -> {
 					if (!stack.isEmpty()) {
 						wrapper.getInventoryHandler().insertItem(stack, false);
 					}

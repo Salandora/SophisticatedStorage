@@ -1,10 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
-import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -390,7 +388,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Nullable
-	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
+	public IItemHandler getExternalItemHandler(@Nullable Direction side) {
 		if (side == null) {
 			return getStorageWrapper().getInventoryForInputOutput();
 		}

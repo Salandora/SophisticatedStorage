@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -194,9 +193,6 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
 				ItemStack slotStack = mainInventoryHandler.getSlotStack(slot);
 				be.getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, slotStack.split(slotStack.getMaxStackSize()));
-
-				// TODO: Remove after rewrite as this is not necessary anymore then
-				mainInventoryHandler.setSlotStack(slot, slotStack);
 			}
 
 			copySettings(this, be, firstIndex, -firstIndex);
@@ -319,7 +315,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 	@Nullable
 	@Override
-	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
+	public IItemHandler getExternalItemHandler(@Nullable Direction side) {
 		if (level == null) {
 			return null;
 		}

@@ -1,10 +1,9 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -33,7 +32,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	private boolean chunkBeingUnloaded = false;
 
 	@Nullable
-	private BlockApiCache<Storage<ItemVariant>, Direction> controllerItemHandlerCache;
+	private BlockApiCache<IItemHandler, Direction> controllerItemHandlerCache;
 
 	protected StorageIOBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -161,14 +160,14 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 
 	@Nullable
 	@SuppressWarnings("java:S1640") //can't use EnumMap because one of keys is null
-	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
+	public IItemHandler getExternalItemHandler(@Nullable Direction side) {
 		if (getControllerPos().isEmpty()) {
 			return null;
 		}
 
 		if (controllerItemHandlerCache == null && level instanceof ServerLevel serverLevel) {
 			controllerItemHandlerCache = BlockApiCache.create(
-					ItemStorage.SIDED,
+					Capabilities.ItemHandler.SIDED,
 					serverLevel,
 					getControllerPos().get()
 			);
@@ -183,7 +182,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 
 	@Override
 	public void sophisticatedLibrary_onChunkUnloaded() {
-		// super.sophisticatedCore_onChunkUnloaded();
+		SophisticatedBlockEntity.super.sophisticatedLibrary_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

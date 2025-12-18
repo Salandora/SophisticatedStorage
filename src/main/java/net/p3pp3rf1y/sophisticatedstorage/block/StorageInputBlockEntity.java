@@ -1,8 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -10,11 +8,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class StorageInputBlockEntity extends StorageIOBlockEntity {
 	@Nullable
-	private Storage<ItemVariant> itemHandler;
+	private IItemHandler itemHandler;
 
 	public StorageInputBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlocks.STORAGE_INPUT_BLOCK_ENTITY_TYPE.get(), pos, state);
@@ -22,7 +21,7 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 
 	@Nullable
 	@Override
-	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
+	public IItemHandler getExternalItemHandler(@Nullable Direction side) {
 		if (getControllerPos().isEmpty()) {
 			return null;
 		}
@@ -60,6 +59,7 @@ public class StorageInputBlockEntity extends StorageIOBlockEntity {
 			return ItemStack.EMPTY;
 		}
 
+		// Fabric: Added for internal use to reset the content when a Transaction was cancelled
 		@Override
 		public void setStackInSlot(int slot, ItemStack stack) {
 			itemHandler.setStackInSlot(slot, stack);

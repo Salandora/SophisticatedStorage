@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.init;
 
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.wrapper.fabric.FabricItemHandlerWrapper;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import com.github.salandora.sophisticatedlibrary.util.DeferredHolder;
 import com.github.salandora.sophisticatedlibrary.util.DeferredRegister;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
@@ -382,14 +384,24 @@ public class ModBlocks {
 	}
 
 	private static void registerCapabilities() {
-		ItemStorage.SIDED.registerForBlockEntity(ControllerBlockEntity::getExternalItemHandler, CONTROLLER_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(ChestBlockEntity::getExternalItemHandler, CHEST_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(ShulkerBoxBlockEntity::getExternalItemHandler, SHULKER_BOX_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(LimitedBarrelBlockEntity::getExternalItemHandler, LIMITED_BARREL_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(BarrelBlockEntity::getExternalItemHandler, BARREL_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(StorageIOBlockEntity::getExternalItemHandler, STORAGE_IO_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(StorageInputBlockEntity::getExternalItemHandler, STORAGE_INPUT_BLOCK_ENTITY_TYPE.get());
-		ItemStorage.SIDED.registerForBlockEntity(StorageOutputBlockEntity::getExternalItemHandler, STORAGE_OUTPUT_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(ControllerBlockEntity::getExternalItemHandler, CONTROLLER_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(ChestBlockEntity::getExternalItemHandler, CHEST_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(ShulkerBoxBlockEntity::getExternalItemHandler, SHULKER_BOX_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(LimitedBarrelBlockEntity::getExternalItemHandler, LIMITED_BARREL_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(BarrelBlockEntity::getExternalItemHandler, BARREL_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(StorageIOBlockEntity::getExternalItemHandler, STORAGE_IO_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(StorageInputBlockEntity::getExternalItemHandler, STORAGE_INPUT_BLOCK_ENTITY_TYPE.get());
+		Capabilities.ItemHandler.SIDED.registerForBlockEntity(StorageOutputBlockEntity::getExternalItemHandler, STORAGE_OUTPUT_BLOCK_ENTITY_TYPE.get());
+
+
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), CONTROLLER_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), CHEST_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), SHULKER_BOX_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), LIMITED_BARREL_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), BARREL_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), STORAGE_IO_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), STORAGE_INPUT_BLOCK_ENTITY_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, dir) -> FabricItemHandlerWrapper.of(be.getExternalItemHandler(dir)), STORAGE_OUTPUT_BLOCK_ENTITY_TYPE.get());
 	}
 
 	public static void registerDispenseBehavior() {

@@ -1,9 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import com.github.salandora.sophisticatedlibrary.util.Capabilities;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -219,7 +217,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 		return List.of();
 	}
 
-	public Storage<ItemVariant> getExternalItemHandler(@Nullable Direction side) {
+	public IItemHandler getExternalItemHandler(@Nullable Direction side) {
 		if (side == null) {
 			return this;
 		} else {

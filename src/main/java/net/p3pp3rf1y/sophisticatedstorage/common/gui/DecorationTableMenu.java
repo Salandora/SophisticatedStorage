@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
 import com.github.salandora.sophisticatedlibrary.inventory.SlotItemHandler;
 import com.github.salandora.sophisticatedlibrary.network.api.v1.PacketDistributor;
-import com.github.salandora.sophisticatedlibrary.transfer.ItemStackHandler;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.ItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
