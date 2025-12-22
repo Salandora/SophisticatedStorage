@@ -85,7 +85,7 @@ public class StorageBlockLootProvider extends LootTableProvider {
 		}
 
 		private static LootTable.Builder dropStorageWithContents(Item storageItem) {
-			LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1))
+			LootPool.Builder pool = LootPool.lootPool()/*.name("main")*/.setRolls(ConstantValue.exactly(1))
 					.add(LootItem.lootTableItem(storageItem))
 					.apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
 					.apply(CopyStorageDataFunction.builder());
@@ -94,7 +94,7 @@ public class StorageBlockLootProvider extends LootTableProvider {
 
 		public LootTable.Builder dropBlock(ItemLike pItem) {
 			LootPool.Builder pool = applyExplosionCondition(pItem, LootPool.lootPool()
-					.name("main")
+					/*.name("main")*/
 					.setRolls(ConstantValue.exactly(1.0F))
 					.add(LootItem.lootTableItem(pItem))
 			);

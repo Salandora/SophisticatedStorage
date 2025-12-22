@@ -2,8 +2,8 @@ package net.p3pp3rf1y.sophisticatedstorage.compat.sb;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.p3pp3rf1y.sophisticatedbackpacks.api.CapabilityBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
-import net.p3pp3rf1y.sophisticatedbackpacks.common.BackpackWrapperLookup;
 import net.p3pp3rf1y.sophisticatedcore.compat.ICompat;
 import net.p3pp3rf1y.sophisticatedstorage.block.BarrelMaterial;
 import net.p3pp3rf1y.sophisticatedstorage.block.DecorationTableBlockEntity;
@@ -43,7 +43,7 @@ public class SBCompat implements ICompat {
 
 				ItemStack result = input.copyWithCount(1);
 
-				return BackpackWrapperLookup.get(result).map(backpackWrapper -> {
+				return result.sophisticatedLibrary_getLazyCapability(CapabilityBackpackWrapper.getCapabilityInstance()).map(backpackWrapper -> {
 					int originalMainColor = backpackWrapper.getMainColor();
 					int originalAccentColor = backpackWrapper.getAccentColor();
 
@@ -53,7 +53,7 @@ public class SBCompat implements ICompat {
 			}
 
 			private boolean colorsTransparentOrSameAs(ItemStack backpack, int mainColorToSet, int accentColorToSet) {
-				return BackpackWrapperLookup.get(backpack)
+				return backpack.sophisticatedLibrary_getLazyCapability(CapabilityBackpackWrapper.getCapabilityInstance())
 						.map(backpackWrapper -> (mainColorToSet == -1 || mainColorToSet == backpackWrapper.getMainColor()) && (accentColorToSet == -1 || accentColorToSet == backpackWrapper.getAccentColor()))
 						.orElse(true);
 			}

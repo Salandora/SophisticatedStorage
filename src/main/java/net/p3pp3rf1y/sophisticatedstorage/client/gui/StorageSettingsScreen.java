@@ -21,7 +21,7 @@ public class StorageSettingsScreen extends SettingsScreen {
 
 	@Override
 	protected void sendStorageInventoryScreenOpenMessage() {
-		StoragePacketHandler.sendToServer(new OpenStorageInventoryMessage(menu.getBlockPosition()));
+		StoragePacketHandler.INSTANCE.sendToServer(new OpenStorageInventoryMessage(menu.getBlockPosition()));
 	}
 
 	public static StorageSettingsScreen constructScreen(SettingsContainerMenu<?> screenContainer, Inventory inventory, Component title) {

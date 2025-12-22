@@ -1,8 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -107,10 +105,7 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 
 	protected void tryToPickup(Level world, ItemEntity itemEntity, IStorageWrapper w) {
 		ItemStack remainingStack = itemEntity.getItem().copy();
-		try (Transaction ctx = Transaction.openOuter()) {
-			remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(world, w.getUpgradeHandler(), remainingStack, ctx);
-			ctx.commit();
-		}
+		remainingStack = InventoryHelper.runPickupOnPickupResponseUpgrades(world, w.getUpgradeHandler(), remainingStack, false);
 		if (remainingStack.getCount() < itemEntity.getItem().getCount()) {
 			itemEntity.setItem(remainingStack);
 		}
@@ -240,13 +235,9 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 	public static boolean tryAddSingleUpgrade(Player player, InteractionHand hand, ItemStack itemInHand, IStorageWrapper storageWrapper) {
 		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem && itemInHand.is(ModItems.STORAGE_UPGRADE_TAG)) {
 			UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
-			ItemVariant resource = ItemVariant.of(itemInHand);
 			if (upgradeItem.canAddUpgradeTo(storageWrapper, itemInHand, true, player.level().isClientSide()).isSuccessful()
-					&& InventoryHelper.simulateInsertIntoInventory(upgradeHandler, resource, 1, null).getCount() != itemInHand.getCount()) {
-				try (Transaction ctx = Transaction.openOuter()) {
-					InventoryHelper.insertIntoInventory(upgradeHandler, resource, 1, ctx);
-					ctx.commit();
-				}
+					&& InventoryHelper.insertIntoInventory(itemInHand, upgradeHandler, true).getCount() != itemInHand.getCount()) {
+				InventoryHelper.insertIntoInventory(itemInHand.copyWithCount(1), upgradeHandler, false);
 				itemInHand.shrink(1);
 				if (itemInHand.isEmpty()) {
 					player.setItemInHand(hand, ItemStack.EMPTY);

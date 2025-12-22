@@ -1,12 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
+import com.github.salandora.sophisticatedlibrary.util.LazyOptional;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -40,7 +39,7 @@ import net.p3pp3rf1y.sophisticatedstorage.upgrades.INeighborChangeListenerUpgrad
 import javax.annotation.Nullable;
 import java.util.*;
 
-public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay {
+public abstract class StorageBlockEntity extends BlockEntity implements IControllableStorage, ILinkable, ILockable, Nameable, ITierDisplay, IUpgradeDisplay, SophisticatedBlockEntity {
 	public static final String STORAGE_WRAPPER_TAG = "storageWrapper";
 	private final StorageWrapper storageWrapper;
 	@Nullable
@@ -59,9 +58,9 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	private boolean chunkBeingUnloaded = false;
 
 	@Nullable
-	private LazyOptional<SlottedStackStorage> itemHandlerCap;
+	private LazyOptional<IItemHandler> itemHandlerCap;
 	@Nullable
-	private LazyOptional<SlottedStackStorage> noSideItemHandlerCap;
+	private LazyOptional<IItemHandler> noSideItemHandlerCap;
 	private boolean locked = false;
 	private boolean showLock = true;
 	private boolean showTier = true;
@@ -160,13 +159,6 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 			}
 		};
 		storageWrapper.setUpgradeCachesInvalidatedHandler(this::onUpgradeCachesInvalidated);
-
-		ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> onChunkUnloaded());
-		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((be, world) -> {
-			if (be == this) {
-				invalidateCaps();
-			}
-		});
 	}
 
 	protected boolean canRefreshUpgrades() {
@@ -282,8 +274,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void onLoad() {
-		super.onLoad();
+	public void sophisticatedLibrary_onLoad() {
+		SophisticatedBlockEntity.super.sophisticatedLibrary_onLoad();
 		storageWrapper.onInit();
 		registerWithControllerOnLoad();
 	}
@@ -303,7 +295,9 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		}
 	}
 
-	public void onChunkUnloaded() {
+	@Override
+	public void sophisticatedLibrary_onChunkUnloaded() {
+		SophisticatedBlockEntity.super.sophisticatedLibrary_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 
@@ -385,9 +379,9 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		setChanged();
 	}
 
-	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
-		if (cap == ItemStorage.SIDED) {
-			if (opt == null) {
+	public <T> LazyOptional<T> getCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
+		if (cap == Capabilities.ItemHandler.SIDED) {
+			if (side == null) {
 				if (noSideItemHandlerCap == null) {
 					noSideItemHandlerCap = LazyOptional.of(() -> getStorageWrapper().getInventoryForInputOutput());
 				}
@@ -401,18 +395,20 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		return LazyOptional.empty();
 	}
 
-	public void invalidateCaps() {
+	@Override
+	public void sophisticatedLibrary_invalidateCaps() {
+		SophisticatedBlockEntity.super.sophisticatedLibrary_invalidateCaps();
 		invalidateStorageCap();
 	}
 
 	private void invalidateStorageCap() {
 		if (itemHandlerCap != null) {
-			LazyOptional<SlottedStackStorage> tempItemHandlerCap = itemHandlerCap;
+			LazyOptional<IItemHandler> tempItemHandlerCap = itemHandlerCap;
 			itemHandlerCap = null;
 			tempItemHandlerCap.invalidate();
 		}
 		if (noSideItemHandlerCap != null) {
-			LazyOptional<SlottedStackStorage> tempNoSideItemHandlerCap = noSideItemHandlerCap;
+			LazyOptional<IItemHandler> tempNoSideItemHandlerCap = noSideItemHandlerCap;
 			noSideItemHandlerCap = null;
 			tempNoSideItemHandlerCap.invalidate();
 		}

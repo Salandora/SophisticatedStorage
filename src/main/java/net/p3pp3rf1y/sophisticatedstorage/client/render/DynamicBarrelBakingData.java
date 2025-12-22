@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
 import com.google.common.collect.ImmutableMap;
-
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.resources.ResourceLocation;
 

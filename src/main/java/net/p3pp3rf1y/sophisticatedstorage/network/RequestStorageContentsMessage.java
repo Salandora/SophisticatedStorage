@@ -1,39 +1,40 @@
 package net.p3pp3rf1y.sophisticatedstorage.network;
 
+import com.github.salandora.sophisticatedlibrary.network.api.v0.NetworkEvent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.p3pp3rf1y.sophisticatedcore.network.SimplePacketBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-public class RequestStorageContentsMessage extends SimplePacketBase {
+public class RequestStorageContentsMessage {
 	private final UUID storageUuid;
 
 	public RequestStorageContentsMessage(UUID storageUuid) {
 		this.storageUuid = storageUuid;
 	}
 
-	public RequestStorageContentsMessage(FriendlyByteBuf buffer) {
-		this(buffer.readUUID());
+	public static void encode(RequestStorageContentsMessage msg, FriendlyByteBuf packetBuffer) {
+		packetBuffer.writeUUID(msg.storageUuid);
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buffer) {
-		buffer.writeUUID(storageUuid);
+	public static RequestStorageContentsMessage decode(FriendlyByteBuf packetBuffer) {
+		return new RequestStorageContentsMessage(packetBuffer.readUUID());
 	}
 
-	@Override
-	public boolean handle(Context context) {
-		context.enqueueWork(() -> {
-			ServerPlayer player = context.getSender();
-			if (player == null) {
-				return;
-			}
-
-			StoragePacketHandler.sendToClient(player, new StorageContentsMessage(storageUuid, ItemContentsStorage.get().getOrCreateStorageContents(storageUuid)));
-		});
-		return true;
+	static void onMessage(RequestStorageContentsMessage msg, Supplier<NetworkEvent.Context> contextSupplier) {
+		NetworkEvent.Context context = contextSupplier.get();
+		context.enqueueWork(() -> handleMessage(context.getSender(), msg));
+		context.setPacketHandled(true);
 	}
 
+	private static void handleMessage(@Nullable ServerPlayer player, RequestStorageContentsMessage msg) {
+		if (player == null) {
+			return;
+		}
+
+		StoragePacketHandler.INSTANCE.sendToClient(player, new StorageContentsMessage(msg.storageUuid, ItemContentsStorage.get().getOrCreateStorageContents(msg.storageUuid)));
+	}
 }

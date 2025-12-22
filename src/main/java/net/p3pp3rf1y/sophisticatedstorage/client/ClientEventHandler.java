@@ -1,10 +1,13 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
+import com.github.salandora.sophisticatedlibrary.common.api.v1.client.ClientExtensionManager;
+import com.github.salandora.sophisticatedlibrary.event.api.v0.client.ClientLifecycleEvents;
+import com.github.salandora.sophisticatedlibrary.event.api.v0.client.ClientRawInputEvent;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.RegisterGeometryLoadersCallback;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
@@ -46,10 +49,10 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase;
-import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvent;
-import net.p3pp3rf1y.sophisticatedcore.event.client.ClientRawInputEvent;
 import net.p3pp3rf1y.sophisticatedcore.util.SimpleIdentifiablePrepareableReloadListener;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
+import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlock;
+import net.p3pp3rf1y.sophisticatedstorage.block.BarrelBlockClientExtensions;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.PaintbrushOverlay;
@@ -105,7 +108,7 @@ public class ClientEventHandler {
 	public static final ModelLayerLocation CHEST_RIGHT_LAYER = new ModelLayerLocation(CHEST_RIGHT_RL, "main");
 
 	public static void registerHandlers() {
-		RegisterGeometryLoadersCallback.EVENT.register(ClientEventHandler::onModelRegistry);
+		RegisterGeometryLoadersCallback.register(ClientEventHandler::onModelRegistry);
 
 		ClientEventHandler.registerLayer();
 		ClientEventHandler.registerTooltipComponent();
@@ -115,6 +118,7 @@ public class ClientEventHandler {
 		ClientEventHandler.registerKeyMappings();
 		ClientEventHandler.registerStorageLayerLoader();
 		ClientEventHandler.onRegisterReloadListeners();
+		ClientEventHandler.registerStorageClientExtensions();
 
 		PreparableModelLoadingPlugin.register(((resourceManager, executor) -> CompletableFuture.completedFuture(resourceManager)), (resourceManager, context) -> onRegisterAdditionalModels(resourceManager, context::addModels));
 
@@ -122,7 +126,7 @@ public class ClientEventHandler {
 		ModItemColors.registerItemColorHandlers();
 		ModBlockColors.registerBlockColorHandlers();
 
-		ClientLifecycleEvent.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
+		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientStorageContentsTooltip::onWorldLoad);
 
 
 		if (!FabricLoader.getInstance().isModLoaded(ModCompat.MKB)) {
@@ -208,7 +212,7 @@ public class ClientEventHandler {
 		if (stack.getItem() != ModItems.STORAGE_TOOL) {
 			return InteractionResult.PASS;
 		}
-		StoragePacketHandler.sendToServer(new ScrolledToolMessage(delta > 0));
+		StoragePacketHandler.INSTANCE.sendToServer(new ScrolledToolMessage(delta > 0));
 		return InteractionResult.SUCCESS;
 	}
 
@@ -334,5 +338,21 @@ public class ClientEventHandler {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.NETHERITE_SHULKER_BOX_ITEM, ShulkerBoxItemRenderer::render);
+	}
+
+	private static void registerStorageClientExtensions() {
+		registerBarrelClientExtensions(
+				ModBlocks.BARREL, ModBlocks.COPPER_BARREL, ModBlocks.IRON_BARREL, ModBlocks.GOLD_BARREL, ModBlocks.DIAMOND_BARREL, ModBlocks.NETHERITE_BARREL,
+				ModBlocks.LIMITED_BARREL_1, ModBlocks.LIMITED_COPPER_BARREL_1, ModBlocks.LIMITED_IRON_BARREL_1, ModBlocks.LIMITED_GOLD_BARREL_1, ModBlocks.LIMITED_DIAMOND_BARREL_1, ModBlocks.LIMITED_NETHERITE_BARREL_1,
+				ModBlocks.LIMITED_BARREL_2, ModBlocks.LIMITED_COPPER_BARREL_2, ModBlocks.LIMITED_IRON_BARREL_2, ModBlocks.LIMITED_GOLD_BARREL_2, ModBlocks.LIMITED_DIAMOND_BARREL_2, ModBlocks.LIMITED_NETHERITE_BARREL_2,
+				ModBlocks.LIMITED_BARREL_3, ModBlocks.LIMITED_COPPER_BARREL_3, ModBlocks.LIMITED_IRON_BARREL_3, ModBlocks.LIMITED_GOLD_BARREL_3, ModBlocks.LIMITED_DIAMOND_BARREL_3, ModBlocks.LIMITED_NETHERITE_BARREL_3,
+				ModBlocks.LIMITED_BARREL_4, ModBlocks.LIMITED_COPPER_BARREL_4, ModBlocks.LIMITED_IRON_BARREL_4, ModBlocks.LIMITED_GOLD_BARREL_4, ModBlocks.LIMITED_DIAMOND_BARREL_4, ModBlocks.LIMITED_NETHERITE_BARREL_4
+		);
+	}
+
+	private static void registerBarrelClientExtensions(BarrelBlock... barrelBlocks) {
+		for (BarrelBlock barrelBlock : barrelBlocks) {
+			ClientExtensionManager.registerBlock(new BarrelBlockClientExtensions(barrelBlock), barrelBlock);
+		}
 	}
 }

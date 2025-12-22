@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
 import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -44,12 +43,12 @@ public class HopperUpgradeContainer extends UpgradeContainerBase<HopperUpgradeWr
 	}
 
 	private void addInputFilterSlot(Slot slot) {
-		slot.setBackground(EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getSecond());
+		slot.sophisticatedLibrary_setBackground(EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getSecond());
 		slots.add(slot);
 	}
 
 	private void addOutputFilterSlot(Slot slot) {
-		slot.setBackground(EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getSecond());
+		slot.sophisticatedLibrary_setBackground(EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getSecond());
 		slots.add(slot);
 	}
 

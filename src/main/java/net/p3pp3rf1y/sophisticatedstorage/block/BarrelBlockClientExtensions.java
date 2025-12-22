@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.client.IClientBlockExtensions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
@@ -18,11 +17,16 @@ import net.p3pp3rf1y.sophisticatedstorage.client.particle.CustomTintTerrainParti
 
 import java.util.Random;
 
-@Environment(EnvType.CLIENT)
-class BarrelBlockClientExtensions {
-	private static final Random random = new Random();
+public class BarrelBlockClientExtensions implements IClientBlockExtensions {
+	private final BarrelBlock barrelBlock;
+	private final Random random = new Random();
 
-	public static boolean addHitEffects(BarrelBlock barrelBlock, BlockState state, Level level, HitResult target, ParticleEngine manager) {
+	public BarrelBlockClientExtensions(BarrelBlock barrelBlock) {
+		this.barrelBlock = barrelBlock;
+	}
+
+	@Override
+	public boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
 		if (state.getBlock() != barrelBlock || !(level instanceof ClientLevel clientLevel) || !(target instanceof BlockHitResult blockHitResult)) {
 			return false;
 		}
@@ -64,13 +68,14 @@ class BarrelBlockClientExtensions {
 				d0 = i + aabb.maxX + 0.1F;
 			}
 
-			manager.add((new CustomTintTerrainParticle(clientLevel, d0, d1, d2, 0.0D, 0.0D, 0.0D, state, pos).sophisticatedCore$updateSprite(state, pos)).setPower(0.2F).scale(0.6F));
+			manager.add((new CustomTintTerrainParticle(clientLevel, d0, d1, d2, 0.0D, 0.0D, 0.0D, state, pos).sophisticatedLibrary_updateSprite(state, pos)).setPower(0.2F).scale(0.6F));
 		}
 
 		return true;
 	}
 
-	public static boolean addDestroyEffects(BarrelBlock barrelBlock, BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
+	@Override
+	public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
 		if (state.getBlock() != barrelBlock || !(level instanceof ClientLevel clientLevel)) {
 			return false;
 		}
@@ -93,7 +98,7 @@ class BarrelBlockClientExtensions {
 						double d7 = d4 * d1 + minX;
 						double d8 = d5 * d2 + minY;
 						double d9 = d6 * d3 + minZ;
-						manager.add(new CustomTintTerrainParticle(clientLevel, pos.getX() + d7, pos.getY() + d8, pos.getZ() + d9, d4 - 0.5D, d5 - 0.5D, d6 - 0.5D, state, pos).sophisticatedCore$updateSprite(state, pos));
+						manager.add(new CustomTintTerrainParticle(clientLevel, pos.getX() + d7, pos.getY() + d8, pos.getZ() + d9, d4 - 0.5D, d5 - 0.5D, d6 - 0.5D, state, pos).sophisticatedLibrary_updateSprite(state, pos));
 					}
 				}
 			}

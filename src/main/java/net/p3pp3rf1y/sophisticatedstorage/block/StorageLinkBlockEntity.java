@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -11,13 +11,13 @@ import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
 
-public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
+public class StorageLinkBlockEntity extends BlockEntity implements ILinkable, SophisticatedBlockEntity {
 	@Nullable
 	private BlockPos controllerPos = null;
 
@@ -25,8 +25,6 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
 
 	public StorageLinkBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlocks.STORAGE_LINK_BLOCK_ENTITY_TYPE, pos, state);
-
-		ServerChunkEvents.CHUNK_UNLOAD.register((level, levelChunk) -> this.onChunkUnloaded());
 	}
 
 	@Override
@@ -103,7 +101,9 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable {
 		return getControllerPos().isPresent();
 	}
 
-	public void onChunkUnloaded() {
+	@Override
+	public void sophisticatedLibrary_onChunkUnloaded() {
+		SophisticatedBlockEntity.super.sophisticatedLibrary_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

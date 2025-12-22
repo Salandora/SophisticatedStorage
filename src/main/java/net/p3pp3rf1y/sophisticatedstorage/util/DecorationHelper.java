@@ -1,11 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.util;
 
-import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -46,13 +42,13 @@ public class DecorationHelper {
 		return Optional.empty();
 	}
 
-	public static boolean consumeDyes(int mainColorBeingSet, int accentColorBeingSet, Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> dyes, Integer storageMainColor, Integer storageAccentColor, TransactionContext ctx) {
+	public static boolean consumeDyes(int mainColorBeingSet, int accentColorBeingSet, Map<ResourceLocation, Integer> remainingParts, List<IItemHandler> dyes, Integer storageMainColor, Integer storageAccentColor, boolean simulate) {
 		Map<TagKey<Item>, Integer> partsNeeded = getDyePartsNeeded(mainColorBeingSet, accentColorBeingSet, storageMainColor, storageAccentColor);
 		if (partsNeeded.isEmpty()) {
 			return true;
 		}
 
-		return consumeDyePartsNeeded(partsNeeded, dyes, remainingParts, ctx).hasEnough();
+		return consumeDyePartsNeeded(partsNeeded, dyes, remainingParts, simulate).hasEnough();
 	}
 
 	public static Map<TagKey<Item>, Integer> getDyePartsNeeded(int mainColorBeingSet, int accentColorBeingSet, int storageMainColor, int storageAccentColor) {
@@ -120,14 +116,14 @@ public class DecorationHelper {
 		return result;
 	}
 
-	public static boolean consumeMaterials(Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> decorativeBlocks, Map<BarrelMaterial, ResourceLocation> originalMaterials, Map<BarrelMaterial, ResourceLocation> materials, TransactionContext ctx) {
+	public static boolean consumeMaterials(Map<ResourceLocation, Integer> remainingParts, List<IItemHandler> decorativeBlocks, Map<BarrelMaterial, ResourceLocation> originalMaterials, Map<BarrelMaterial, ResourceLocation> materials, boolean simulate) {
 		Map<ResourceLocation, Integer> partsNeeded = getMaterialPartsNeeded(originalMaterials, materials);
-		return consumeMaterialPartsNeeded(partsNeeded, remainingParts, decorativeBlocks, ctx).hasEnough();
+		return consumeMaterialPartsNeeded(partsNeeded, remainingParts, decorativeBlocks, simulate).hasEnough();
 	}
 
-	public static ConsumptionResult consumeMaterialPartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> remainingParts, List<Storage<ItemVariant>> decorativeBlocks, TransactionContext ctx) {
+	public static ConsumptionResult consumeMaterialPartsNeeded(Map<ResourceLocation, Integer> partsNeeded, Map<ResourceLocation, Integer> remainingParts, List<IItemHandler> decorativeBlocks, boolean simulate) {
 		return consumePartsNeeded(partsNeeded, decorativeBlocks, location -> location,
-				(materialLocation, stack) -> getMaterialLocation(stack).map(ml -> ml.equals(materialLocation)).orElse(false), remainingParts, ctx);
+				(materialLocation, stack) -> getMaterialLocation(stack).map(ml -> ml.equals(materialLocation)).orElse(false), remainingParts, simulate);
 	}
 
 	public static Map<ResourceLocation, Integer> getMaterialPartsNeeded(Map<BarrelMaterial, ResourceLocation> originalMaterials, Map<BarrelMaterial, ResourceLocation> materialsToApply) {
@@ -162,11 +158,11 @@ public class DecorationHelper {
 		return materialLocation;
 	}
 
-	public static ConsumptionResult consumeDyePartsNeeded(Map<TagKey<Item>, Integer> partsNeeded, List<Storage<ItemVariant>> resourceHandlers, Map<ResourceLocation, Integer> remainingParts, TransactionContext ctx) {
-		return consumePartsNeeded(partsNeeded, resourceHandlers, TagKey::location, (dyeName, stack) -> stack.is(dyeName), remainingParts, ctx);
+	public static ConsumptionResult consumeDyePartsNeeded(Map<TagKey<Item>, Integer> partsNeeded, List<IItemHandler> resourceHandlers, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
+		return consumePartsNeeded(partsNeeded, resourceHandlers, TagKey::location, (dyeName, stack) -> stack.is(dyeName), remainingParts, simulate);
 	}
 
-	private static <T> ConsumptionResult consumePartsNeeded(Map<T, Integer> partsNeeded, List<Storage<ItemVariant>> resourceHandlers, Function<T, ResourceLocation> locationGetter, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, TransactionContext ctx) {
+	private static <T> ConsumptionResult consumePartsNeeded(Map<T, Integer> partsNeeded, List<IItemHandler> resourceHandlers, Function<T, ResourceLocation> locationGetter, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate) {
 		Map<ResourceLocation, Integer> missingParts = new HashMap<>();
 		for (Map.Entry<T, Integer> entry : partsNeeded.entrySet()) {
 			T material = entry.getKey();
@@ -174,11 +170,14 @@ public class DecorationHelper {
 			ResourceLocation materialLocation = locationGetter.apply(material);
 			int remainingPartCount = remainingParts.getOrDefault(materialLocation, 0);
 			if (remainingPartCount > parts) {
-				int finalParts = parts;
-				TransactionCallback.onSuccess(ctx, () -> remainingParts.put(materialLocation, remainingPartCount - finalParts));
+				if (!simulate) {
+					remainingParts.put(materialLocation, remainingPartCount - parts);
+				}
 				continue;
 			} else {
-				TransactionCallback.onSuccess(ctx, () -> remainingParts.remove(materialLocation));
+				if (!simulate) {
+					remainingParts.remove(materialLocation);
+				}
 				if (remainingPartCount == parts) {
 					continue;
 				}
@@ -186,7 +185,7 @@ public class DecorationHelper {
 
 			parts -= remainingPartCount;
 
-			SingleItemConsumptionResult singleItemConsumptionResult = consumeFromHandlers(resourceHandlers, stackMatcher, remainingParts, ctx, material, parts, materialLocation);
+			SingleItemConsumptionResult singleItemConsumptionResult = consumeFromHandlers(resourceHandlers, stackMatcher, remainingParts, simulate, material, parts, materialLocation);
 			if (!singleItemConsumptionResult.hasEnough()) {
 				missingParts.put(materialLocation, singleItemConsumptionResult.countMissing());
 			}
@@ -194,25 +193,22 @@ public class DecorationHelper {
 		return new ConsumptionResult(missingParts.isEmpty(), missingParts);
 	}
 
-	private static <T> SingleItemConsumptionResult consumeFromHandlers(List<Storage<ItemVariant>> resourceHandlers, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, TransactionContext ctx, T material, Integer parts, ResourceLocation materialLocation) {
-		for (Storage<ItemVariant> resources : resourceHandlers) {
-			for (StorageView<ItemVariant> view : resources.nonEmptyViews()) {
-				ItemStack stack = view.getResource().toStack((int) view.getAmount());
+	private static <T> SingleItemConsumptionResult consumeFromHandlers(List<IItemHandler> resourceHandlers, BiPredicate<T, ItemStack> stackMatcher, Map<ResourceLocation, Integer> remainingParts, boolean simulate, T material, Integer parts, ResourceLocation materialLocation) {
+		for (IItemHandler resources : resourceHandlers) {
+			for (int slot = 0; slot < resources.getSlotCount(); slot++) {
+				ItemStack stack = resources.getStackInSlot(slot);
 				if (!stackMatcher.test(material, stack)) {
 					continue;
 				}
 
 				int toRemove = (int) Math.ceil((double)parts / BLOCK_TOTAL_PARTS);
-				long removed  = resources.extract(view.getResource(), toRemove, ctx);
-				int partsRemoved = (int)removed * BLOCK_TOTAL_PARTS;
+				ItemStack removed = resources.extractItem(slot, toRemove, simulate);
+				int partsRemoved = removed.getCount() * BLOCK_TOTAL_PARTS;
 
 				if (partsRemoved >= parts) {
-					int finalParts = parts;
-					TransactionCallback.onSuccess(ctx, () -> {
-						if (partsRemoved > finalParts) {
-							remainingParts.put(materialLocation, partsRemoved - finalParts);
-						}
-					});
+					if (partsRemoved > parts && !simulate) {
+						remainingParts.put(materialLocation, partsRemoved - parts);
+					}
 					return new SingleItemConsumptionResult(true, 0);
 				}
 				parts -= partsRemoved;

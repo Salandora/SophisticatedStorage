@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
@@ -16,8 +14,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
-import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedstorage.item.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.mixin.common.accessor.ShapelessRecipeAccessor;
 
@@ -50,15 +48,12 @@ public class ShulkerBoxFromVanillaShapelessRecipe extends ShapelessRecipe implem
 		ItemStack upgradedStorage = super.assemble(input, registries);
 		getVanillaShulkerBox(input).ifPresent(vanillaShulkerBox -> {
 			NonNullList<ItemStack> itemStacks = getStoredItems(vanillaShulkerBox);
-			CapabilityStorageWrapper.get(upgradedStorage).ifPresent(wrapper -> {
+			upgradedStorage.sophisticatedLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance()).ifPresent(wrapper -> {
 				for (ItemStack stack : itemStacks) {
 					if (!stack.isEmpty()) {
-						try (Transaction ctx = Transaction.openOuter()) {
-							wrapper.getInventoryHandler().insert(ItemVariant.of(stack), stack.getCount(), ctx);
-							ctx.commit();
-						}
+						wrapper.getInventoryHandler().insertItem(stack, false);
 					}
-				}
+				};
 			});
 		});
 		return upgradedStorage;

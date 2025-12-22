@@ -1,11 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +21,7 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 	@Nullable
 	@Override
 	protected <T> Direction getAdjustedCapabilitySide(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
-		if (cap == ItemStorage.SIDED) {
+		if (cap == Capabilities.ItemHandler.SIDED) {
 			return null; //passing null side to not get the cache failed handler from controller
 		}
 
@@ -33,7 +30,7 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 
 	@Override
 	protected <T> T wrapCapability(BlockApiLookup<T, Direction> cap, T capability) {
-		if (cap == ItemStorage.SIDED) {
+		if (cap == Capabilities.ItemHandler.SIDED) {
 			if (capability instanceof IItemHandlerSimpleInserter itemHandler) {
 				return (T) new OutputOnlyItemHandlerWrapper(itemHandler);
 			}
@@ -42,10 +39,10 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		return super.wrapCapability(cap, capability);
 	}
 
-	private static class OutputOnlyItemHandlerWrapper implements SlottedStackStorage {
-		private final SlottedStackStorage itemHandler;
+	private static class OutputOnlyItemHandlerWrapper implements IItemHandler {
+		private final IItemHandlerSimpleInserter itemHandler;
 
-		public OutputOnlyItemHandlerWrapper(SlottedStackStorage itemHandler) {
+		public OutputOnlyItemHandlerWrapper(IItemHandlerSimpleInserter itemHandler) {
 			this.itemHandler = itemHandler;
 		}
 
@@ -55,37 +52,24 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-			return new SingleSlotOutputSlotWrapper(itemHandler.getSlot(slot));
-		}
-
-		@Override
-		public void setStackInSlot(int slot, ItemStack stack) {
-		}
-
-		@Override
 		public @NotNull ItemStack getStackInSlot(int slot) {
 			return itemHandler.getStackInSlot(slot);
 		}
 
+		// Fabric: Added for internal use to reset the content when a Transaction was cancelled
 		@Override
-		public long insert(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return 0;
+		public void setStackInSlot(int slot, ItemStack stack) {
+			itemHandler.setStackInSlot(slot, stack);
 		}
 
 		@Override
-		public long insertSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return 0;
+		public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+			return stack;
 		}
 
 		@Override
-		public long extract(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return itemHandler.extract(resource, maxAmount, ctx);
-		}
-
-		@Override
-		public long extractSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-			return itemHandler.extractSlot(slot, resource, maxAmount, ctx);
+		public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+			return itemHandler.extractItem(slot, amount, simulate);
 		}
 
 		@Override
@@ -94,45 +78,8 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		}
 
 		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
+		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 			return false;
-		}
-	}
-
-	private static class SingleSlotOutputSlotWrapper implements SingleSlotStorage<ItemVariant> {
-		private final SingleSlotStorage<ItemVariant> backingSlot;
-		public SingleSlotOutputSlotWrapper(SingleSlotStorage<ItemVariant> backingSlot) {
-			this.backingSlot = backingSlot;
-		}
-
-		@Override
-		public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-			return 0;
-		}
-
-		@Override
-		public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-			return backingSlot.extract(resource, maxAmount, transaction);
-		}
-
-		@Override
-		public boolean isResourceBlank() {
-			return backingSlot.isResourceBlank();
-		}
-
-		@Override
-		public ItemVariant getResource() {
-			return backingSlot.getResource();
-		}
-
-		@Override
-		public long getAmount() {
-			return backingSlot.getAmount();
-		}
-
-		@Override
-		public long getCapacity() {
-			return backingSlot.getSlotCount();
 		}
 	}
 }

@@ -1,9 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.ItemStackHandler;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -61,8 +59,8 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		}
 
 		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return resource.getItem() instanceof BlockItem blockItem && !(resource.getItem() instanceof StorageBlockItem) && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO));
+		public boolean isItemValid(int slot, ItemStack stack) {
+			return stack.getItem() instanceof BlockItem blockItem && !(stack.getItem() instanceof StorageBlockItem) && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO));
 		}
 	};
 
@@ -74,11 +72,11 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		}
 
 		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
+		public boolean isItemValid(int slot, ItemStack stack) {
 			return switch (slot) {
-				case RED_DYE_SLOT -> resource.toStack().is(ConventionalItemTags.RED_DYES);
-				case GREEN_DYE_SLOT -> resource.toStack().is(ConventionalItemTags.GREEN_DYES);
-				case BLUE_DYE_SLOT -> resource.toStack().is(ConventionalItemTags.BLUE_DYES);
+				case RED_DYE_SLOT -> stack.is(ConventionalItemTags.RED_DYES);
+				case GREEN_DYE_SLOT -> stack.is(ConventionalItemTags.GREEN_DYES);
+				case BLUE_DYE_SLOT -> stack.is(ConventionalItemTags.BLUE_DYES);
 				default -> false;
 			};
 		}
@@ -105,8 +103,8 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		}
 
 		@Override
-		public boolean isItemValid(int slot, ItemVariant resource, int count) {
-			return ITEM_DECORATORS.keySet().stream().anyMatch(predicate -> predicate.test(resource.toStack(count)));
+		public boolean isItemValid(int slot, ItemStack stack) {
+			return ITEM_DECORATORS.keySet().stream().anyMatch(predicate -> predicate.test(stack));
 		}
 	};
 
@@ -387,14 +385,11 @@ public class DecorationTableBlockEntity extends BlockEntity {
 			}
 
 			boolean emptyDecorativeBlocks = InventoryHelper.isEmpty(decorativeBlocks);
-			try (Transaction ctx = Transaction.openOuter()) {
-				if ((emptyDecorativeBlocks || !itemDecorator.supportsMaterials(input)) && itemDecorator.supportsTints(input)) {
-					DecorationHelper.consumeDyes(mainColor, accentColor, this.remainingParts, List.of(dyes), StorageBlockItem.getMainColorFromStack(input).orElse(-1), StorageBlockItem.getAccentColorFromStack(input).orElse(-1), ctx);
-				} else if (!emptyDecorativeBlocks && itemDecorator.supportsMaterials(input)) {
-					Map<BarrelMaterial, ResourceLocation> originalMaterials = BarrelBlockItem.getUncompactedMaterials(input);
-					DecorationHelper.consumeMaterials(this.remainingParts, List.of(decorativeBlocks), originalMaterials, getMaterialsToApply(!STORAGES_WIHOUT_TOP_INNER_TRIM.contains(input.getItem())), ctx);
-				}
-				ctx.commit();
+			if ((emptyDecorativeBlocks || !itemDecorator.supportsMaterials(input)) && itemDecorator.supportsTints(input)) {
+				DecorationHelper.consumeDyes(mainColor, accentColor, this.remainingParts, List.of(dyes), StorageBlockItem.getMainColorFromStack(input).orElse(-1), StorageBlockItem.getAccentColorFromStack(input).orElse(-1), false);
+			} else if (!emptyDecorativeBlocks && itemDecorator.supportsMaterials(input)) {
+				Map<BarrelMaterial, ResourceLocation> originalMaterials = BarrelBlockItem.getUncompactedMaterials(input);
+				DecorationHelper.consumeMaterials(this.remainingParts, List.of(decorativeBlocks), originalMaterials, getMaterialsToApply(!STORAGES_WIHOUT_TOP_INNER_TRIM.contains(input.getItem())), false);
 			}
 
 			setChanged();

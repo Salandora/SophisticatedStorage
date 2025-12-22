@@ -2,8 +2,6 @@ package net.p3pp3rf1y.sophisticatedstorage;
 
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
-import org.apache.commons.lang3.tuple.Pair;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -29,26 +27,23 @@ import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeConfig;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
+import java.util.*;
 
 public class Config {
 	private Config() {}
 
 	private static final String MAX_UPGRADES_MATCHER = "([a-z0-9_]+\\|[a-z0-9_/.-]+\\|\\d+)";
 
-	public static final Common COMMON;
-	public static final ForgeConfigSpec COMMON_SPEC;
 	public static final Client CLIENT;
 	public static final ForgeConfigSpec CLIENT_SPEC;
+
 	public static final Server SERVER;
 	public static final ForgeConfigSpec SERVER_SPEC;
+	public static final Common COMMON;
+	public static final ForgeConfigSpec COMMON_SPEC;
 
 	static {
 		final Pair<Server, ForgeConfigSpec> serverSpec = new ForgeConfigSpec.Builder().configure(Server::new);

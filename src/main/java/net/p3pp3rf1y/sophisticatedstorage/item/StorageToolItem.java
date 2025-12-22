@@ -20,19 +20,14 @@ import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedstorage.block.ICountDisplay;
-import net.p3pp3rf1y.sophisticatedstorage.block.IFillLevelDisplay;
-import net.p3pp3rf1y.sophisticatedstorage.block.ILockable;
-import net.p3pp3rf1y.sophisticatedstorage.block.ITierDisplay;
-import net.p3pp3rf1y.sophisticatedstorage.block.IUpgradeDisplay;
-import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
+import net.p3pp3rf1y.sophisticatedstorage.block.*;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 
 public class StorageToolItem extends ItemBase {
 
@@ -65,7 +60,7 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult onItemUseFirst(ItemStack tool, UseOnContext context) {
+	public InteractionResult sophisticatedLibrary_onItemUseFirst(ItemStack tool, UseOnContext context) {
 		BlockPos pos = context.getClickedPos();
 		Level level = context.getLevel();
 		Block blockClicked = level.getBlockState(pos).getBlock();
@@ -107,7 +102,7 @@ public class StorageToolItem extends ItemBase {
 				}
 			}
 		}
-		return super.onItemUseFirst(tool, context);
+		return super.sophisticatedLibrary_onItemUseFirst(tool, context);
 	}
 
 	private static <T> boolean tryToggling(BlockPos pos, Level level, Class<T> clazz, Consumer<T> toggle) {

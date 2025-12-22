@@ -18,7 +18,6 @@
           "function": "sophisticatedstorage:copy_storage_data"
         }
       ],
-      "name": "main",
       "rolls": 1.0
     }
   ],

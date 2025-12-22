@@ -13,6 +13,6 @@ public class SophisticatedStorageClient implements ClientModInitializer {
 		ModBlocks.registerScreens();
 		ModItems.registerScreens();
 
-        StoragePacketHandler.getChannel().initClientListener();
+		StoragePacketHandler.INSTANCE.initClientListener();
     }
 }

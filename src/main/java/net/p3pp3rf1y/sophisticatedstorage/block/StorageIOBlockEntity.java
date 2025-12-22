@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
+import com.github.salandora.sophisticatedlibrary.util.LazyOptional;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,7 +20,7 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class StorageIOBlockEntity extends BlockEntity implements IControllerBoundable, ILinkable {
+public class StorageIOBlockEntity extends BlockEntity implements IControllerBoundable, ILinkable, SophisticatedBlockEntity {
 	@Nullable
 	private BlockPos controllerPos = null;
 	private boolean isLinkedToController = false;
@@ -28,8 +28,6 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	private Map<BlockApiLookup<?, Direction>, Map<Direction, LazyOptional<?>>> capabilitySideCache = new HashMap<>();
 	protected StorageIOBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-
-		ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> onChunkUnloaded());
 	}
 
 	public StorageIOBlockEntity(BlockPos pos, BlockState state) {
@@ -168,10 +166,6 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 					.map(c -> getControllerCapability(cap, side, c))
 					.orElseGet(LazyOptional::empty);
 			capabilitySideCache.computeIfAbsent(cap, k -> new HashMap<>()).put(side, lazyOptional);
-			// TODO: needed?
-			/*if (lazyOptional.isPresent()) {
-				lazyOptional.addListener(l -> removeCapabilityCacheOnSide(cap, opt));
-			}*/
 		}
 
 		return capabilitySideCache.get(cap).get(side).cast();
@@ -187,10 +181,10 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	protected <T> LazyOptional<T> getControllerCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction side, ControllerBlockEntity c) {
 		LazyOptional<T> controllerCap = c.getCapability(cap, getAdjustedCapabilitySide(cap, side));
 
-		return controllerCap.lazyMap(capability -> {
+		return controllerCap.map(capability -> {
 			controllerCap.addListener(l -> removeCapabilityCacheOnSide(cap, side));
-			return wrapCapability(cap, capability);
-		});
+			return LazyOptional.of(() -> wrapCapability(cap, capability));
+		}).orElseGet(LazyOptional::empty);
 	}
 
 	@Nullable
@@ -202,7 +196,9 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 		return capability;
 	}
 
-	public void onChunkUnloaded() {
+	@Override
+	public void sophisticatedLibrary_onChunkUnloaded() {
+		SophisticatedBlockEntity.super.sophisticatedLibrary_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

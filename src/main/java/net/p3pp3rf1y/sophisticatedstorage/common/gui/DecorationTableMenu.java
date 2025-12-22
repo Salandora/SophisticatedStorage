@@ -1,8 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.common.gui;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import com.github.salandora.sophisticatedlibrary.inventory.SlotItemHandler;
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.ItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,7 +14,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.ISyncedContainer;
-import net.p3pp3rf1y.sophisticatedcore.common.gui.SlotItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncContainerClientDataMessage;
 import net.p3pp3rf1y.sophisticatedcore.util.SlotRange;
@@ -46,7 +44,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 	private SlotRange playerSlotRange;
 	@Nullable
 	private Runnable slotChangedListener = null;
-	private SlotItemHandler<?> storageSlot;
+	private SlotItemHandler storageSlot;
 
 	public DecorationTableMenu(int containerId, Player player, BlockPos pos) {
 		super(ModBlocks.DECORATION_TABLE_CONTAINER_TYPE, containerId);
@@ -75,7 +73,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 
 	private void addStorageSlots() {
 		ItemStackHandler storageBlock = blockEntity.getStorageBlock();
-		storageSlot = new SlotItemHandler<>(storageBlock, 0, getSlot(dyeSlotRange.firstSlot()).x, getSlot(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT).y) {
+		storageSlot = new SlotItemHandler(storageBlock, 0, getSlot(dyeSlotRange.firstSlot()).x, getSlot(DecorationTableBlockEntity.BOTTOM_TRIM_SLOT).y) {
 			@Override
 			public void setChanged() {
 				super.setChanged();
@@ -121,10 +119,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 					return;
 				}
 				blockEntity.consumeIngredientsOnCraft();
-				try (Transaction ctx = Transaction.openOuter()) {
-					blockEntity.getStorageBlock().extractSlot(0, blockEntity.getStorageBlock().getVariantInSlot(0), 1, ctx);
-					ctx.commit();
-				}
+				blockEntity.getStorageBlock().extractItem(0, 1, false);
 			}
 		};
 		addSlot(resultSlot);
@@ -150,18 +145,18 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		x += 44;
 
 		ItemStackHandler dyes = blockEntity.getDyes();
-		addSlot(new SlotItemHandler<>(dyes, 0, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_RED_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler(dyes, 0, x, yOffset).sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_RED_DYE_SLOT_BACKGROUND));
 		x += 18;
-		addSlot(new SlotItemHandler<>(dyes, 1, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler(dyes, 1, x, yOffset).sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_GREEN_DYE_SLOT_BACKGROUND));
 		x += 18;
-		addSlot(new SlotItemHandler<>(dyes, 2, x, yOffset).setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
+		addSlot(new SlotItemHandler(dyes, 2, x, yOffset).sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_BLUE_DYE_SLOT_BACKGROUND));
 		dyeSlotRange = new SlotRange(decorationSlotRange.firstSlot() + decorationSlotRange.numberOfSlots(), dyes.getSlotCount());
 
 		return y;
 	}
 
 	private int addDecorationSlot(ItemStackHandler itemHandler, int slotIndex, int xOffset, int y, int yPadding) {
-		addSlot(new SlotItemHandler<>(itemHandler, slotIndex, xOffset, y) {
+		addSlot(new SlotItemHandler(itemHandler, slotIndex, xOffset, y) {
 			@Override
 			public void setChanged() {
 				super.setChanged();
@@ -169,7 +164,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 					slotChangedListener.run();
 				}
 			}
-		}.setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_MATERIAL_SLOT_BACKGROUND));
+		}.sophisticatedLibrary_setBackground(InventoryMenu.BLOCK_ATLAS, EMPTY_MATERIAL_SLOT_BACKGROUND));
 		y += 18;
 		y += yPadding;
 		return y;
@@ -199,13 +194,13 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		ItemStack slotStack = slot.getItem();
 		ItemStack slotStackCopy = slotStack.copy();
 		if (isPlayerSlot(slotIndex)) {
-			if (blockEntity.getDecorativeBlocks().isItemValid(decorationSlotRange.firstSlot(), ItemVariant.of(slotStack), slotStack.getCount())
+			if (blockEntity.getDecorativeBlocks().isItemValid(decorationSlotRange.firstSlot(), slotStack)
 					&& !moveItemStackTo(slotStack, decorationSlotRange, false)) {
 				return ItemStack.EMPTY;
 			} else if (isValidDye(slotStack)
 					&& !moveItemStackTo(slotStack, dyeSlotRange, false)) {
 				return ItemStack.EMPTY;
-			} else if (blockEntity.getStorageBlock().isItemValid(0, ItemVariant.of(slotStack), slotStack.getCount())
+			} else if (blockEntity.getStorageBlock().isItemValid(0, slotStack)
 					&& !moveItemStackTo(slotStack, storageSlotRange, false)) {
 				return ItemStack.EMPTY;
 			}
@@ -228,7 +223,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 		ItemStackHandler dyes = blockEntity.getDyes();
 
 		for (int slot = 0; slot < dyes.getSlotCount(); slot++) {
-			if (dyes.isItemValid(slot, ItemVariant.of(stack), stack.getCount())) {
+			if (dyes.isItemValid(slot, stack)) {
 				return true;
 			}
 		}
@@ -303,7 +298,7 @@ public class DecorationTableMenu extends AbstractContainerMenu implements ISynce
 
 		CompoundTag data = new CompoundTag();
 		addData.accept(data);
-		PacketHandler.sendToServer(new SyncContainerClientDataMessage(data));
+		PacketHandler.INSTANCE.sendToServer(new SyncContainerClientDataMessage(data));
 	}
 
 	public Map<ResourceLocation, Integer> getPartsNeeded() {

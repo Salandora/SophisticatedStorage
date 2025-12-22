@@ -1,14 +1,15 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.google.gson.JsonDeserializationContext;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.client.render.CustomParticleIcon;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelProperty;
 import com.google.gson.JsonObject;
-
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -24,31 +25,29 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.p3pp3rf1y.sophisticatedcore.client.render.CustomParticleIcon;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import net.p3pp3rf1y.sophisticatedcore.util.model.ModelData;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
-import static net.p3pp3rf1y.sophisticatedcore.util.model.ModelProperties.HAS_MAIN_COLOR;
-
-public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynamicModel> {
+public class ShulkerBoxDynamicModel implements IUnbakedGeometry {
 	private static final String BLOCK_BREAK_FOLDER = "block/break/";
 	public static final ResourceLocation TINTABLE_BREAK_TEXTURE = SophisticatedStorage.getRL(BLOCK_BREAK_FOLDER + "tintable_shulker_box");
 	public static final ResourceLocation MAIN_BREAK_TEXTURE = SophisticatedStorage.getRL(BLOCK_BREAK_FOLDER + "shulker_box");
 
 	@Override
-	public BakedModel bake(BlockModel context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
+	public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
 		return new ShulkerBoxBakedModel();
 	}
 
 	private static class ShulkerBoxBakedModel implements BakedModel, CustomParticleIcon {
+		private static final ModelProperty<Boolean> HAS_MAIN_COLOR = new ModelProperty<>();
+
 		@Override
 		public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
 			return Collections.emptyList();
@@ -114,7 +113,7 @@ public class ShulkerBoxDynamicModel implements IUnbakedGeometry<ShulkerBoxDynami
 		public static final Loader INSTANCE = new Loader();
 
 		@Override
-		public ShulkerBoxDynamicModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
+		public ShulkerBoxDynamicModel read(JsonObject modelContents) {
 			return new ShulkerBoxDynamicModel();
 		}
 	}

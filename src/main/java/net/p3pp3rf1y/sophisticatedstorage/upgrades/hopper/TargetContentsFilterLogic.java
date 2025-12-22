@@ -1,10 +1,9 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
@@ -20,9 +19,9 @@ import java.util.function.Supplier;
 
 public class TargetContentsFilterLogic extends ContentsFilterLogic {
 	private Set<ItemStackKey> inventoryFilterStacks = new HashSet<>();
-	private final LoadingCache<Storage<ItemVariant>, Set<ItemStackKey>> inventoryCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build(new CacheLoader<>() {
+	private final LoadingCache<IItemHandler, Set<ItemStackKey>> inventoryCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build(new CacheLoader<>() {
 		@Override
-		public Set<ItemStackKey> load(Storage<ItemVariant> inventory) {
+		public Set<ItemStackKey> load(IItemHandler inventory) {
 			return InventoryHelper.getUniqueStacks(inventory);
 		}
 	});
@@ -31,7 +30,7 @@ public class TargetContentsFilterLogic extends ContentsFilterLogic {
 		super(upgrade, saveHandler, filterSlotCount, getInventoryHandler, memorySettings, parentTagKey);
 	}
 
-	public void setInventory(Storage<ItemVariant> inventory) {
+	public void setInventory(IItemHandler inventory) {
 		inventoryFilterStacks = inventoryCache.getUnchecked(inventory);
 	}
 

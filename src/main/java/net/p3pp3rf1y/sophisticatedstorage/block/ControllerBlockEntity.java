@@ -1,14 +1,13 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import com.github.salandora.sophisticatedlibrary.util.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedcore.controller.ControllerBlockEntityBase;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 
@@ -31,27 +30,23 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 		boolean doubleClick = gameTime - lastDepositTime < 10;
 		lastDepositTime = gameTime;
 		if (doubleClick) {
-			PlayerInventoryStorage playerInventory = PlayerInventoryStorage.of(player);
-			for (var view : playerInventory.nonEmptyViews()) {
-				if (canDepositStack(view.getResource().toStack((int) view.getAmount()))) {
-					try(Transaction ctx = Transaction.openOuter()) {
-						long inserted = insert(view.getResource(), view.getAmount(), ctx, false);
-						if (inserted > 0 && view.extract(view.getResource(), inserted, ctx) == inserted) {
-							ctx.commit();
+			player.sophisticatedLibrary_getCapability(Capabilities.ItemHandler.ENTITY, null).ifPresent(
+					playerInventory -> InventoryHelper.iterate(playerInventory, (slot, stack) -> {
+						if (canDepositStack(stack)) {
+							ItemStack resultStack = insertItem(stack, true, false);
+							int countToExtract = stack.getCount() - resultStack.getCount();
+							if (countToExtract > 0 && playerInventory.extractItem(slot, countToExtract, true).getCount() == countToExtract) {
+								insertItem(playerInventory.extractItem(slot, countToExtract, false), false, false);
+							}
 						}
 					}
-				}
-			}
+			));
 			return;
 		}
 
 		ItemStack itemInHand = player.getItemInHand(hand);
 		if (!itemInHand.isEmpty() && canDepositStack(itemInHand)) {
-			try (Transaction ctx = Transaction.openOuter()) {
-				long inserted = insert(ItemVariant.of(itemInHand), itemInHand.getCount(), ctx, false);
-				player.setItemInHand(hand, itemInHand.copyWithCount(itemInHand.getCount() - (int) inserted));
-				ctx.commit();
-			}
+			player.setItemInHand(hand, insertItem(itemInHand, false, false));
 		}
 	}
 

@@ -1,18 +1,18 @@
 package net.p3pp3rf1y.sophisticatedstorage.network;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import com.github.salandora.sophisticatedlibrary.network.api.v0.NetworkEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
 import net.p3pp3rf1y.sophisticatedcore.client.render.ClientStorageContentsTooltipBase;
-import net.p3pp3rf1y.sophisticatedcore.network.SimplePacketBase;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 
-import java.util.UUID;
 import javax.annotation.Nullable;
+import java.util.UUID;
+import java.util.function.Supplier;
 
-public class StorageContentsMessage extends SimplePacketBase {
+public class StorageContentsMessage {
 	private final UUID shulkerBoxUuid;
 	@Nullable
 	private final CompoundTag contents;
@@ -22,29 +22,28 @@ public class StorageContentsMessage extends SimplePacketBase {
 		this.contents = contents;
 	}
 
-	public StorageContentsMessage(FriendlyByteBuf buffer) {
-		this(buffer.readUUID(), buffer.readNbt());
+	public static void encode(StorageContentsMessage msg, FriendlyByteBuf packetBuffer) {
+		packetBuffer.writeUUID(msg.shulkerBoxUuid);
+		packetBuffer.writeNbt(msg.contents);
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buffer) {
-		buffer.writeUUID(shulkerBoxUuid);
-		buffer.writeNbt(contents);
+	public static StorageContentsMessage decode(FriendlyByteBuf packetBuffer) {
+		return new StorageContentsMessage(packetBuffer.readUUID(), packetBuffer.readNbt());
 	}
 
-	@Override
-	@Environment(EnvType.CLIENT)
-	public boolean handle(Context context) {
-		context.enqueueWork(() -> {
-			Player player = context.getClientPlayer();
-			if (player == null || contents == null) {
-				return;
-			}
-
-			ItemContentsStorage.get().setStorageContents(shulkerBoxUuid, contents);
-			ClientStorageContentsTooltipBase.refreshContents();
-		});
-		return true;
+	static void onMessage(StorageContentsMessage msg, Supplier<NetworkEvent.Context> contextSupplier) {
+		NetworkEvent.Context context = contextSupplier.get();
+		context.enqueueWork(() -> handleMessage(msg));
+		context.setPacketHandled(true);
 	}
 
+	private static void handleMessage(StorageContentsMessage msg) {
+		LocalPlayer player = Minecraft.getInstance().player;
+		if (player == null || msg.contents == null) {
+			return;
+		}
+
+		ItemContentsStorage.get().setStorageContents(msg.shulkerBoxUuid, msg.contents);
+		ClientStorageContentsTooltipBase.refreshContents();
+	}
 }

@@ -1,7 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.compression;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -91,12 +89,12 @@ public class CompressionInventoryPartTest {
 
 	private InventoryHandler getFilledInventoryHandler(Map<Integer, ItemStack> slotStacks, int baseSlotLimit) {
 		InventoryHandler inventoryHandler = Mockito.mock(InventoryHandler.class);
-		when(inventoryHandler.getBaseStackLimit(any(ItemVariant.class))).thenAnswer(i -> {
-			ItemVariant resource = i.getArgument(0);
-			int limit = MathHelper.intMaxCappedMultiply(resource.getItem().getMaxStackSize(), (baseSlotLimit / 64));
+		when(inventoryHandler.getBaseStackLimit(any(ItemStack.class))).thenAnswer(i -> {
+			ItemStack stack = i.getArgument(0);
+			int limit = MathHelper.intMaxCappedMultiply(stack.getMaxStackSize(), (baseSlotLimit / 64));
 			int remainder = baseSlotLimit % 64;
 			if (remainder > 0) {
-				limit = MathHelper.intMaxCappedAddition(limit, remainder * resource.getItem().getMaxStackSize() / 64);
+				limit = MathHelper.intMaxCappedAddition(limit, remainder * stack.getMaxStackSize() / 64);
 			}
 			return limit;
 		});
@@ -125,7 +123,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("compactsStacksOnInit")
 	void compactsStacksOnInit(Map<Integer, ItemStack> slotStacksInput, Map<Integer, ItemStack> slotStacksModified, int baseSlotLimit) {
 		InventoryHandler invHandler = getFilledInventoryHandler(slotStacksInput, baseSlotLimit);
 		int minSlot = Collections.min(slotStacksInput.keySet());
@@ -196,7 +194,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("calculatedStacksCorrectOnInit")
 	void calculatedStacksCorrectOnInit(Map<Integer, ItemStack> slotStacksInput, Map<Integer, ItemStack> calculatedStacks, int baseSlotLimit) {
 		InventoryHandler invHandler = getFilledInventoryHandler(slotStacksInput, baseSlotLimit);
 		int minSlot = Collections.min(slotStacksInput.keySet());
@@ -259,19 +257,14 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("extractItemUpdatesStacks")
 	void extractItemUpdatesStacks(Map<Integer, ItemStack> internalStacksBefore, int baseSlotLimit, int extractSlot, int extractAmount, ItemStack extractResult, Map<Integer, ItemStack> internalStacksUpdated, Map<Integer, ItemStack> calculatedStacksAfter) {
 		InventoryHandler invHandler = getFilledInventoryHandler(internalStacksBefore, baseSlotLimit);
 		int minSlot = Collections.min(internalStacksBefore.keySet());
 
 		CompressionInventoryPart part = initCompressionInventoryPart(internalStacksBefore, invHandler, minSlot);
 
-		ItemVariant variant = part.getVariantInSlot(extractSlot, s -> ItemVariant.blank());
-		ItemStack result;
-		try (Transaction ctx = Transaction.openOuter()) {
-			result = variant.toStack((int) part.extractItem(extractSlot, variant, extractAmount, ctx));
-			ctx.commit();
-		}
+		ItemStack result = part.extractItem(extractSlot, extractAmount, false);
 
 		assertStackEquals(extractResult, result, "Extract result doesn't match");
 		assertCalculatedStacks(calculatedStacksAfter, minSlot, part);
@@ -384,18 +377,14 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("simulatedExtractItemDoesNotUpdateStacks")
 	void simulatedExtractItemDoesNotUpdateStacks(Map<Integer, ItemStack> internalStacksBefore, Map<Integer, ItemStack> calculatedStacksBefore, int baseSlotLimit, int extractSlot, int extractAmount, ItemStack extractResult) {
 		InventoryHandler invHandler = getFilledInventoryHandler(internalStacksBefore, baseSlotLimit);
 		int minSlot = Collections.min(internalStacksBefore.keySet());
 
 		CompressionInventoryPart part = initCompressionInventoryPart(internalStacksBefore, invHandler, minSlot);
 
-		ItemVariant variant = part.getVariantInSlot(extractSlot, s -> ItemVariant.blank());
-		ItemStack result;
-		try (Transaction ctx = Transaction.openOuter()) {
-			result = variant.toStack((int) part.extractItem(extractSlot, variant, extractAmount, ctx));
-		}
+		ItemStack result = part.extractItem(extractSlot, extractAmount, true);
 
 		assertStackEquals(extractResult, result, "Extract result doesn't match");
 		assertCalculatedStacks(calculatedStacksBefore, minSlot, part);
@@ -439,8 +428,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(params.internalStacksBefore, invHandler, minSlot);
 
-		ItemVariant variant = ItemVariant.of(params.stack);
-		ItemStack result = variant.toStack(params.stack.getCount() - (int) part.insertItem(params.insertSlot, variant, params.stack.getCount(), null, (slot, resource, amount, context) -> 0L));
+		ItemStack result = part.insertItem(params.insertSlot, params.stack, false, (slot, itemStack, simulate) -> ItemStack.EMPTY);
 
 		assertStackEquals(params.insertResult, result, "Insert result doesn't match");
 		assertCalculatedStacks(params.calculatedStacksAfter, minSlot, part);
@@ -605,11 +593,11 @@ public class CompressionInventoryPartTest {
 		InventoryHandler invHandler = getFilledInventoryHandler(slotStacksInput, 64);
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> getMemorySettings(invHandler, Map.of()));
-		part.extractItem(0, null, 63, null);
+		part.extractItem(0, 63, false);
 
-		long inserted = part.insertItem(1, ItemVariant.of(Items.GOLD_NUGGET), 10, null, (s, res, amount, nested) -> 10L);
+		ItemStack insertResult = part.insertItem(1, new ItemStack(Items.GOLD_NUGGET, 10), false, (s, st, sim) -> ItemStack.EMPTY);
 
-		assertEquals(10L, inserted);
+		assertEquals(ItemStack.EMPTY, insertResult);
 	}
 
 	@Test
@@ -619,9 +607,9 @@ public class CompressionInventoryPartTest {
 		when(memorySettings.getSlotFilterStack(eq(0), anyBoolean())).thenReturn(Optional.of(new ItemStack(Items.IRON_BLOCK)));
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> memorySettings);
-		part.extractItem(0, null, 32, null);
+		part.extractItem(0, 32, false);
 
-		assertEquals(0L, part.insertItem(1, ItemVariant.of(Items.GOLD_BLOCK), 32, null, (s, res, amount, nested) -> 0L), "Insert result does not equal");
+		assertStackEquals(new ItemStack(Items.GOLD_BLOCK, 32), part.insertItem(1, new ItemStack(Items.GOLD_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
 	}
 
 	@Test
@@ -632,13 +620,8 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(0, 3), () -> memorySettings);
 
-		long inserted;
-		try (Transaction simulate = Transaction.openOuter()) {
-			inserted = part.insertItem(1, ItemVariant.of(Items.GOLD_BLOCK), 32, simulate, (s, res, amount, nested) -> 0L);
-		}
-
-		assertEquals(0L, inserted, "Insert result does not equal");
-		assertEquals(32L, part.insertItem(1, ItemVariant.of(Items.IRON_BLOCK), 32, null, (s, res, amount, nested) -> 32L), "Insert result does not equal");
+		assertStackEquals(new ItemStack(Items.GOLD_BLOCK, 32), part.insertItem(1, new ItemStack(Items.GOLD_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
+		assertStackEquals(ItemStack.EMPTY, part.insertItem(1, new ItemStack(Items.IRON_BLOCK, 32), true, (s, st, sim) -> ItemStack.EMPTY), "Insert result does not equal");
 	}
 
 	@ParameterizedTest
@@ -702,7 +685,7 @@ public class CompressionInventoryPartTest {
 
 		ItemStack damagedItem = new ItemStack(Items.NETHERITE_AXE);
 		damagedItem.setDamageValue(10);
-		part.insertItem(1, ItemVariant.of(damagedItem), damagedItem.getCount(), null, (s, res, amount, nested) -> (long) damagedItem.getCount());
+		part.insertItem(1, damagedItem, false, (s, st, sim) -> ItemStack.EMPTY);
 
 		assertStackEquals(damagedItem, part.getStackInSlot(1, s -> ItemStack.EMPTY), "Damaged item doesn't match");
 	}
@@ -723,17 +706,14 @@ public class CompressionInventoryPartTest {
 		ItemStack damagedItem = new ItemStack(Items.NETHERITE_AXE);
 		damagedItem.setDamageValue(10);
 
-		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, damagedItem.copy(), 2, ItemStack.EMPTY), 64);
+		InventoryHandler invHandler = getFilledInventoryHandler(Map.of(0, ItemStack.EMPTY, 1, damagedItem, 2, ItemStack.EMPTY), 64);
 		int minSlot = 0;
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
-		ItemVariant resource = part.getVariantInSlot(1, s -> ItemVariant.blank());
-		ItemStack extracted;
-		try (Transaction ctx = Transaction.openOuter()) {
-			extracted = resource.toStack((int) part.extractItem(1, resource, 1, ctx));
-		}
-		assertStackEquals(damagedItem, extracted, "Extracted item doesn't match");
+		ItemStack damagedItemToMatch = new ItemStack(Items.NETHERITE_AXE);
+		damagedItemToMatch.setDamageValue(10);
+		assertStackEquals(damagedItemToMatch, part.extractItem(1, 1, false), "Extracted item doesn't match");
 	}
 
 	@Test
@@ -743,10 +723,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + 3), () -> getMemorySettings(invHandler, Map.of()));
 
-		ItemVariant resource = part.getVariantInSlot(1, s -> ItemVariant.blank());
-		ItemStack extracted = resource.toStack((int) part.extractItem(1, null, 1, null));
-
-		assertStackEquals(new ItemStack(Items.COBBLESTONE, 1), extracted, "Extracted item doesn't match");
+		assertStackEquals(new ItemStack(Items.COBBLESTONE, 1), part.extractItem(1, 1, false), "Extracted item doesn't match");
 		assertStackEquals(new ItemStack(Items.COBBLESTONE, 9), part.getStackInSlot(1, s -> ItemStack.EMPTY), "Item left in slot doesn't match");
 	}
 
@@ -758,7 +735,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
-		params.expectedLimits().forEach((slot, stackLimit) -> assertEquals(stackLimit.getRight(), part.getStackLimit(slot, ItemVariant.of(stackLimit.getLeft())), "Stack limit doesn't match"));
+		params.expectedLimits().forEach((slot, stackLimit) -> assertEquals(stackLimit.getRight(), part.getStackLimit(slot, stackLimit.getLeft()), "Stack limit doesn't match"));
 	}
 
 	private record StackLimitsAreSetCorrectlyOnInitParams(Map<Integer, ItemStack> stacks, int baseLimit,
@@ -799,15 +776,14 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("insertingAdditionalUncompressibleItemsProperlyCalculatesCount")
 	void insertingAdditionalUncompressibleItemsProperlyCalculatesCount(InsertingAdditionalUncompressibleItemsProperlyCalculatesCountParams params) {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
-		ItemStack stack = params.insertedStack.getRight();
-		part.insertItem(params.insertedStack.getLeft(), ItemVariant.of(stack), stack.getCount(), null, (slot, resource, amount, nested) -> 0L);
+		part.insertItem(params.insertedStack.getLeft(), params.insertedStack.getRight(), false, (slot, itemStack, simulate) -> ItemStack.EMPTY);
 
 		assertCalculatedStacks(params.expectedStacksSet(), 0, part);
 		assertInternalStacks(params.expectedStacksSet(), invHandler);
@@ -850,7 +826,7 @@ public class CompressionInventoryPartTest {
 
 		CompressionInventoryPart part = initCompressionInventoryPart(invHandler, new SlotRange(minSlot, minSlot + params.stacks().size()), () -> getMemorySettings(invHandler, Map.of()));
 
-		part.extractItem(params.extractedStack.getLeft(), null, params.extractedStack.getRight(), null);
+		part.extractItem(params.extractedStack.getLeft(), params.extractedStack.getRight(), false);
 
 		assertCalculatedStacks(params.expectedCalculatedStacks(), 0, part);
 	}
@@ -899,7 +875,7 @@ public class CompressionInventoryPartTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource
+	@MethodSource("initializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacks")
 	void initializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacks(InitializingWithPartiallyNonCompressibleItemsDoesntCrashAndAllowsAccessToNonCompressedStacksParams params) {
 		InventoryHandler invHandler = getFilledInventoryHandler(params.stacks(), params.baseLimit());
 		int minSlot = 0;

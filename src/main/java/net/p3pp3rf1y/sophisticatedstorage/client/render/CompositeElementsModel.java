@@ -1,10 +1,14 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
+import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.BlockModelGeometryBakingContext;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.models.BlockModelWrapper;
+import com.github.salandora.sophisticatedlibrary.model.api.v1.models.ElementsModel;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -30,11 +34,15 @@ public class CompositeElementsModel extends BlockModel {
 	public BakedModel bake(ModelBaker modelBaker, BlockModel owner, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ResourceLocation modelLocation, boolean guiLight3d) {
 		if (getRootModel() == ModelBakery.BLOCK_ENTITY_MARKER) {
 			var particleSprite = spriteGetter.apply(getMaterial("particle"));
-			return new BuiltInModel(getTransforms(), getOverrides(modelBaker, owner, spriteGetter), particleSprite, getGuiLight().lightLikeBlock());
+			return new BuiltInModel(getTransforms(), getOverrides(modelBaker, owner), particleSprite, getGuiLight().lightLikeBlock());
 		}
 
 		var elementsModel = new ElementsModel(getElements());
-		return elementsModel.bake(this, modelBaker, spriteGetter, modelState, getOverrides(modelBaker, owner, spriteGetter), modelLocation);
+		return elementsModel.bake(new BlockModelGeometryBakingContext(this), modelBaker, spriteGetter, modelState, getOverrides(modelBaker, owner), modelLocation);
+	}
+
+	private ItemOverrides getOverrides(ModelBaker baker, BlockModel model) {
+		return getOverrides().isEmpty() ? ItemOverrides.EMPTY : new ItemOverrides(baker, model, getOverrides());
 	}
 
 	@SuppressWarnings("java:S1874") //overriding getElements here
@@ -55,7 +63,7 @@ public class CompositeElementsModel extends BlockModel {
 	private void copyElementsFromAllIncludedModels() {
 		if (parent != null) {
 			elements.addAll(parent.getElements());
-			if (parent.getCustomGeometry() instanceof SimpleCompositeModel simpleCompositeModel) {
+			if (parent instanceof BlockModelWrapper wrapper && wrapper.getWrapper() instanceof SimpleCompositeModel simpleCompositeModel) {
 				elements.addAll(simpleCompositeModel.getElements());
 			}
 		}
@@ -65,7 +73,7 @@ public class CompositeElementsModel extends BlockModel {
 	private void copyTexturesFromAllIncludedModels() {
 		if (parent != null) {
 			((BlockModelAccessor) parent).getTextureMap().forEach(((BlockModelAccessor) this).getTextureMap()::putIfAbsent);
-			if (parent.getCustomGeometry() instanceof SimpleCompositeModel simpleCompositeModel) {
+			if (parent instanceof BlockModelWrapper wrapper && wrapper.getWrapper() instanceof SimpleCompositeModel simpleCompositeModel) {
 				simpleCompositeModel.getTextures().forEach(((BlockModelAccessor) this).getTextureMap()::putIfAbsent);
 			}
 		}

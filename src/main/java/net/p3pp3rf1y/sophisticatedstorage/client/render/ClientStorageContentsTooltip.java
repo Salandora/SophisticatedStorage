@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.client.render.ClientStorageContentsTooltipBase;
-import net.p3pp3rf1y.sophisticatedstorage.common.CapabilityStorageWrapper;
+import net.p3pp3rf1y.sophisticatedstorage.item.CapabilityStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedstorage.network.RequestStorageContentsMessage;
 import net.p3pp3rf1y.sophisticatedstorage.network.StoragePacketHandler;
@@ -24,7 +24,7 @@ public class ClientStorageContentsTooltip extends ClientStorageContentsTooltipBa
 
 	@Override
 	public void renderImage(Font font, int leftX, int topY, GuiGraphics guiGraphics) {
-		CapabilityStorageWrapper.get(storageItem).ifPresent(wrapper -> renderTooltip(wrapper, font, leftX, topY, guiGraphics));
+		storageItem.sophisticatedLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance()).ifPresent(wrapper -> renderTooltip(wrapper, font, leftX, topY, guiGraphics));
 	}
 
 	public ClientStorageContentsTooltip(StorageContentsTooltip tooltip) {
@@ -33,6 +33,6 @@ public class ClientStorageContentsTooltip extends ClientStorageContentsTooltipBa
 
 	@Override
 	protected void sendInventorySyncRequest(UUID uuid) {
-		StoragePacketHandler.sendToServer(new RequestStorageContentsMessage(uuid));
+		StoragePacketHandler.INSTANCE.sendToServer(new RequestStorageContentsMessage(uuid));
 	}
 }

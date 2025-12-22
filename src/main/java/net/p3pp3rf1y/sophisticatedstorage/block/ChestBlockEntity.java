@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import com.github.salandora.sophisticatedlibrary.util.LazyOptional;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -131,7 +131,6 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 	}
 
 	private <T extends ISettingsCategory<?>> void copyCategorySettings(ISettingsCategory<T> category, ISettingsCategory<?> mainCategory, int startFromSlot, int slotOffset) {
-		//noinspection unchecked
 		category.copyTo((T) mainCategory, startFromSlot, slotOffset);
 	}
 
@@ -195,9 +194,6 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlotCount(); slot++) {
 				ItemStack slotStack = mainInventoryHandler.getSlotStack(slot);
 				be.getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, slotStack.split(slotStack.getMaxStackSize()));
-
-				// TODO: Remove after rewrite as this is not necessary anymore then
-				mainInventoryHandler.setSlotStack(slot, slotStack);
 			}
 
 			copySettings(this, be, firstIndex, -firstIndex);
@@ -320,16 +316,16 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 
 	@NotNull
 	@Override
-	public <T, C> LazyOptional<T> getCapability(BlockApiLookup<T, C> cap, @Nullable C opt) {
+	public <T> LazyOptional<T> getCapability(BlockApiLookup<T, Direction> cap, @Nullable Direction side) {
 		if (level == null) {
 			return LazyOptional.empty();
 		}
 
 		if (doubleMainPos != null) {
-			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getCapability(cap, opt)).orElseGet(LazyOptional::empty);
+			return level.getBlockEntity(doubleMainPos, ModBlocks.CHEST_BLOCK_ENTITY_TYPE).map(be -> be.getCapability(cap, side)).orElseGet(LazyOptional::empty);
 		}
 
-		return super.getCapability(cap, opt);
+		return super.getCapability(cap, side);
 	}
 
 	public boolean isMainChest() {

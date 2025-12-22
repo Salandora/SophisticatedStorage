@@ -1,9 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
+import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -86,10 +84,7 @@ public class PaintbrushItem extends ItemBase {
 
 	public static Optional<ItemRequirements> getItemRequirements(ItemStack paintbrush, Player player, Map<ResourceLocation, Integer> allPartsNeeded) {
 		Map<ResourceLocation, Integer> remainingParts = getRemainingParts(paintbrush);
-		DecorationHelper.ConsumptionResult result;
-		try (Transaction simulate = Transaction.openOuter()) {
-			result = DecorationHelper.consumeMaterialPartsNeeded(allPartsNeeded, remainingParts, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), simulate);
-		}
+		DecorationHelper.ConsumptionResult result = DecorationHelper.consumeMaterialPartsNeeded(allPartsNeeded, remainingParts, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), true);
 
 		List<ItemStack> itemsPresent = new ArrayList<>();
 		List<ItemStack> itemsMissing = new ArrayList<>();
@@ -144,11 +139,7 @@ public class PaintbrushItem extends ItemBase {
 
 	public static @NotNull Optional<ItemRequirements> getDyeItemRequirements(ItemStack paintbrush, Player player, Map<TagKey<Item>, Integer> allPartsNeeded) {
 		Map<ResourceLocation, Integer> remainingParts = getRemainingParts(paintbrush);
-
-		DecorationHelper.ConsumptionResult result;
-		try (Transaction simulate = Transaction.openOuter()) {
-			result = DecorationHelper.consumeDyePartsNeeded(allPartsNeeded, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), remainingParts, simulate);
-		}
+		DecorationHelper.ConsumptionResult result = DecorationHelper.consumeDyePartsNeeded(allPartsNeeded, InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player), remainingParts, true);
 
 		return compileDyeItemRequirements(allPartsNeeded, remainingParts, result);
 	}
@@ -204,7 +195,7 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult onItemUseFirst(ItemStack paintbrush, UseOnContext context) {
+	public InteractionResult sophisticatedLibrary_onItemUseFirst(ItemStack paintbrush, UseOnContext context) {
 		if (!hasMainColor(paintbrush) && !hasAccentColor(paintbrush) && !hasBarrelMaterials(paintbrush)) {
 			return InteractionResult.PASS;
 		}
@@ -280,7 +271,7 @@ public class PaintbrushItem extends ItemBase {
 
 	public static boolean setColors(Player player, ItemStack paintbrush, ITintable tintable, @Nullable IMaterialHolder materialHolder) {
 		Map<ResourceLocation, Integer> remainingParts = new HashMap<>(getRemainingParts(paintbrush));
-		List<Storage<ItemVariant>> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
+		List<IItemHandler> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
 		int mainColorToSet = getMainColor(paintbrush) & 0x00FFFFFF;
 		int accentColorToSet = getAccentColor(paintbrush) & 0x00FFFFFF;
 
@@ -291,10 +282,8 @@ public class PaintbrushItem extends ItemBase {
 			return false;
 		}
 
-		try (Transaction simulate = Transaction.openOuter()) {
-			if (!DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, simulate)) {
-				return false;
-			}
+		if (!DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, true)) {
+			return false;
 		}
 
 		tintable.setColors(mainColorToSet & 0x00FFFFFF, accentColorToSet & 0x00FFFFFF);
@@ -303,16 +292,13 @@ public class PaintbrushItem extends ItemBase {
 			materialHolder.setMaterials(Collections.emptyMap());
 		}
 
-		try (Transaction consume = Transaction.openOuter()) {
-			DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, consume);
-			consume.commit();
-		}
+		DecorationHelper.consumeDyes(mainColorToSet, accentColorToSet, remainingParts, itemHandlers, originalMainColor, originalAccentColor, false);
 		setRemainingParts(paintbrush, remainingParts);
 		return true;
 	}
 
 	private static boolean applyMaterials(Player player, ItemStack paintbrush, IMaterialHolder materialHolder, ITintable tintable) {
-		List<Storage<ItemVariant>> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
+		List<IItemHandler> itemHandlers = InventoryHelper.getItemHandlersFromPlayerIncludingContainers(player);
 		Map<ResourceLocation, Integer> remainingParts = new HashMap<>(getRemainingParts(paintbrush));
 
 		Map<BarrelMaterial, ResourceLocation> originalMaterials = new HashMap<>(materialHolder.getMaterials());
@@ -323,16 +309,11 @@ public class PaintbrushItem extends ItemBase {
 
 		BarrelBlockItem.uncompactMaterials(originalMaterials);
 
-		try (Transaction simulate = Transaction.openOuter()) {
-			if (!DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, simulate)) {
-				return false;
-			}
+		if (!DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, true)) {
+			return false;
 		}
 
-		try (Transaction consume = Transaction.openOuter()) {
-			DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, consume);
-			consume.commit();
-		}
+		DecorationHelper.consumeMaterials(remainingParts, itemHandlers, originalMaterials, materialsToApply, false);
 		setRemainingParts(paintbrush, remainingParts);
 
 		tintable.setColors(-1, -1);

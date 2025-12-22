@@ -9,9 +9,9 @@ import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 public class StackStorageWrapper extends StorageWrapper {
 	private static final String CONTENTS_TAG = "contents";

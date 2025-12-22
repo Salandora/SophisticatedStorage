@@ -1,8 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -35,7 +32,6 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
@@ -89,13 +85,13 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+	public boolean sophisticatedLibrary_addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
 		level.sendParticles(new CustomTintTerrainParticleData(state1, pos), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15D);
 		return true;
 	}
 
 	@Override
-	public boolean addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
+	public boolean sophisticatedLibrary_addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
 		Vec3 vec3 = entity.getDeltaMovement();
 		level.addParticle(new CustomTintTerrainParticleData(state, pos),
 				entity.getX() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(), entity.getY() + 0.1D, entity.getZ() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(),
@@ -103,22 +99,18 @@ public class BarrelBlock extends WoodStorageBlockBase {
 		return true;
 	}
 
-	@Environment(EnvType.CLIENT)
+	// In ClientEventHandler
+	/*@OnlyIn(Dist.CLIENT)
 	@Override
-	public boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
-		return BarrelBlockClientExtensions.addHitEffects(this, state, level, target, manager);
-	}
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
-		return BarrelBlockClientExtensions.addDestroyEffects(this, state, level, pos, manager);
-	}
+	public void initializeClient(Consumer<IClientBlockExtensions> consumer) {
+		consumer.accept(new BarrelBlockClientExtensions(this));
+	}*/
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		return WorldHelper.getBlockEntity(level, pos, WoodStorageBlockEntity.class).map(b -> {
+			ItemStack stackInHand = player.getItemInHand(hand);
 			if (b.isPacked()) {
 				return InteractionResult.PASS;
 			}
@@ -126,13 +118,12 @@ public class BarrelBlock extends WoodStorageBlockBase {
 				return InteractionResult.SUCCESS;
 			}
 
-			ItemStack stackInHand = player.getItemInHand(hand);
 			if (tryItemInteraction(player, hand, b, stackInHand, getFacing(state), hitResult)) {
 				return InteractionResult.SUCCESS;
 			}
 
 			player.awardStat(Stats.OPEN_BARREL);
-			player.sophisticatedCore_openMenu(
+			player.sophisticatedLibrary_openMenu(
 					new SimpleMenuProvider(
 							(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
 							WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())

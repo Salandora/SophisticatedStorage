@@ -1,8 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ISlotTracker;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
@@ -37,21 +34,19 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 		return itemHandlerGetter.get().getStackInSlot(slot);
 	}
 
+	@Nonnull
 	@Override
-	public SingleSlotStorage<ItemVariant> getSlot(int slot) {
-		return itemHandlerGetter.get().getSlot(slot);
-	}
-	@Override
-	public long insertSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		if (matchesContents(resource.toStack((int) maxAmount))) {
-			return itemHandlerGetter.get().insertSlot(slot, resource, maxAmount, ctx);
+	public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+		if (matchesContents(stack)) {
+			return itemHandlerGetter.get().insertItem(slot, stack, simulate);
 		}
-		return 0;
+		return stack;
 	}
 
+	@Nonnull
 	@Override
-	public long extractSlot(int slot, ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		return itemHandlerGetter.get().extractSlot(slot, resource, maxAmount, ctx);
+	public ItemStack extractItem(int slot, int amount, boolean simulate) {
+		return itemHandlerGetter.get().extractItem(slot, amount, simulate);
 	}
 
 	@Override
@@ -60,8 +55,8 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 	}
 
 	@Override
-	public boolean isItemValid(int slot, ItemVariant resource, int count) {
-		return matchesContents(resource.toStack(count)) && itemHandlerGetter.get().isItemValid(slot, resource, count);
+	public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+		return matchesContents(stack) && itemHandlerGetter.get().isItemValid(slot, stack);
 	}
 
 	private boolean matchesContents(ItemStack stack) {
@@ -69,16 +64,11 @@ public class ContentsFilteredItemHandler implements ITrackedContentsItemHandler 
 	}
 
 	@Override
-	public long insert(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		if (matchesContents(resource.toStack((int) maxAmount))) {
-			return itemHandlerGetter.get().insert(resource, maxAmount, ctx);
+	public ItemStack insertItem(ItemStack stack, boolean simulate) {
+		if (matchesContents(stack)) {
+			return itemHandlerGetter.get().insertItem(stack, simulate);
 		}
-		return 0;
-	}
-
-	@Override
-	public long extract(ItemVariant resource, long maxAmount, TransactionContext ctx) {
-		return itemHandlerGetter.get().extract(resource, maxAmount, ctx);
+		return stack;
 	}
 
 	@Override
