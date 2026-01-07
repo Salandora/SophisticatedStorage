@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.ItemStackHandler;
-import com.github.salandora.sophisticatedlibrary.util.Lazy;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.ItemStackHandler;
+import com.github.salandora.sophisticatedfabriclib.util.Lazy;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;

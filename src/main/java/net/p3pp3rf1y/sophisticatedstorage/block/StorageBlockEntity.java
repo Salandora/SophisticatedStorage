@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedfabriclib.common.api.v1.extensions.block.entity.SophisticatedBlockEntity;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.IItemHandler;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

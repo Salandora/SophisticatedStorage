@@ -1,11 +1,11 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.github.salandora.sophisticatedlibrary.model.api.v1.client.render.CustomParticleIcon;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryBakingContext;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IGeometryLoader;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.loading.IUnbakedGeometry;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelProperty;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.client.render.CustomParticleIcon;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.loading.IGeometryBakingContext;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.loading.IGeometryLoader;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.loading.IUnbakedGeometry;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.util.ModelData;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.util.ModelProperty;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockModelShaper;

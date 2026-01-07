@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
-import com.github.salandora.sophisticatedlibrary.util.Capabilities;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedfabriclib.util.Capabilities;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;

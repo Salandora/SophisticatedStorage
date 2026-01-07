@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
-import com.github.salandora.sophisticatedlibrary.common.api.v1.extensions.component.SophisticatedDataComponentHolder;
+import com.github.salandora.sophisticatedfabriclib.common.api.v1.extensions.component.SophisticatedDataComponentHolder;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;

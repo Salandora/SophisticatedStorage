@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
-import com.github.salandora.sophisticatedlibrary.util.DeferredHolder;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedfabriclib.util.DeferredHolder;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

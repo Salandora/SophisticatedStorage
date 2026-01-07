@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.common;
 
-import com.github.salandora.sophisticatedlibrary.network.api.v1.PacketDistributor;
+import com.github.salandora.sophisticatedfabriclib.network.api.v1.PacketDistributor;
 import com.google.common.collect.Queues;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
