@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import com.github.salandora.sophisticatedlibrary.common.api.v1.client.IClientBlockExtensions;
+import com.github.salandora.sophisticatedfabriclib.common.api.v1.client.IClientBlockExtensions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;

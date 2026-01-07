@@ -1,8 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.EmptyItemHandler;
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
-import com.github.salandora.sophisticatedlibrary.util.Capabilities;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.EmptyItemHandler;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedfabriclib.util.Capabilities;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

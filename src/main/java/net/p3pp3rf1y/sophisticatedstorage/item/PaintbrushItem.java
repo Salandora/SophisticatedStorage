@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.item;
 
-import com.github.salandora.sophisticatedlibrary.transfer.api.v1.IItemHandler;
+import com.github.salandora.sophisticatedfabriclib.transfer.api.v1.IItemHandler;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

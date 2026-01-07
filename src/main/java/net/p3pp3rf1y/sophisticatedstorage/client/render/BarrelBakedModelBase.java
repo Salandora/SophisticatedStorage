@@ -1,8 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.client.render;
 
-import com.github.salandora.sophisticatedlibrary.model.api.v1.client.render.CustomParticleIcon;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelData;
-import com.github.salandora.sophisticatedlibrary.model.api.v1.util.ModelProperty;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.client.render.CustomParticleIcon;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.util.ModelData;
+import com.github.salandora.sophisticatedfabriclib.model.api.v1.util.ModelProperty;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
