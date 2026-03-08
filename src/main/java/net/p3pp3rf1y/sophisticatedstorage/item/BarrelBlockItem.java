@@ -40,26 +40,26 @@ public class BarrelBlockItem extends WoodStorageBlockItem {
 
 	public static void setFlatTop(ItemStack stack, boolean flatTop) {
 		if (flatTop) {
-			stack.sophisticatedLibrary_set(ModDataComponents.FLAT_TOP, true);
+			stack.sophisticatedFabricLibrary_set(ModDataComponents.FLAT_TOP, true);
 		} else {
-			stack.sophisticatedLibrary_remove(ModDataComponents.FLAT_TOP);
+			stack.sophisticatedFabricLibrary_remove(ModDataComponents.FLAT_TOP);
 		}
 	}
 
 	public static boolean isFlatTop(SophisticatedDataComponentHolder componentHolder) {
-		return componentHolder.sophisticatedLibrary_getOrDefault(ModDataComponents.FLAT_TOP, false);
+		return componentHolder.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.FLAT_TOP, false);
 	}
 
 	public static void setMaterials(ItemStack barrel, Map<BarrelMaterial, ResourceLocation> materials) {
-		barrel.sophisticatedLibrary_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
+		barrel.sophisticatedFabricLibrary_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getMaterials(ItemStack barrel) {
-		return barrel.sophisticatedLibrary_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of());
+		return barrel.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.BARREL_MATERIALS, Map.of());
 	}
 
 	public static void removeMaterials(ItemStack stack) {
-		stack.sophisticatedLibrary_remove(ModDataComponents.BARREL_MATERIALS);
+		stack.sophisticatedFabricLibrary_remove(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	public static void uncompactMaterials(Map<BarrelMaterial, ResourceLocation> materials) {

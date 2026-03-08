@@ -36,11 +36,11 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     public static void setPacked(ItemStack storageStack, boolean packed) {
-        storageStack.sophisticatedLibrary_set(ModDataComponents.PACKED, packed);
+        storageStack.sophisticatedFabricLibrary_set(ModDataComponents.PACKED, packed);
     }
 
     public static boolean isPacked(ItemStack storageStack) {
-        return storageStack.sophisticatedLibrary_getOrDefault(ModDataComponents.PACKED, false);
+        return storageStack.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.PACKED, false);
     }
 
     @Override
@@ -91,15 +91,15 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     private void removeWoodType(ItemStack storageStack) {
-        storageStack.sophisticatedLibrary_remove(ModDataComponents.WOOD_TYPE);
+        storageStack.sophisticatedFabricLibrary_remove(ModDataComponents.WOOD_TYPE);
     }
 
     public static Optional<WoodType> getWoodType(SophisticatedDataComponentHolder componentHolder) {
-        return Optional.ofNullable(componentHolder.sophisticatedLibrary_get(ModDataComponents.WOOD_TYPE));
+        return Optional.ofNullable(componentHolder.sophisticatedFabricLibrary_get(ModDataComponents.WOOD_TYPE));
     }
 
     public static ItemStack setWoodType(ItemStack storageStack, WoodType woodType) {
-        storageStack.sophisticatedLibrary_set(ModDataComponents.WOOD_TYPE, woodType);
+        storageStack.sophisticatedFabricLibrary_set(ModDataComponents.WOOD_TYPE, woodType);
         return storageStack;
     }
 

@@ -103,7 +103,7 @@ public class StorageLinkBlockEntity extends BlockEntity implements ILinkable, So
 	}
 
 	@Override
-	public void sophisticatedLibrary_onChunkUnloaded() {
+	public void sophisticatedFabricLibrary_onChunkUnloaded() {
 		// super.sophisticatedCore_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}

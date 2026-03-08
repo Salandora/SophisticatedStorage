@@ -14,10 +14,10 @@ public class ChestBlockItem extends WoodStorageBlockItem {
 	}
 
 	public static boolean isDoubleChest(ItemStack stack) {
-		return stack.sophisticatedLibrary_getOrDefault(ModDataComponents.DOUBLE_CHEST, false);
+		return stack.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.DOUBLE_CHEST, false);
 	}
 
 	public static void setDoubleChest(ItemStack stack, boolean doubleChest) {
-		stack.sophisticatedLibrary_set(ModDataComponents.DOUBLE_CHEST, doubleChest);
+		stack.sophisticatedFabricLibrary_set(ModDataComponents.DOUBLE_CHEST, doubleChest);
 	}
 }

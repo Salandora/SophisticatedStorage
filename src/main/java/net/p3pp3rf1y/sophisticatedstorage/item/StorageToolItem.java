@@ -59,7 +59,7 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult sophisticatedLibrary_onItemUseFirst(ItemStack tool, UseOnContext context) {
+	public InteractionResult sophisticatedFabricLibrary_onItemUseFirst(ItemStack tool, UseOnContext context) {
 		BlockPos pos = context.getClickedPos();
 		Level level = context.getLevel();
 		Block blockClicked = level.getBlockState(pos).getBlock();
@@ -101,7 +101,7 @@ public class StorageToolItem extends ItemBase {
 				}
 			}
 		}
-		return super.sophisticatedLibrary_onItemUseFirst(tool, context);
+		return super.sophisticatedFabricLibrary_onItemUseFirst(tool, context);
 	}
 
 	private static <T> boolean tryToggling(BlockPos pos, Level level, Class<T> clazz, Consumer<T> toggle) {
@@ -140,15 +140,15 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	private void setControllerLink(ItemStack tool, BlockPos pos) {
-		tool.sophisticatedLibrary_set(ModDataComponents.CONTROLLER_POS, pos);
+		tool.sophisticatedFabricLibrary_set(ModDataComponents.CONTROLLER_POS, pos);
 	}
 
 	public static Optional<BlockPos> getControllerLink(ItemStack tool) {
-		return Optional.ofNullable(tool.sophisticatedLibrary_get(ModDataComponents.CONTROLLER_POS));
+		return Optional.ofNullable(tool.sophisticatedFabricLibrary_get(ModDataComponents.CONTROLLER_POS));
 	}
 
 	private void removeControllerLink(ItemStack tool) {
-		tool.sophisticatedLibrary_remove(ModDataComponents.CONTROLLER_POS);
+		tool.sophisticatedFabricLibrary_remove(ModDataComponents.CONTROLLER_POS);
 	}
 
 	public static Component getOverlayMessage(ItemStack tool) {
@@ -173,11 +173,11 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	public static Mode getMode(ItemStack tool) {
-		return tool.sophisticatedLibrary_getOrDefault(ModDataComponents.TOOL_MODE, Mode.LINK);
+		return tool.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.TOOL_MODE, Mode.LINK);
 	}
 
 	public static void cycleMode(ItemStack tool, boolean next) {
-		tool.sophisticatedLibrary_set(ModDataComponents.TOOL_MODE, next ? getMode(tool).next() : getMode(tool).previous());
+		tool.sophisticatedFabricLibrary_set(ModDataComponents.TOOL_MODE, next ? getMode(tool).next() : getMode(tool).previous());
 	}
 
 	public enum Mode implements StringRepresentable {

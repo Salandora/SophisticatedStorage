@@ -155,7 +155,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 
 	protected void invalidateItemHandlerCache() {
 		controllerItemHandlerCache = null;
-		sophisticatedLibrary_invalidateCapabilities();
+		sophisticatedFabricLibrary_invalidateCapabilities();
 	}
 
 	@Nullable
@@ -181,8 +181,8 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	@Override
-	public void sophisticatedLibrary_onChunkUnloaded() {
-		SophisticatedBlockEntity.super.sophisticatedLibrary_onChunkUnloaded();
+	public void sophisticatedFabricLibrary_onChunkUnloaded() {
+		SophisticatedBlockEntity.super.sophisticatedFabricLibrary_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 

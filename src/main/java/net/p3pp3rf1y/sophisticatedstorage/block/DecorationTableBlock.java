@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
@@ -58,7 +57,7 @@ public class DecorationTableBlock extends BlockBase implements EntityBlock {
 			return InteractionResult.SUCCESS;
 		}
 
-		player.sophisticatedCore_openMenu(new SimpleMenuProvider((w, p, pl) -> new DecorationTableMenu(w, pl, pos), getName()), pos);
+		player.sophisticatedFabricLibrary_openMenu(new SimpleMenuProvider((w, p, pl) -> new DecorationTableMenu(w, pl, pos), getName()), pos);
 
 		return InteractionResult.CONSUME;
 	}

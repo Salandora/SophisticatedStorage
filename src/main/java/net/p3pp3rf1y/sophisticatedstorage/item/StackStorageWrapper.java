@@ -26,7 +26,7 @@ public class StackStorageWrapper extends StorageWrapper {
 
 	public static StackStorageWrapper fromStack(HolderLookup.Provider registries, ItemStack stack) {
 		StackStorageWrapper stackStorageWrapper = StorageWrapperRepository.getStorageWrapper(stack, StackStorageWrapper.class, StackStorageWrapper::new);
-		UUID uuid = stack.sophisticatedLibrary_get(ModCoreDataComponents.STORAGE_UUID);
+		UUID uuid = stack.sophisticatedFabricLibrary_get(ModCoreDataComponents.STORAGE_UUID);
 		if (uuid != null) {
 			CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
 			stackStorageWrapper.load(compoundtag);
@@ -55,7 +55,7 @@ public class StackStorageWrapper extends StorageWrapper {
 	public void setContentsUuid(@Nullable UUID contentsUuid) {
 		super.setContentsUuid(contentsUuid);
 		if (contentsUuid != null) {
-			storageStack.sophisticatedLibrary_set(ModCoreDataComponents.STORAGE_UUID, contentsUuid);
+			storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.STORAGE_UUID, contentsUuid);
 			ItemContentsStorage itemContentsStorage = ItemContentsStorage.get();
 			CompoundTag storageContents = itemContentsStorage.getOrCreateStorageContents(contentsUuid);
 			if (!storageContents.contains(StorageBlockEntity.STORAGE_WRAPPER_TAG)) {
@@ -94,8 +94,8 @@ public class StackStorageWrapper extends StorageWrapper {
 			numberOfInventorySlots = wrapperTag.getInt(StorageWrapper.NUMBER_OF_INVENTORY_SLOTS_TAG);
 			numberOfUpgradeSlots = wrapperTag.getInt(StorageWrapper.NUMBER_OF_UPGRADE_SLOTS_TAG);
 		}, () -> {
-			numberOfInventorySlots = storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
-			numberOfUpgradeSlots = storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+			numberOfInventorySlots = storageStack.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
+			numberOfUpgradeSlots = storageStack.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
 		});
 	}
 
@@ -130,30 +130,30 @@ public class StackStorageWrapper extends StorageWrapper {
 
 	@Override
 	public void setColors(int mainColor, int accentColor) {
-		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
-		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
+		storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
 		save();
 	}
 
 	@Override
 	public int getMainColor() {
-		return storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
+		return storageStack.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
 	}
 
 
 	@Override
 	public boolean hasMainColor() {
-		return storageStack.sophisticatedLibrary_has(ModCoreDataComponents.MAIN_COLOR);
+		return storageStack.sophisticatedFabricLibrary_has(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	@Override
 	public int getAccentColor() {
-		return storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
+		return storageStack.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
 	}
 
 	@Override
 	public boolean hasAccentColor() {
-		return storageStack.sophisticatedLibrary_has(ModCoreDataComponents.ACCENT_COLOR);
+		return storageStack.sophisticatedFabricLibrary_has(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 }

@@ -43,12 +43,12 @@ public class HopperUpgradeContainer extends UpgradeContainerBase<HopperUpgradeWr
 	}
 
 	private void addInputFilterSlot(Slot slot) {
-		slot.sophisticatedLibrary_setBackground(EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getSecond());
+		slot.sophisticatedFabricLibrary_setBackground(EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_INPUT_FILTER_SLOT_BACKGROUND.getSecond());
 		slots.add(slot);
 	}
 
 	private void addOutputFilterSlot(Slot slot) {
-		slot.sophisticatedLibrary_setBackground(EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getSecond());
+		slot.sophisticatedFabricLibrary_setBackground(EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getFirst(), EMPTY_OUTPUT_FILTER_SLOT_BACKGROUND.getSecond());
 		slots.add(slot);
 	}
 

@@ -54,7 +54,7 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	public static void setBarrelMaterials(ItemStack paintbrush, Map<BarrelMaterial, ResourceLocation> materials) {
-		paintbrush.sophisticatedLibrary_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
+		paintbrush.sophisticatedFabricLibrary_set(ModDataComponents.BARREL_MATERIALS, Map.copyOf(materials));
 		resetMainColor(paintbrush);
 		resetAccentColor(paintbrush);
 	}
@@ -199,7 +199,7 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult sophisticatedLibrary_onItemUseFirst(ItemStack paintbrush, UseOnContext context) {
+	public InteractionResult sophisticatedFabricLibrary_onItemUseFirst(ItemStack paintbrush, UseOnContext context) {
 		if (!hasMainColor(paintbrush) && !hasAccentColor(paintbrush) && !hasBarrelMaterials(paintbrush)) {
 			return InteractionResult.PASS;
 		}
@@ -352,33 +352,33 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	private static void resetBarrelMaterials(ItemStack paintbrush) {
-		paintbrush.sophisticatedLibrary_remove(ModDataComponents.BARREL_MATERIALS);
+		paintbrush.sophisticatedFabricLibrary_remove(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	public static void resetMainColor(ItemStack paintbrush) {
-		paintbrush.sophisticatedLibrary_remove(ModCoreDataComponents.MAIN_COLOR);
+		paintbrush.sophisticatedFabricLibrary_remove(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	public static void resetAccentColor(ItemStack paintbrush) {
-		paintbrush.sophisticatedLibrary_remove(ModCoreDataComponents.ACCENT_COLOR);
+		paintbrush.sophisticatedFabricLibrary_remove(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 	public static void setMainColor(ItemStack paintbrush, int mainColor) {
-		paintbrush.sophisticatedLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		paintbrush.sophisticatedFabricLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
 		resetBarrelMaterials(paintbrush);
 	}
 
 	public static void setAccentColor(ItemStack paintbrush, int secondaryColor) {
-		paintbrush.sophisticatedLibrary_set(ModCoreDataComponents.ACCENT_COLOR, secondaryColor);
+		paintbrush.sophisticatedFabricLibrary_set(ModCoreDataComponents.ACCENT_COLOR, secondaryColor);
 		resetBarrelMaterials(paintbrush);
 	}
 
 	public static void setRemainingParts(ItemStack paintbrush, Map<ResourceLocation, Integer> remainingParts) {
-		paintbrush.sophisticatedLibrary_set(ModDataComponents.REMAINING_PARTS, remainingParts);
+		paintbrush.sophisticatedFabricLibrary_set(ModDataComponents.REMAINING_PARTS, remainingParts);
 	}
 
 	public static Map<ResourceLocation, Integer> getRemainingParts(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_getOrDefault(ModDataComponents.REMAINING_PARTS, Collections.emptyMap());
+		return paintbrush.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.REMAINING_PARTS, Collections.emptyMap());
 	}
 
 	@Override
@@ -420,27 +420,27 @@ public class PaintbrushItem extends ItemBase {
 	}
 
 	private static boolean hasMainColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_has(ModCoreDataComponents.MAIN_COLOR);
+		return paintbrush.sophisticatedFabricLibrary_has(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	private static boolean hasAccentColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_has(ModCoreDataComponents.ACCENT_COLOR);
+		return paintbrush.sophisticatedFabricLibrary_has(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 	private static boolean hasBarrelMaterials(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_has(ModDataComponents.BARREL_MATERIALS);
+		return paintbrush.sophisticatedFabricLibrary_has(ModDataComponents.BARREL_MATERIALS);
 	}
 
 	public static int getMainColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
+		return paintbrush.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.MAIN_COLOR, -1);
 	}
 
 	public static int getAccentColor(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
+		return paintbrush.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.ACCENT_COLOR, -1);
 	}
 
 	public static Map<BarrelMaterial, ResourceLocation> getBarrelMaterials(ItemStack paintbrush) {
-		return paintbrush.sophisticatedLibrary_getOrDefault(ModDataComponents.BARREL_MATERIALS, Collections.emptyMap());
+		return paintbrush.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.BARREL_MATERIALS, Collections.emptyMap());
 	}
 
 	public record ItemRequirements(List<ItemStack> itemsPresent, List<ItemStack> itemsMissing) {}

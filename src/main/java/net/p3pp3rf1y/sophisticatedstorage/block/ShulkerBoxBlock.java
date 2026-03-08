@@ -121,7 +121,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 		}
 
 		player.awardStat(Stats.CUSTOM.get(Stats.OPEN_SHULKER_BOX));
-		player.sophisticatedCore_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, pos),
+		player.sophisticatedFabricLibrary_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, pos),
 				WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())), pos);
 		PiglinAi.angerNearbyPiglins(player, true);
 		return InteractionResult.CONSUME;
@@ -134,7 +134,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
 		WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).ifPresent(be -> {
-			UUID storageUuid = stack.sophisticatedLibrary_get(ModCoreDataComponents.STORAGE_UUID);
+			UUID storageUuid = stack.sophisticatedFabricLibrary_get(ModCoreDataComponents.STORAGE_UUID);
 			if (storageUuid != null) {
 				ItemContentsStorage itemContentsStorage = ItemContentsStorage.get();
 				be.loadAdditional(itemContentsStorage.getOrCreateStorageContents(storageUuid), level.registryAccess());
@@ -227,7 +227,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 		shulkerContents.remove(IControllerBoundable.CONTROLLER_POS_TAG);
 		if (!shulkerContents.isEmpty()) {
 			ItemContentsStorage.get().setStorageContents(shulkerBoxUuid, shulkerContents);
-			stack.sophisticatedLibrary_set(ModCoreDataComponents.STORAGE_UUID, shulkerBoxUuid);
+			stack.sophisticatedFabricLibrary_set(ModCoreDataComponents.STORAGE_UUID, shulkerBoxUuid);
 		}
 		addBasicPropertiesToStack(stack, be, storageWrapper);
 		StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
@@ -235,7 +235,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 
 	private void addBasicPropertiesToStack(ItemStack stack, StorageBlockEntity be, StorageWrapper storageWrapper) {
 		if (be.hasCustomName()) {
-			stack.sophisticatedLibrary_set(DataComponents.CUSTOM_NAME, be.getCustomName());
+			stack.sophisticatedFabricLibrary_set(DataComponents.CUSTOM_NAME, be.getCustomName());
 		}
 		if (stack.getItem() instanceof ShulkerBoxItem shulkerBoxItem) {
 			int mainColor = storageWrapper.getMainColor();
@@ -327,13 +327,13 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 	}
 
 	@Override
-	public boolean sophisticatedLibrary_addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+	public boolean sophisticatedFabricLibrary_addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
 		level.sendParticles(new CustomTintTerrainParticleData(state1, pos), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15D);
 		return true;
 	}
 
 	@Override
-	public boolean sophisticatedLibrary_addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
+	public boolean sophisticatedFabricLibrary_addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
 		Vec3 vec3 = entity.getDeltaMovement();
 		level.addParticle(new CustomTintTerrainParticleData(state, pos),
 				entity.getX() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(), entity.getY() + 0.1D, entity.getZ() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(),

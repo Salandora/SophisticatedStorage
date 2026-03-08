@@ -23,7 +23,7 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	}
 
 	public static Optional<CompoundTag> getEntityWrapperTagFromStack(SophisticatedDataComponentHolder componentHolder) {
-		CustomData customData = componentHolder.sophisticatedLibrary_get(() -> DataComponents.BLOCK_ENTITY_DATA);
+		CustomData customData = componentHolder.sophisticatedFabricLibrary_get(() -> DataComponents.BLOCK_ENTITY_DATA);
 		if (customData == null) {
 			return Optional.empty();
 		}
@@ -33,34 +33,34 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	public static Optional<Integer> getMainColorFromComponentHolder(SophisticatedDataComponentHolder componentHolder) {
 		return getEntityWrapperTagFromStack(componentHolder)
 				.flatMap(tag -> tag.contains(StorageWrapper.MAIN_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.MAIN_COLOR_TAG)) : Optional.empty())
-				.or(() -> Optional.ofNullable(componentHolder.sophisticatedLibrary_get(ModCoreDataComponents.MAIN_COLOR)));
+				.or(() -> Optional.ofNullable(componentHolder.sophisticatedFabricLibrary_get(ModCoreDataComponents.MAIN_COLOR)));
 	}
 
 	public static Optional<Integer> getAccentColorFromComponentHolder(SophisticatedDataComponentHolder componentHolder) {
 		return getEntityWrapperTagFromStack(componentHolder)
 				.flatMap(tag -> tag.contains(StorageWrapper.ACCENT_COLOR_TAG) ? Optional.of(tag.getInt(StorageWrapper.ACCENT_COLOR_TAG)) : Optional.empty())
-				.or(() -> Optional.ofNullable(componentHolder.sophisticatedLibrary_get(ModCoreDataComponents.ACCENT_COLOR)));
+				.or(() -> Optional.ofNullable(componentHolder.sophisticatedFabricLibrary_get(ModCoreDataComponents.ACCENT_COLOR)));
 	}
 
 	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
+		storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
 	}
 
 	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
+		storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
 	}
 
 	public static int getNumberOfInventorySlots(ItemStack storageStack) {
-		return storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
+		return storageStack.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0);
 	}
 
 	public static int getNumberOfUpgradeSlots(ItemStack storageStack) {
-		return storageStack.sophisticatedLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
+		return storageStack.sophisticatedFabricLibrary_getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0);
 	}
 
 	@Override
 	public void setMainColor(ItemStack storageStack, int mainColor) {
-		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
+		storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.MAIN_COLOR, mainColor);
 	}
 
 	@Override
@@ -70,17 +70,17 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 
 	@Override
 	public void setAccentColor(ItemStack storageStack, int accentColor) {
-		storageStack.sophisticatedLibrary_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
+		storageStack.sophisticatedFabricLibrary_set(ModCoreDataComponents.ACCENT_COLOR, accentColor);
 	}
 
 	@Override
 	public void removeMainColor(ItemStack stack) {
-		stack.sophisticatedLibrary_remove(ModCoreDataComponents.MAIN_COLOR);
+		stack.sophisticatedFabricLibrary_remove(ModCoreDataComponents.MAIN_COLOR);
 	}
 
 	@Override
 	public void removeAccentColor(ItemStack stack) {
-		stack.sophisticatedLibrary_remove(ModCoreDataComponents.ACCENT_COLOR);
+		stack.sophisticatedFabricLibrary_remove(ModCoreDataComponents.ACCENT_COLOR);
 	}
 
 	@Override
@@ -89,14 +89,14 @@ public class StorageBlockItem extends BlockItemBase implements ITintableBlockIte
 	}
 
 	public static boolean showsTier(ItemStack stack) {
-		return stack.sophisticatedLibrary_getOrDefault(ModDataComponents.SHOWS_TIER, true);
+		return stack.sophisticatedFabricLibrary_getOrDefault(ModDataComponents.SHOWS_TIER, true);
 	}
 
 	public static void setShowsTier(ItemStack stack, boolean showsTier) {
 		if (showsTier) {
-			stack.sophisticatedLibrary_remove(ModDataComponents.SHOWS_TIER);
+			stack.sophisticatedFabricLibrary_remove(ModDataComponents.SHOWS_TIER);
 		} else {
-			stack.sophisticatedLibrary_set(ModDataComponents.SHOWS_TIER, false);
+			stack.sophisticatedFabricLibrary_set(ModDataComponents.SHOWS_TIER, false);
 		}
 	}
 }

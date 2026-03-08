@@ -169,7 +169,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	protected abstract String getStorageType();
 
 	protected void onUpgradeCachesInvalidated() {
-		sophisticatedLibrary_invalidateCapabilities();
+		sophisticatedFabricLibrary_invalidateCapabilities();
 	}
 
 	public boolean isOpen() {
@@ -270,7 +270,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void sophisticatedLibrary_onLoad() {
+	public void sophisticatedFabricLibrary_onLoad() {
 		// super.sophisticatedCore_onLoad();
 		storageWrapper.onInit();
 		registerWithControllerOnLoad();
@@ -292,7 +292,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void sophisticatedLibrary_onChunkUnloaded() {
+	public void sophisticatedFabricLibrary_onChunkUnloaded() {
 		// super.sophisticatedCore_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
@@ -512,7 +512,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
 			contentsFilteredItemHandler = null;
-			sophisticatedLibrary_invalidateCapabilities();
+			sophisticatedFabricLibrary_invalidateCapabilities();
 		}
 		setChanged();
 		WorldHelper.notifyBlockUpdate(this);
@@ -532,7 +532,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 		updateEmptySlots();
 		if (allowsEmptySlotsMatchingItemInsertsWhenLocked()) {
 			contentsFilteredItemHandler = null;
-			sophisticatedLibrary_invalidateCapabilities();
+			sophisticatedFabricLibrary_invalidateCapabilities();
 		}
 		setChanged();
 		setUpdateBlockRender();

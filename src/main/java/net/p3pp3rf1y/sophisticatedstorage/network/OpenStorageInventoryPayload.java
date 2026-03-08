@@ -28,7 +28,7 @@ public record OpenStorageInventoryPayload(BlockPos pos) implements CustomPacketP
 	}
 
 	public static void handlePayload(OpenStorageInventoryPayload payload, IPayloadContext context) {
-		context.player().sophisticatedCore_openMenu(
+		context.player().sophisticatedFabricLibrary_openMenu(
 				new SophisticatedMenuProvider(
 						(w, p, pl) -> instantiateContainerMenu(w, pl, payload.pos),
 						WorldHelper.getBlockEntity(context.player().level(), payload.pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty()),

@@ -75,7 +75,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void initDirections(Level level, BlockPos pos) {
-		if (upgrade.sophisticatedLibrary_has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.sophisticatedLibrary_has(ModDataComponents.PULL_DIRECTIONS)) {
+		if (upgrade.sophisticatedFabricLibrary_has(ModDataComponents.PUSH_DIRECTIONS) || upgrade.sophisticatedFabricLibrary_has(ModDataComponents.PULL_DIRECTIONS)) {
 			return;
 		}
 		BlockState state = level.getBlockState(pos);
@@ -267,23 +267,23 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	private void serializePullDirections() {
-		upgrade.sophisticatedLibrary_set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
+		upgrade.sophisticatedFabricLibrary_set(ModDataComponents.PULL_DIRECTIONS, Set.copyOf(pullDirections));
 		save();
 	}
 
 	private void serializePushDirections() {
-		upgrade.sophisticatedLibrary_set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
+		upgrade.sophisticatedFabricLibrary_set(ModDataComponents.PUSH_DIRECTIONS, Set.copyOf(pushDirections));
 		save();
 	}
 
 	public void deserialize() {
 		pullDirections.clear();
 		pushDirections.clear();
-		Set<Direction> directions = upgrade.sophisticatedLibrary_get(ModDataComponents.PULL_DIRECTIONS);
+		Set<Direction> directions = upgrade.sophisticatedFabricLibrary_get(ModDataComponents.PULL_DIRECTIONS);
 		if (directions != null) {
 			pullDirections.addAll(directions);
 		}
-		directions = upgrade.sophisticatedLibrary_get(ModDataComponents.PUSH_DIRECTIONS);
+		directions = upgrade.sophisticatedFabricLibrary_get(ModDataComponents.PUSH_DIRECTIONS);
 		if (directions != null) {
 			pushDirections.addAll(directions);
 		}

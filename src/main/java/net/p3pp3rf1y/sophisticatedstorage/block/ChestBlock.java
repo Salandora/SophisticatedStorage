@@ -296,7 +296,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_CHEST));
 
-			player.sophisticatedCore_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, mainChestPos), b.getDisplayName()), mainChestPos);
+			player.sophisticatedFabricLibrary_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, mainChestPos), b.getDisplayName()), mainChestPos);
 
 			PiglinAi.angerNearbyPiglins(player, true);
 

@@ -1,8 +1,8 @@
 package net.p3pp3rf1y.sophisticatedstorage.settings;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.settings.ISettingsCategory;
@@ -22,8 +22,8 @@ public abstract class StorageSettingsHandler extends SettingsHandler {
 	}
 
 	private static void onPlayerClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
-		CompoundTag oldData = oldPlayer.sophisticatedLibrary_getCustomData();
-		CompoundTag newData = newPlayer.sophisticatedLibrary_getCustomData();
+		CompoundTag oldData = oldPlayer.sophisticatedFabricLibrary_getCustomData();
+		CompoundTag newData = newPlayer.sophisticatedFabricLibrary_getCustomData();
 
 		if (oldData.contains(SOPHISTICATED_STORAGE_SETTINGS_PLAYER_TAG)) {
 			//noinspection ConstantConditions

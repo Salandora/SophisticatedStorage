@@ -41,7 +41,7 @@ public class ShulkerBoxFromVanillaShapelessRecipe extends ShapelessRecipe implem
 	public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
 		ItemStack upgradedStorage = super.assemble(input, registries);
 		getVanillaShulkerBox(input).ifPresent(vanillaShulkerBox -> {
-			@Nullable IItemHandler itemCap = vanillaShulkerBox.sophisticatedLibrary_getCapability(Capabilities.ItemHandler.ITEM);
+			@Nullable IItemHandler itemCap = vanillaShulkerBox.sophisticatedFabricLibrary_getCapability(Capabilities.ItemHandler.ITEM);
 			if (itemCap != null) {
 				StackStorageWrapper wrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
 				InventoryHelper.iterate(itemCap, (slot, stack) -> {
