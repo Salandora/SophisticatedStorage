@@ -24,7 +24,7 @@ public class ClientStorageContentsTooltip extends ClientStorageContentsTooltipBa
 
 	@Override
 	public void renderImage(Font font, int leftX, int topY, GuiGraphics guiGraphics) {
-		storageItem.sophisticatedLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance()).ifPresent(wrapper -> renderTooltip(wrapper, font, leftX, topY, guiGraphics));
+		storageItem.sophisticatedFabricLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance()).ifPresent(wrapper -> renderTooltip(wrapper, font, leftX, topY, guiGraphics));
 	}
 
 	public ClientStorageContentsTooltip(StorageContentsTooltip tooltip) {

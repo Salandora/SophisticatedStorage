@@ -274,8 +274,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void sophisticatedLibrary_onLoad() {
-		SophisticatedBlockEntity.super.sophisticatedLibrary_onLoad();
+	public void sophisticatedFabricLibrary_onLoad() {
+		SophisticatedBlockEntity.super.sophisticatedFabricLibrary_onLoad();
 		storageWrapper.onInit();
 		registerWithControllerOnLoad();
 	}
@@ -296,8 +296,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void sophisticatedLibrary_onChunkUnloaded() {
-		SophisticatedBlockEntity.super.sophisticatedLibrary_onChunkUnloaded();
+	public void sophisticatedFabricLibrary_onChunkUnloaded() {
+		SophisticatedBlockEntity.super.sophisticatedFabricLibrary_onChunkUnloaded();
 		chunkBeingUnloaded = true;
 	}
 
@@ -396,8 +396,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	}
 
 	@Override
-	public void sophisticatedLibrary_invalidateCaps() {
-		SophisticatedBlockEntity.super.sophisticatedLibrary_invalidateCaps();
+	public void sophisticatedFabricLibrary_invalidateCaps() {
+		SophisticatedBlockEntity.super.sophisticatedFabricLibrary_invalidateCaps();
 		invalidateStorageCap();
 	}
 

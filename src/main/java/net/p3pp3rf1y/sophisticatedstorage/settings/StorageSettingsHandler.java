@@ -22,8 +22,8 @@ public abstract class StorageSettingsHandler extends SettingsHandler {
 	}
 
 	private static void onPlayerClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
-		CompoundTag oldData = oldPlayer.sophisticatedLibrary_getCustomData();
-		CompoundTag newData = newPlayer.sophisticatedLibrary_getCustomData();
+		CompoundTag oldData = oldPlayer.sophisticatedFabricLibrary_getCustomData();
+		CompoundTag newData = newPlayer.sophisticatedFabricLibrary_getCustomData();
 
 		if (oldData.contains(SOPHISTICATED_STORAGE_SETTINGS_PLAYER_TAG)) {
 			//noinspection ConstantConditions

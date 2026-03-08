@@ -69,7 +69,7 @@ public class StorageTierUpgradeItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult sophisticatedLibrary_onItemUseFirst(ItemStack stack, UseOnContext context) {
+	public InteractionResult sophisticatedFabricLibrary_onItemUseFirst(ItemStack stack, UseOnContext context) {
 		Level level = context.getLevel();
 		if (level.isClientSide) {
 			return InteractionResult.PASS;

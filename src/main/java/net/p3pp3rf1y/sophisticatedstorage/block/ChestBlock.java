@@ -189,7 +189,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		}
 
 		Direction direction = context.getHorizontalDirection().getOpposite();
-		return chestBeingPlaced.sophisticatedLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance())
+		return chestBeingPlaced.sophisticatedFabricLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance())
 				.filter(StackStorageWrapper::hasContents)
 				.map(wrapper ->
 						getStateForPlacement(context, direction, fluidstate,
@@ -287,7 +287,7 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 			}
 
 			player.awardStat(Stats.CUSTOM.get(Stats.OPEN_CHEST));
-			player.sophisticatedLibrary_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, mainChestPos), b.getDisplayName()), mainChestPos);
+			player.sophisticatedFabricLibrary_openMenu(new SimpleMenuProvider((w, p, pl) -> new StorageContainerMenu(w, pl, mainChestPos), b.getDisplayName()), mainChestPos);
 			PiglinAi.angerNearbyPiglins(player, true);
 
 			return InteractionResult.CONSUME;

@@ -45,7 +45,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		if (isPacked(stack)) {
 			if (flagIn == TooltipFlag.ADVANCED) {
-				stack.sophisticatedLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance())
+				stack.sophisticatedFabricLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance())
 						.ifPresent(w -> w.getContentsUuid().ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY))));
 			}
 			if (!Screen.hasShiftDown()) {

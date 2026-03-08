@@ -198,7 +198,7 @@ public class LimitedBarrelBlockEntity extends BarrelBlockEntity implements ICoun
 	private boolean depositFromAllOfPlayersInventory(Player player, int slot, InventoryHandler invHandler, ItemStack stackInSlot, MemorySettingsCategory memorySettings) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		Predicate<ItemStack> memoryItemMatches = itemStack -> memorySettings.isSlotSelected(slot) && memorySettings.matchesFilter(slot, itemStack);
-		player.sophisticatedLibrary_getCapability(Capabilities.ItemHandler.ENTITY, null).ifPresent(
+		player.sophisticatedFabricLibrary_getCapability(Capabilities.ItemHandler.ENTITY, null).ifPresent(
 				playerInventory -> InventoryHelper.iterate(playerInventory, (playerSlot, playerStack) -> {
 					if ((stackInSlot.isEmpty() && (memoryItemMatches.test(playerStack) || invHandler.isFilterItem(playerStack.getItem())) || (!playerStack.isEmpty() && ItemStack.isSameItemSameTags(stackInSlot, playerStack)))) {
 

@@ -40,7 +40,7 @@ public class OpenStorageInventoryMessage {
 			return;
 		}
 
-		player.sophisticatedLibrary_openMenu(new SophisticatedMenuProvider((w, p, pl) -> instantiateContainerMenu(msg, w, pl),
+		player.sophisticatedFabricLibrary_openMenu(new SophisticatedMenuProvider((w, p, pl) -> instantiateContainerMenu(msg, w, pl),
 				WorldHelper.getBlockEntity(player.level(), msg.pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty()), false), msg.pos);
 	}
 

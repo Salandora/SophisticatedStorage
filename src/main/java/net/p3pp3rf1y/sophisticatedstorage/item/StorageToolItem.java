@@ -60,7 +60,7 @@ public class StorageToolItem extends ItemBase {
 	}
 
 	@Override
-	public InteractionResult sophisticatedLibrary_onItemUseFirst(ItemStack tool, UseOnContext context) {
+	public InteractionResult sophisticatedFabricLibrary_onItemUseFirst(ItemStack tool, UseOnContext context) {
 		BlockPos pos = context.getClickedPos();
 		Level level = context.getLevel();
 		Block blockClicked = level.getBlockState(pos).getBlock();
@@ -102,7 +102,7 @@ public class StorageToolItem extends ItemBase {
 				}
 			}
 		}
-		return super.sophisticatedLibrary_onItemUseFirst(tool, context);
+		return super.sophisticatedFabricLibrary_onItemUseFirst(tool, context);
 	}
 
 	private static <T> boolean tryToggling(BlockPos pos, Level level, Class<T> clazz, Consumer<T> toggle) {

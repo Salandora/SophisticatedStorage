@@ -48,7 +48,7 @@ public class ShulkerBoxFromVanillaShapelessRecipe extends ShapelessRecipe implem
 		ItemStack upgradedStorage = super.assemble(input, registries);
 		getVanillaShulkerBox(input).ifPresent(vanillaShulkerBox -> {
 			NonNullList<ItemStack> itemStacks = getStoredItems(vanillaShulkerBox);
-			upgradedStorage.sophisticatedLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance()).ifPresent(wrapper -> {
+			upgradedStorage.sophisticatedFabricLibrary_getLazyCapability(CapabilityStorageWrapper.getCapabilityInstance()).ifPresent(wrapper -> {
 				for (ItemStack stack : itemStacks) {
 					if (!stack.isEmpty()) {
 						wrapper.getInventoryHandler().insertItem(stack, false);

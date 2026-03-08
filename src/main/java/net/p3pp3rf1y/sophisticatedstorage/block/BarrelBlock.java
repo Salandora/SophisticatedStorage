@@ -85,13 +85,13 @@ public class BarrelBlock extends WoodStorageBlockBase {
 	}
 
 	@Override
-	public boolean sophisticatedLibrary_addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+	public boolean sophisticatedFabricLibrary_addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
 		level.sendParticles(new CustomTintTerrainParticleData(state1, pos), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15D);
 		return true;
 	}
 
 	@Override
-	public boolean sophisticatedLibrary_addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
+	public boolean sophisticatedFabricLibrary_addRunningEffects(BlockState state, Level level, BlockPos pos, Entity entity) {
 		Vec3 vec3 = entity.getDeltaMovement();
 		level.addParticle(new CustomTintTerrainParticleData(state, pos),
 				entity.getX() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(), entity.getY() + 0.1D, entity.getZ() + (level.random.nextDouble() - 0.5D) * entity.getBbWidth(),
@@ -123,7 +123,7 @@ public class BarrelBlock extends WoodStorageBlockBase {
 			}
 
 			player.awardStat(Stats.OPEN_BARREL);
-			player.sophisticatedLibrary_openMenu(
+			player.sophisticatedFabricLibrary_openMenu(
 					new SimpleMenuProvider(
 							(w, p, pl) -> instantiateContainerMenu(w, pl, pos),
 							WorldHelper.getBlockEntity(level, pos, StorageBlockEntity.class).map(StorageBlockEntity::getDisplayName).orElse(Component.empty())

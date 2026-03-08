@@ -30,7 +30,7 @@ public class ControllerBlockEntity extends ControllerBlockEntityBase implements 
 		boolean doubleClick = gameTime - lastDepositTime < 10;
 		lastDepositTime = gameTime;
 		if (doubleClick) {
-			player.sophisticatedLibrary_getCapability(Capabilities.ItemHandler.ENTITY, null).ifPresent(
+			player.sophisticatedFabricLibrary_getCapability(Capabilities.ItemHandler.ENTITY, null).ifPresent(
 					playerInventory -> InventoryHelper.iterate(playerInventory, (slot, stack) -> {
 						if (canDepositStack(stack)) {
 							ItemStack resultStack = insertItem(stack, true, false);

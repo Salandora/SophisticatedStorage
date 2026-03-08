@@ -43,7 +43,7 @@ public class SBCompat implements ICompat {
 
 				ItemStack result = input.copyWithCount(1);
 
-				return result.sophisticatedLibrary_getLazyCapability(CapabilityBackpackWrapper.getCapabilityInstance()).map(backpackWrapper -> {
+				return result.sophisticatedFabricLibrary_getLazyCapability(CapabilityBackpackWrapper.getCapabilityInstance()).map(backpackWrapper -> {
 					int originalMainColor = backpackWrapper.getMainColor();
 					int originalAccentColor = backpackWrapper.getAccentColor();
 
@@ -53,7 +53,7 @@ public class SBCompat implements ICompat {
 			}
 
 			private boolean colorsTransparentOrSameAs(ItemStack backpack, int mainColorToSet, int accentColorToSet) {
-				return backpack.sophisticatedLibrary_getLazyCapability(CapabilityBackpackWrapper.getCapabilityInstance())
+				return backpack.sophisticatedFabricLibrary_getLazyCapability(CapabilityBackpackWrapper.getCapabilityInstance())
 						.map(backpackWrapper -> (mainColorToSet == -1 || mainColorToSet == backpackWrapper.getMainColor()) && (accentColorToSet == -1 || accentColorToSet == backpackWrapper.getAccentColor()))
 						.orElse(true);
 			}
