@@ -628,7 +628,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	// fabric: we need to check if we are the server here or else the game crashes when storage blocks are in create elevator contraptions
 	@Override
 	public void setChanged() {
-		if (SophisticatedCore.getCurrentServer().isSameThread()) {
+		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread()) {
 			super.setChanged();
 		}
 	}
