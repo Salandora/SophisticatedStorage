@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 import net.p3pp3rf1y.sophisticatedcore.controller.IControllableStorage;
 import net.p3pp3rf1y.sophisticatedcore.controller.ILinkable;
 import net.p3pp3rf1y.sophisticatedcore.inventory.CachedFailedInsertInventoryHandler;
@@ -618,5 +619,13 @@ public abstract class StorageBlockEntity extends BlockEntity implements IControl
 	@SuppressWarnings("unused") //parameter used in override
 	public float getSlotFillPercentage(int slot) {
 		return 0; //only used in limited barrels
+	}
+
+	// fabric: we need to check if we are the server here or else the game crashes when storage blocks are in create elevator contraptions
+	@Override
+	public void setChanged() {
+		if (SophisticatedCore.getCurrentServer() != null && SophisticatedCore.getCurrentServer().isSameThread()) {
+			super.setChanged();
+		}
 	}
 }
