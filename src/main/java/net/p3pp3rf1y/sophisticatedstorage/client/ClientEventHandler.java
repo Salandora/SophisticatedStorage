@@ -249,9 +249,9 @@ public class ClientEventHandler {
 					// and there is no full equivalent to forges event
 					state.getBlock().attack(state, level, pos, player);
 					Minecraft.getInstance().gameMode.destroyDelay = 5;
+					return InteractionResult.SUCCESS;
 				}
 			}
-			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}
