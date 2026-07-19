@@ -70,25 +70,36 @@ repositories {
     maven { url = "https://maven.resourcefulbees.com/repository/maven-public/" } // Chipped, resourcefullib, athena
     maven { url = 'https://maven.cafeteria.dev/releases/' } // NoIndium
     maven {
-        name = "GitHubPackagesCore"
-        url = uri("https://maven.pkg.github.com/Salandora/SophisticatedCore")
+        name = "SophisticatedCore GitHubPackages"
+        url = "https://maven.pkg.github.com/Salandora/SophisticatedCore"
         credentials {
             username = System.getenv("USERNAME")
             password = System.getenv("READ_PACKAGES_TOKEN")
         }
         content {
-            includeGroupByRegex "sophisticatedcore.*"
+            includeGroupAndSubgroups "sophisticatedcore"
         }
     }
     maven {
-        name = "GitHubPackagesBackpacks"
-        url = uri("https://maven.pkg.github.com/Salandora/SophisticatedBackpacks")
+        name = "SophisticatedFabricLibrary GitHubPackages"
+        url = "https://maven.pkg.github.com/Salandora/SophisticatedFabricLib"
         credentials {
             username = System.getenv("USERNAME")
             password = System.getenv("READ_PACKAGES_TOKEN")
         }
         content {
-            includeGroupByRegex "sophisticatedbackpacks.*"
+            includeGroupAndSubgroups "com.github.salandora"
+        }
+    }
+    maven {
+        name = "SophisticatedBackpacks GitHubPackages"
+        url = "https://maven.pkg.github.com/Salandora/SophisticatedBackpacks"
+        credentials {
+            username = System.getenv("USERNAME")
+            password = System.getenv("READ_PACKAGES_TOKEN")
+        }
+        content {
+            includeGroupAndSubgroups "sophisticatedbackpacks"
         }
     }
 }
