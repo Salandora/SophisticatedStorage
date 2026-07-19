@@ -277,8 +277,12 @@ dependencies {
     modCompileOnly("net.blay09.mods:craftingtweaks-fabric:${project.craftingtweaks_version}")
     modCompileOnly("net.blay09.mods:balm-fabric:${project.balm_version}")
 
-    modCompileOnly("earth.terrarium.chipped:chipped-fabric-${minecraft_version}:${project.chipped_version}")
-    modLocalRuntime("earth.terrarium.chipped:chipped-fabric-${minecraft_version}:${project.chipped_version}")
+    modCompileOnly("earth.terrarium.chipped:chipped-fabric-${minecraft_version}:${project.chipped_version}") {
+        exclude group: "com.terraformersmc", module: "modmenu"
+    }
+    modLocalRuntime("earth.terrarium.chipped:chipped-fabric-${minecraft_version}:${project.chipped_version}") {
+        exclude group: "com.terraformersmc", module: "modmenu"
+    }
 
     // Tom's Storage Network
     modCompileOnly("maven.modrinth:toms-storage:${project.toms_storage_version}")
