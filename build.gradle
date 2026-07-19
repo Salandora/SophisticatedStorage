@@ -45,7 +45,7 @@ repositories {
         name = "Fuzs Mod Resources"
         url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
     }
-    maven { url = "https://maven.nova-committee.cn/releases" } // Modern KeyBinding
+    //maven { url = "https://maven.nova-committee.cn/releases" } // Modern KeyBinding
     maven { url = "https://maven.terraformersmc.com/releases/" } // Emi
     maven { url = "https://maven.shedaniel.me/" } // REI and deps
     exclusiveContent {
